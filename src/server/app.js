@@ -1,19 +1,34 @@
-const fs = require("fs");
+const mongoose = require('mongoose');
 const express = require("express");
-const path = require("path");
-const socket = require("socket.io");
-var http = require("http");
+const auth = require("./routes/auth");
+const post = require("./routes/post");
+const dotenv = require('dotenv');
+dotenv.config({path: 'src/server/key.env'});
 
 const app = express();
 
-const server = http.createServer(app);
+app.use(express.json());
 
-app.use(express.static(path.join(__dirname, "build")));
+app.use("/auth", auth); //auth주소는 auth파일로 간다
+app.use("/post", post);
 
-app.get("/", function (request, response) {
-  response.sendFile(path.join(__dirname, "/build/index.html"));
+app.get("/", (req, res) =>{
+  res.send("Hi I am worrking");
 });
 
-server.listen(3000, function () {
-  console.log("Server on!");
+
+
+app.listen(5000, (err)=>{
+  console.log('server on');
+  if(err){
+    return console.log(err);
+  }else{
+      mongoose.connect(process.env.MONGODB_URL, {useNewUrlParser: true}, err=>{
+          if(err){
+              console.log(err);
+          }else{
+              console.log('connecte to data base successfully');
+          }
+      });
+}
 });
