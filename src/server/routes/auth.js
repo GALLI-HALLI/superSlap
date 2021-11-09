@@ -2,12 +2,16 @@ const router = require("express").Router();
 const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
+const path = require('path');
 
 //DB
 const dotenv = require('dotenv');
 dotenv.config({path: 'src/server/key.env'});
 const User = require("../models/User");
 
+router.get('/login', (req, res)=>{
+    res.render(path.join(__dirname, "../../view/login.ejs"))
+})
 
 router.post('/signup', [
     check("id", "6자 이상의 아이디를 입력해 주세요").isLength({//이메일 할거면 isEmail도 있음
@@ -81,35 +85,52 @@ router.post('/login', async (req,res) => {
     let user = await User.findOne({ "id" : id});
 
     if(!user){
-        return res.status(400).json({
-            "errors": [
-                {
-                    "msg": "유효하지 않은 아이디입니다.",
-                }
-            ]
-        });
+        console.log("here");
+        // console.log(res.json({
+        //     success: false,
+        //     msg: "유효하지 않은 아이디입니다."
+        // }));
+        const result = {success: false,
+            msg: "유효하지 않은 아이디입니다."};
+        console.log(result);
+        return res.json(result);
+        // return res.status(400).json({
+        //     "errors": [
+        //         {
+        //             "msg": "유효하지 않은 아이디입니다.",
+        //         }
+        //     ],
+        //     success: false
+        // });
     }
 
+    console.log("아이디 있음");
     let isMatch = await bcrypt.compare(password, user.password);
 
     if(!isMatch){
-        return res.status(400).json({
-            "errors": [
-                {
-                    "msg": "비밀번호가 틀렸습니다",
-                }
-            ]
-        });
+        return res.send("비밀번호");
+        // return res.send({
+        //     success:false,
+        //     msg:"비밀번호가 틀렸습니다"
+        // }));
+        // return res.status(400).json({
+        //     "errors": [
+        //         {
+        //             "msg": "비밀번호가 틀렸습니다",
+        //             success: false
+        //         }
+        //     ]
+        // });
     }
-
+    console.log("비밀번호 확인");
     const token = await JWT.sign({
         id
     }, process.env.JWT_KEY, { //여기 있는거 시크릿키임
         expiresIn: 3600000 //2시간동안 토큰 있음
     });
 
-    res.json({
-        token
+    return res.json({
+        token, success:true
     });
 });
 

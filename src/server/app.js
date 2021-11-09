@@ -7,6 +7,11 @@ dotenv.config({path: 'src/server/key.env'});
 
 const app = express();
 
+//앱세팅-front
+app.set("views", "../view");
+app.set("view engine", "ejs");
+app.use(express.static(`${__dirname}/routes`));
+
 app.use(express.json());
 
 app.use("/auth", auth); //auth주소는 auth파일로 간다
@@ -15,8 +20,6 @@ app.use("/post", post);
 app.get("/", (req, res) =>{
   res.send("Hi I am worrking");
 });
-
-
 
 app.listen(5000, (err)=>{
   console.log('server on');
@@ -27,7 +30,7 @@ app.listen(5000, (err)=>{
           if(err){
               console.log(err);
           }else{
-              console.log('connecte to data base successfully');
+              console.log('connected to data base successfully');
           }
       });
 }
