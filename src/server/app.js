@@ -7,6 +7,16 @@ dotenv.config({path: 'src/server/key.env'});
 
 const app = express();
 
+// google-oauth
+const passport  = require('passport');
+const session   = require('express-session');  // express-session 설정이 반드시 passport-session 위에 있어야 함
+app.use(session({secret:'MySecret', resave: false, saveUninitialized:true}));
+
+// Passport setting
+app.use(passport.initialize());
+app.use(passport.session());
+app.use('/google-auth', require('./routes/google-auth'));
+
 //앱세팅-front
 app.set("views", "../view");
 app.set("view engine", "ejs");
@@ -26,7 +36,7 @@ app.listen(5000, (err)=>{
   if(err){
     return console.log(err);
   }else{
-      mongoose.connect("mongodb+srv://root:1234@namu.slulh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {useNewUrlParser: true}, err=>{
+      mongoose.connect(process.env.MONGODB_URL, {useNewUrlParser: true}, err=>{
           if(err){
               console.log(err);
           }else{
