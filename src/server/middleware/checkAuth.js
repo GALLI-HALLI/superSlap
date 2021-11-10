@@ -3,7 +3,8 @@ const dotenv = require('dotenv');
 dotenv.config({path: 'src/server/key.env'});
 
 module.exports = async (req,res,next) => {
-    const token = req.header('x-auth-token');
+    // const token = req.header('x-auth-token');
+    const token = localStorage.getItem('jwt');
 
     if(!token){
         return res.status(400).json({

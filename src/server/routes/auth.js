@@ -4,6 +4,12 @@ const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
 const path = require('path');
 
+const LocalStorage = require('node-localstorage').LocalStorage;
+localStorage = new LocalStorage('./scratch')
+
+const wrap = require('express-async-wrap');
+const asyncHandler = require('express-async-handler');
+
 //DB
 const dotenv = require('dotenv');
 dotenv.config({path: 'src/server/key.env'});
@@ -81,46 +87,20 @@ router.post('/signup', [
 
 router.post('/login', async (req,res) => {
     const {password, id} = req.body;
-
     let user = await User.findOne({ "id" : id});
 
     if(!user){
         console.log("here");
-        // console.log(res.json({
-        //     success: false,
-        //     msg: "유효하지 않은 아이디입니다."
-        // }));
-        const result = {success: false,
-            msg: "유효하지 않은 아이디입니다."};
-        console.log(result);
-        return res.json(result);
-        // return res.status(400).json({
-        //     "errors": [
-        //         {
-        //             "msg": "유효하지 않은 아이디입니다.",
-        //         }
-        //     ],
-        //     success: false
-        // });
+        return res.json({success: false,
+            msg: "유효하지 않은 아이디입니다."});
     }
 
     console.log("아이디 있음");
     let isMatch = await bcrypt.compare(password, user.password);
 
     if(!isMatch){
-        return res.send("비밀번호");
-        // return res.send({
-        //     success:false,
-        //     msg:"비밀번호가 틀렸습니다"
-        // }));
-        // return res.status(400).json({
-        //     "errors": [
-        //         {
-        //             "msg": "비밀번호가 틀렸습니다",
-        //             success: false
-        //         }
-        //     ]
-        // });
+        return res.json({success: false,
+            msg: "유효하지 않은 비밀번호입니다."});
     }
     console.log("비밀번호 확인");
     const token = await JWT.sign({
@@ -128,6 +108,9 @@ router.post('/login', async (req,res) => {
     }, process.env.JWT_KEY, { //여기 있는거 시크릿키임
         expiresIn: 3600000 //2시간동안 토큰 있음
     });
+
+    // localStorage.setItem('jwt', token);
+    // res.setheader("x-auth-token",token);
 
     return res.json({
         token, success:true
