@@ -7,11 +7,14 @@ const id = document.querySelector('#id'),
 
 loginBtn.addEventListener("click", login);
 
-function login(){
+
+function login(e){
+    e.preventDefault();
+
     const req={
         id: id.value,
         password: password.value,
-    };
+    }
     
     fetch("/auth/login",{
         method: "POST",
@@ -21,17 +24,16 @@ function login(){
         body: JSON.stringify(req)
     }).then((res) => res.json())
     .then((res) => {
-        console.log(res);
-        console.log("hihihihihi");
+
         if(res.success){
             location.href = "/post/private";
+            setheader("x-auth-token",res.token);
         }else{
             alert(res.msg);
         }
     })
     .catch((err)=>{
-        console.log("ksdgjlasgkfl");
-        // console.error(new Error("로그인 중 에러발생"));
-        // console.error("로그인 중 에러발생");
+        console.log(err);
+        console.error("로그인 중 에러발생");
     })
 }
