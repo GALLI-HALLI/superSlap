@@ -1,0 +1,53 @@
+@mixin inputBox {
+  width: 300px;
+  height: 30px;
+  border: none;
+  border-radius: 10px;
+}
+
+@mixin btnStyle {
+  width: 80px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: #974dcb;
+  &:hover {
+    background: #6937a1;
+  }
+}
+
+.MainPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+  flex-direction: column;
+  font-family: "Jua-Regular";
+
+  .LogoImg {
+    width: 300px;
+    height: 150px;
+  }
+  .InputContainer {
+    margin-right: auto;
+    align-items: left;
+  }
+  .SubmitBtnContainer {
+    display: flex;
+    padding-top: 10px;
+    justify-content: flex-end;
+    .SubmitBtn {
+      margin-right: 10px;
+      @include btnStyle();
+    }
+    .RegiBtn {
+      @include btnStyle();
+    }
+  }
+  .LoginIdInputBox {
+    @include inputBox();
+  }
+  .LoginPwInputBox {
+    @include inputBox();
+  }
+}
