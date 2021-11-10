@@ -1,14 +1,11 @@
 import React from "react";
-import LOGO from "../../image/LOGO.png";
 import "../../pages/MainPage.scss";
 import FormInput from "./FormInput";
+import { Link } from "react-router-dom";
 
 const InputForm = () => {
   return (
     <form>
-      <div>
-        <img className="LogoImg" alt="MainLogo" src={LOGO} />
-      </div>
       <div className="InputContainer">
         <FormInput
           name="id"
@@ -25,7 +22,9 @@ const InputForm = () => {
         <button type="submit" className="SubmitBtn">
           로그인
         </button>
-        <button className="RegiBtn">회원가입</button>
+        <Link to="/register">
+          <button className="RegiBtn">회원가입</button>
+        </Link>
       </div>
     </form>
   );
