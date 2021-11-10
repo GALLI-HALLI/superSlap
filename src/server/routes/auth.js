@@ -6,6 +6,12 @@ const path = require("path");
 const passport = require("../config/passport");
 const asyncHandler = require("express-async-handler");
 
+const LocalStorage = require('node-localstorage').LocalStorage;
+localStorage = new LocalStorage('./scratch')
+
+const wrap = require('express-async-wrap');
+const asyncHandler = require('express-async-handler');
+
 //DB
 const User = require("../models/User");
 
