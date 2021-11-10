@@ -2,7 +2,7 @@ const passport         = require('passport');
 const GoogleStrategy   = require('passport-google-oauth2').Strategy;
 const dotenv = require("dotenv");
 
-dotenv.config({path : "src/server/key.env"});
+dotenv.config();
 
 passport.serializeUser(function(user, done) {   // user를 session에 저장
   done(null, user);

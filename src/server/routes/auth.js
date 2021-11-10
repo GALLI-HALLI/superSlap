@@ -15,6 +15,20 @@ const dotenv = require('dotenv');
 dotenv.config({path: 'src/server/key.env'});
 const User = require("../models/User");
 
+// google-oauth
+const passport = require('../config/passport');
+router.get('/google',
+  passport.authenticate('google', { scope: ['email', 'profile'] })   // 구글 로그인 페이지로 이동하여 로그인 이루어짐
+);
+
+router.get('/google/callback',  // 로그인 성공 시 callbackURL 설정에 따라 이 라우터로 이동
+  passport.authenticate('google'), authSuccess  // 여기서 callback 함수 호출
+);
+
+function authSuccess(req, res) {
+  res.redirect('/');
+}
+
 router.get('/login', (req, res)=>{
     res.render(path.join(__dirname, "../../view/login.ejs"))
 })
@@ -105,7 +119,6 @@ router.post('/login', async (req,res) => {
     console.log("비밀번호 확인");
     const token = await JWT.sign({
         id
-    // }, "ddddddddddddd", {    
     }, process.env.JWT_KEY, { //여기 있는거 시크릿키임
         expiresIn: 3600000 //2시간동안 토큰 있음
     });

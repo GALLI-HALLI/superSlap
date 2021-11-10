@@ -3,7 +3,7 @@ const express = require("express");
 const auth = require("./routes/auth");
 const post = require("./routes/post");
 const dotenv = require('dotenv');
-dotenv.config({path: 'src/server/key.env'});
+dotenv.config();
 
 const app = express();
 
@@ -15,7 +15,7 @@ app.use(session({secret:'MySecret', resave: false, saveUninitialized:true}));
 // Passport setting
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/google-auth', require('./routes/google-auth'));
+app.use('/auth', require('./routes/auth'));
 
 //앱세팅-front
 app.set("views", "../view");
@@ -36,7 +36,8 @@ app.listen(5000, (err)=>{
   if(err){
     return console.log(err);
   }else{
-      mongoose.connect(process.env.MONGODB_URL, {useNewUrlParser: true}, err=>{
+      mongoose.connect("mongodb+srv://root:1234@namu.slulh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {useNewUrlParser: true}, err=>{
+      // mongoose.connect(process.env.MONGODB_URL, {useNewUrlParser: true}, err=>{
           if(err){
               console.log(err);
           }else{
