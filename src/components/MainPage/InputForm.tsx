@@ -1,6 +1,7 @@
 import React from "react";
 import LOGO from "../../image/LOGO.png";
-import "../../styles/MainPage.scss";
+import "../../pages/MainPage.scss";
+import FormInput from "./FormInput";
 
 const InputForm = () => {
   return (
@@ -9,14 +10,14 @@ const InputForm = () => {
         <img className="LogoImg" alt="MainLogo" src={LOGO} />
       </div>
       <div className="InputContainer">
-        <p>아이디</p>
-        <input
-          className="LoginIdInputBox"
+        <FormInput
+          name="id"
+          label="아이디"
           placeholder="아이디를 입력해 주세요"
         />
-        <p>비밀번호</p>
-        <input
-          className="LoginPwInputBox"
+        <FormInput
+          name="password"
+          label="비밀번호"
           placeholder="비밀번호를 입력해 주세요"
         />
       </div>

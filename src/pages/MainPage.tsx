@@ -1,6 +1,6 @@
 import React from "react";
 import InputForm from "../components/MainPage/InputForm";
-import "../styles/MainPage.scss";
+import "./MainPage.scss";
 
 const MainPage = () => {
   return (
