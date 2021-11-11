@@ -28,7 +28,7 @@ app.use("/auth", auth); //auth주소는 auth파일로 간다
 app.use("/post", post);
 
 app.get("/", (req, res) =>{
-  res.send("Hi I am worrking");
+  res.send("Hi I am working");
 });
 
 app.listen(5000, (err)=>{
