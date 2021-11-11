@@ -10,10 +10,10 @@ localStorage = new LocalStorage('./scratch')
 
 const wrap = require('express-async-wrap');
 const asyncHandler = require('express-async-handler');
+const dotenv = require('dotenv');
 
 //DB
-const dotenv = require('dotenv');
-dotenv.config({path: 'src/server/key.env'});
+dotenv.config();
 const User = require("../models/User");
 
 // google-oauth

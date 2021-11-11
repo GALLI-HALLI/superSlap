@@ -15,7 +15,6 @@ app.use(session({secret:'MySecret', resave: false, saveUninitialized:true}));
 // Passport setting
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/auth', require('./routes/auth'));
 
 //앱세팅-front
 app.set("views", "../view");
@@ -23,6 +22,7 @@ app.set("view engine", "ejs");
 app.use(express.static(`${__dirname}/routes`));
 
 app.use(express.json());
+app.use(express.urlencoded({extend: true}));
 
 app.use("/auth", auth); //auth주소는 auth파일로 간다
 app.use("/post", post);
