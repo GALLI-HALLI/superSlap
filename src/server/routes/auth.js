@@ -8,12 +8,9 @@ const passport = require('../config/passport');
 const LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = new LocalStorage('./scratch')
 
-const wrap = require('express-async-wrap');
-const asyncHandler = require('express-async-handler');
-
 //DB
 const dotenv = require('dotenv');
-dotenv.config({path: 'src/server/key.env'});
+dotenv.config();
 const User = require("../models/User");
 
 // google-oauth
@@ -104,7 +101,6 @@ router.post('/login', async (req,res) => {
     let user = await User.findOne({ "id" : id});
 
     if(!user){
-        console.log("here");
         return res.json({success: false,
             msg: "유효하지 않은 아이디입니다."});
     }

@@ -15,7 +15,6 @@ app.use(session({secret:'MySecret', resave: false, saveUninitialized:true}));
 // Passport setting
 app.use(passport.initialize());
 app.use(passport.session());
-app.use('/auth', require('./routes/auth'));
 
 //앱세팅-front
 app.set("views", "../view");
