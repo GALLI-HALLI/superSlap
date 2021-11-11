@@ -14,21 +14,25 @@ const userSchema = new Schema({
         unique:true,
     },
     password:{
+        type:String
+        // required:true,
+    },
+    type: {
         type:String,
-        required:true,
+        required:true
     },
-    game1_win:{
-        type:Number,
-        default:0,
-    },
-    game2_loose:{
-        type:Number,
-        default:0,
-    },
-    point:{
-        type:Number,
-        default:0,
-    }
+    // game1_win:{
+    //     type:Number,
+    //     default:0,
+    // },
+    // game2_loose:{
+    //     type:Number,
+    //     default:0,
+    // },
+    // point:{
+    //     type:Number,
+    //     default:0,
+    // }
 },{
     timestamps: true //언제 생성, 업데이트 됐는지
 })
