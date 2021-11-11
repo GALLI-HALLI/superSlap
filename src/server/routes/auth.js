@@ -98,8 +98,7 @@ router.post('/signup', [
 
 router.post('/login', async (req,res) => {
     const {password, id} = req.body;
-    let user = await User.findOne({ "id" : id});
-
+    let user = await User.findOne({ "id" : id, "type" : "S"});
     if(!user){
         return res.json({success: false,
             msg: "유효하지 않은 아이디입니다."});
@@ -123,6 +122,18 @@ router.post('/login', async (req,res) => {
     // res.setheader("x-auth-token",token);
     return res.json({
         token, success:true
+    });
+});
+
+router.post('/kakao', async (req, res) => {
+    console.log(req.body);
+     User.findOne({"id": req.body.id, "type": "K"}).then((existingUser) => {
+      if (!existingUser) {
+        new User({"id" : req.body.id,
+                  "name" : req.body.name,
+                  "type" : req.body.type
+                }).save();
+      }
     });
 });
 

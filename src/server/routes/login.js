@@ -58,8 +58,20 @@ function getinfo(){
         url: '/v2/user/me',
         success: function(res){
             console.log(res)
-            var nickname = res.kakao_account.profil_nickname
-            var email = res.kakao_account.email
+            const nickname = res.kakao_account.profile.nickname
+            const id = res.id
+            console.log(nickname, id);
+            const User = {id : id,
+                    name : nickname,
+                    type : "K"
+                }
+            fetch("/auth/kakao",{
+                method: "POST",
+                headers:{
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(User)
+            })
         },
         fail: function(error){
             alert('ERROR', JSON.stringify(error))

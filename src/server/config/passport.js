@@ -21,7 +21,7 @@ passport.use(new GoogleStrategy(
     passReqToCallback   : true
   }, function(request, accessToken, refreshToken, profile, done){
     console.log('profile: ', profile);
-    User.findOne({"id": profile.email}).then((existingUser) => {
+    User.findOne({"id": profile.email, "type" : "G"}).then((existingUser) => {
       if (existingUser) {
         done(null, existingUser);
       } else {
@@ -31,14 +31,6 @@ passport.use(new GoogleStrategy(
                 }).save().then((user) => {
                   done(null, user);
                 })
-        // const hashedPassword = bcrypt.hash(profile.sub, 10);
-        // let gUser = new User({"id" : profile.email,
-        //           "name" : profile.displayName,
-        //           "password" : hashedPassword
-        //         })
-        // gUser.save().then((user) => {
-        //   done(null, user);
-        // })
       }
     });
   }
