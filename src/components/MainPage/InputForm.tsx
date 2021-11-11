@@ -1,7 +1,6 @@
-import React from "react";
-import "../../pages/MainPage.scss";
 import FormInput from "./FormInput";
 import { Link } from "react-router-dom";
+import styles from "./InputForm.module.scss";
 
 const InputForm = () => {
   return (
@@ -15,11 +14,12 @@ const InputForm = () => {
         <FormInput
           name="password"
           label="비밀번호"
+          type="password"
           placeholder="비밀번호를 입력해 주세요"
         />
       </div>
-      <div className="SubmitBtnContainer">
-        <button type="submit" className="SubmitBtn">
+      <div className={styles.SubmitBtnContainer}>
+        <button type="submit" className={styles.SubmitBtn}>
           로그인
         </button>
         <Link to="/register">

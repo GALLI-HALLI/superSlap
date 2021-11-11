@@ -17,21 +17,8 @@
   flex-direction: column;
   font-family: "Jua-Regular";
 
-  .LogoImg {
-    width: 300px;
-    height: 150px;
-  }
   .InputContainer {
     margin-right: auto;
     align-items: left;
-  }
-  .SubmitBtnContainer {
-    display: flex;
-    padding-top: 10px;
-    justify-content: flex-end;
-
-    .SubmitBtn {
-      margin-right: 10px;
-    }
   }
 }

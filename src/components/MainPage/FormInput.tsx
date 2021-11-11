@@ -1,10 +1,10 @@
 import React, { InputHTMLAttributes, useEffect, useState } from "react";
-import { unPack } from "../../utils/util";
+import { unPack } from "../../utils/promise";
 import styles from "./FormInput.module.scss";
 
 type TFormInputProps = {
   label: string;
-  onChange?: ({ value, isValid }: { value: string; isValid: boolean }) => void;
+  onChange?: (data: { value: string; isValid: boolean }) => void;
   message?: { valid: string; invalid: string };
   validator?: (value: string) => Promise<boolean> | boolean;
   // 인풋 앨리먼트가 가지고있는 prop중 onChange를 제외하고 타입선언
@@ -27,8 +27,6 @@ const FormInput = ({
   const [value, setValue] = useState("");
   const [status, setStatus] = useState(ValidStatus.Idle);
 
-  console.log(styles);
-
   const hanedleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
     if (status === ValidStatus.Idle) {
@@ -38,6 +36,10 @@ const FormInput = ({
 
   const getMessage = () => {
     if (!message) {
+      return null;
+    }
+    // value가 없다면 안내문구 글귀 제거
+    if (value.length === 0) {
       return null;
     }
     if ([ValidStatus.Idle, ValidStatus.Edited].includes(status)) {
@@ -74,7 +76,13 @@ const FormInput = ({
         onChange={hanedleChange}
         {...props}
       />
-      <div>{getMessage()}</div>
+      <div
+        style={
+          status === ValidStatus.Invalid ? { color: "red" } : { color: "black" }
+        }
+      >
+        {getMessage()}
+      </div>
     </div>
   );
 };
