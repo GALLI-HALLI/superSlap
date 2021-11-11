@@ -8,9 +8,6 @@ const RegisterPage = () => {
       <div>
         <p>아이디</p>
         <input placeholder="아이디를 입력해 주세요" />
-        <div className="IdCheck">
-          <button>중복확인</button>
-        </div>
         <p>닉네임</p>
         <input placeholder="닉네임을 입력해 주세요" />
         <p>비밀번호</p>
