@@ -1,6 +1,8 @@
 const passport         = require('passport');
 const GoogleStrategy   = require('passport-google-oauth2').Strategy;
 const dotenv = require("dotenv");
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
 
 dotenv.config();
 
@@ -19,9 +21,26 @@ passport.use(new GoogleStrategy(
     passReqToCallback   : true
   }, function(request, accessToken, refreshToken, profile, done){
     console.log('profile: ', profile);
-    let user = profile;
-
-    done(null, user);   // user를 passport.serializeUser에 전달
+    User.findOne({"id": profile.email}).then((existingUser) => {
+      if (existingUser) {
+        done(null, existingUser);
+      } else {
+        new User({"id" : profile.email,
+                  "name" : profile.displayName,
+                  "password" : profile.sub
+                }).save().then((user) => {
+                  done(null, user);
+                })
+        // const hashedPassword = bcrypt.hash(profile.sub, 10);
+        // let gUser = new User({"id" : profile.email,
+        //           "name" : profile.displayName,
+        //           "password" : hashedPassword
+        //         })
+        // gUser.save().then((user) => {
+        //   done(null, user);
+        // })
+      }
+    });
   }
 ));
 
