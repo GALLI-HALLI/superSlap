@@ -36,8 +36,7 @@ app.listen(5000, (err)=>{
   if(err){
     return console.log(err);
   }else{
-      mongoose.connect("mongodb+srv://root:1234@namu.slulh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", {useNewUrlParser: true}, err=>{
-      // mongoose.connect(process.env.MONGODB_URL, {useNewUrlParser: true}, err=>{
+      mongoose.connect(process.env.MONGODB_URL, {useNewUrlParser: true}, err=>{
           if(err){
               console.log(err);
           }else{

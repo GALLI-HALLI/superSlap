@@ -3,6 +3,7 @@ const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
 const path = require('path');
+const passport = require('../config/passport');
 
 const LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = new LocalStorage('./scratch')
@@ -16,7 +17,6 @@ dotenv.config({path: 'src/server/key.env'});
 const User = require("../models/User");
 
 // google-oauth
-const passport = require('../config/passport');
 router.get('/google',
   passport.authenticate('google', { scope: ['email', 'profile'] })   // 구글 로그인 페이지로 이동하여 로그인 이루어짐
 );
