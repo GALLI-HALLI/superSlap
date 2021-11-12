@@ -10,7 +10,7 @@ const checkDuplicate = (value: string) =>
 
 const RegisterPage = () => {
   return (
-    <div className={styles.RegisterPage}>
+    <div className={styles.registerPage}>
       <LogoImg />
       <form>
         <div>
@@ -55,9 +55,9 @@ const RegisterPage = () => {
             }}
           />
         </div>
-        <div className={styles.RegiBtnContainer}>
+        <div className={styles.regiBtnContainer}>
           <Link to="/" onClick={() => alert("가입되었습니다!")}>
-            <button className={styles.RegiBtn}>가입 하기</button>
+            <button className={styles.regiBtn}>가입 하기</button>
           </Link>
         </div>
       </form>

@@ -9,7 +9,7 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
     <div className={styles.MainPage}>
       <LogoImg />
       <form>
-        <div className="InputContainer">
+        <div className={styles.inputContainer}>
           <FormInput
             name="id"
             label="아이디"
@@ -22,12 +22,12 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
             placeholder="비밀번호를 입력해 주세요"
           />
         </div>
-        <div className={styles.SubmitBtnContainer}>
-          <button type="submit" className={styles.SubmitBtn}>
+        <div className={styles.submitBtnContainer}>
+          <button type="submit" className={styles.submitBtn}>
             로그인
           </button>
           <Link to="/register">
-            <button className="RegiBtn">회원가입</button>
+            <button>회원가입</button>
           </Link>
         </div>
       </form>

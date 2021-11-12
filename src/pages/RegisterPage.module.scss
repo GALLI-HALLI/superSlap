@@ -13,7 +13,7 @@ button {
   @include btnStyle();
 }
 
-.RegisterPage {
+.registerPage {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,17 +21,12 @@ button {
   flex-direction: column;
   font-family: "Jua-Regular";
 
-  .InputContainer {
-    margin-right: auto;
-    align-items: left;
-  }
-
-  .RegiBtnContainer {
+  .regiBtnContainer {
     display: flex;
     justify-content: flex-end;
     margin-top: 10px;
   }
-  .RegiBtn {
+  .regiBtn {
     display: block;
   }
 }

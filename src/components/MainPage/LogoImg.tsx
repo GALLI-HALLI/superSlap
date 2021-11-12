@@ -4,7 +4,7 @@ import LOGO from "../../image/LOGO.png";
 const LogoImg = () => {
   return (
     <div>
-      <img className={styles.LogoImg} alt="MainLogo" src={LOGO} />
+      <img className={styles.logoImg} alt="MainLogo" src={LOGO} />
     </div>
   );
 };
