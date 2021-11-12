@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import "./RegisterPage.scss";
 import FormInput from "../components/MainPage/FormInput";
 import LogoImg from "../components/MainPage/LogoImg";
 import styles from "./RegisterPage.module.scss";
