@@ -1,5 +1,5 @@
 import styles from "./LogoImg.module.scss";
-import LOGO from "../../image/LOGO.png";
+import LOGO from "../../image/superSlapLogo.png";
 
 const LogoImg = () => {
   return (
