@@ -1,0 +1,32 @@
+@mixin btnStyle {
+  width: 80px;
+  height: 35px;
+  border-radius: 10px;
+  border: none;
+  background: #974dcb;
+  &:hover {
+    background: #6937a1;
+  }
+}
+
+button {
+  @include btnStyle();
+}
+
+.registerPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+  flex-direction: column;
+  font-family: "Jua-Regular";
+
+  .regiBtnContainer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+  .regiBtn {
+    display: block;
+  }
+}

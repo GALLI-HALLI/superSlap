@@ -1,12 +1,15 @@
-import React from "react";
-import "./styles/App.scss";
-import { Route } from "react-router-dom";
+import styles from "./styles/App.module.scss";
+import { Route, Switch } from "react-router-dom";
 import MainPage from "./pages/MainPage";
+import RegisterPage from "./pages/RegisterPage";
 
 function App() {
   return (
-    <div className="App">
-      <Route path="/" component={MainPage} />
+    <div className={styles.App}>
+      <Switch>
+        <Route path="/" exact component={MainPage} />
+        <Route path="/register" component={RegisterPage} />
+      </Switch>
     </div>
   );
 }
