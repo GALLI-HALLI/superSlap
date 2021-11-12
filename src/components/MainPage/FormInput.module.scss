@@ -1,21 +1,31 @@
-.inputBox {
-  width: 300px;
-  height: 30px;
-  border: none;
-  border-radius: 10px;
-}
-.inputLabel {
-  display: block;
+.input {
+  font-size: 10px;
+  margin-top: 5px;
+  &Box {
+    width: 300px;
+    height: 30px;
+    border: none;
+    border-radius: 10px;
+    padding-left: 10px;
+  }
+
+  &Label {
+    display: block;
+  }
+
+  &Container {
+    height: 80px;
+  }
 }
 
-.inputContainer {
-  height: 80px;
-}
+.inputHint {
+  font-size: 10px;
+  margin-top: 5px;
+  &Red {
+    color: red;
+  }
 
-.inputHintRed {
-  color: red;
-}
-
-.inputHintBlack {
-  color: black;
+  &Black {
+    color: black;
+  }
 }

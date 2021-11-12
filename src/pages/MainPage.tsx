@@ -6,7 +6,7 @@ import LogoImg from "../components/MainPage/LogoImg";
 
 const MainPage = ({ children }: PropsWithChildren<{}>) => {
   return (
-    <div className={styles.MainPage}>
+    <div className={styles.mainPage}>
       <LogoImg />
       <form>
         <div className={styles.inputContainer}>
