@@ -21,4 +21,13 @@
     margin-right: auto;
     align-items: left;
   }
+
+  .SubmitBtnContainer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .SubmitBtn {
+    margin-right: 10px;
+  }
 }

@@ -55,9 +55,9 @@ const RegisterPage = () => {
             }}
           />
         </div>
-        <div className="RegiBtnContainer">
+        <div className={styles.RegiBtnContainer}>
           <Link to="/" onClick={() => alert("가입되었습니다!")}>
-            <button>가입 하기</button>
+            <button className={styles.RegiBtn}>가입 하기</button>
           </Link>
         </div>
       </form>

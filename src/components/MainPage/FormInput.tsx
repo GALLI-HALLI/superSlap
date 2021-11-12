@@ -77,8 +77,10 @@ const FormInput = ({
         {...props}
       />
       <div
-        style={
-          status === ValidStatus.Invalid ? { color: "red" } : { color: "black" }
+        className={
+          status === ValidStatus.Invalid
+            ? styles.inputHintRed
+            : styles.inputHintBlack
         }
       >
         {getMessage()}

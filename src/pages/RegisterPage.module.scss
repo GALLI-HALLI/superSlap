@@ -25,16 +25,13 @@ button {
     margin-right: auto;
     align-items: left;
   }
+
   .RegiBtnContainer {
     display: flex;
     justify-content: flex-end;
     margin-top: 10px;
   }
-}
-
-.IdCheck {
-  display: flex;
-  margin-top: 10px;
-  justify-content: flex-end;
-  padding-bottom: 0px;
+  .RegiBtn {
+    display: block;
+  }
 }
