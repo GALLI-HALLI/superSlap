@@ -18,13 +18,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-//################################################### 지워야 할 부분! 잊지 말자! #############################################################
-//앱세팅-front
-app.set("views", "../view");
-app.set("view engine", "ejs");
-app.use(express.static(`${__dirname}/routes`));
-//################################################### 지워야 할 부분! 잊지 말자! #############################################################
-
 app.use(express.json());
 app.use(express.urlencoded({ extend: true }));
 
