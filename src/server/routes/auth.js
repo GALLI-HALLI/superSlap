@@ -109,7 +109,6 @@ router.post(
       return res.json({ success: false, msg: "유효하지 않은 아이디입니다." });
     }
 
-    console.log("아이디 있음");
     let isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
