@@ -1,0 +1,55 @@
+.myInfo {
+  margin-top: 100px;
+  width: 450px;
+  font-family: "Jua-Regular";
+
+  .myInfoTabs {
+    width: 100%;
+    height: auto;
+    min-height: 400px;
+    margin: 10px;
+    padding: 2rem 1rem;
+    border-radius: 2rem;
+
+    //Tab 고르는 상단 바
+    .tabNav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px;
+      margin-bottom: 0;
+
+      button {
+        font-family: inherit;
+        font-size: 20px;
+        width: 33%;
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.7s;
+        background: rgba(50, 224, 196, 0.15);
+        &:hover {
+          background: rgba(50, 224, 196, 0.15);
+        }
+      }
+
+      .active {
+        background: white;
+      }
+    }
+
+    // 각 tab 컴포넌트 내부의 p태그 꾸미는 css
+    .FirstTab p,
+    .SecondTab p,
+    .ThirdTab p {
+      font-size: 2rem;
+      text-align: center;
+      background: white;
+      border-radius: 2rem;
+      height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

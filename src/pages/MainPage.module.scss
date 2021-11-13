@@ -1,0 +1,16 @@
+.mainPage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+  flex-direction: column;
+
+  .submitBtnContainer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .submitBtn {
+    margin-right: 10px;
+  }
+}
