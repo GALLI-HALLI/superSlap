@@ -1,0 +1,26 @@
+@mixin btnStyle {
+  width: 80px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: #974dcb;
+  &:hover {
+    background: #6937a1;
+  }
+  margin: 10px;
+}
+
+.Top {
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .Title {
+    font-size: 30px;
+  }
+
+  .Btn {
+    @include btnStyle()
+  }
+}

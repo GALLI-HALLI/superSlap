@@ -1,139 +1,67 @@
 @mixin btnStyle {
-  width: 80px;
-  height: 40px;
-  border-radius: 10px;
-  border: none;
-  background: #974dcb;
-  &:hover {
-    background: #6937a1;
-  }
+	width: 80px;
+	height: 40px;
+	border-radius: 10px;
+	border: none;
+	background: #974dcb;
+	&:hover {
+		background: #6937a1;
+	}
+	margin: 10px;
 }
 
 .MyInfo {
-  // display: flex;
-  margin-top: 100px;
-  background: white;
-  font-family: "Jua-Regular";
-  // border-radius: 25px;
+	margin-top: 100px;
+	width: 450px;
+	font-family: 'Jua-Regular';
 
-  // flex-direction: column;
-  
-  // align-items: left;
-  
-  width: 450px;
+	.myInfoTabs {
+		width: 100%;
+		height: auto;
+		min-height: 400px;
+		margin: 10px;
+		padding: 2rem 1rem;
+		border-radius: 2rem;
 
-  .MyInfoHeader {
-    // justify-content: center;
-    // float: left;
+		//Tab 고르는 상단 바
+		.tabNav {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 10px;
+			margin-bottom: 0;
 
-    .Top {
-      height: 60px;
+			button {
+				font-family: inherit;
+				font-size: 20px;
+				width: 33%;
+				padding: 10px;
+				text-align: center;
+				cursor: pointer;
+				transition: all 0.7s;
+				background: rgba(50, 224, 196, 0.15);
+				&:hover {
+					background: rgba(50, 224, 196, 0.15);
+				}
+			}
 
-      .GoBackButton {
-        margin: 10px;
-        float: left;
-        @include btnStyle()
-      }
-  
-      .MyInfoTitle {
-        // float: left;
-        display: flex;
-        height: 60px;
-        justify-content: center;
-        align-items: center;
+			.active {
+				background: white;
+			}
+		}
 
-        font-size: 30px;
-      }
-    }
-    
-    .MyInfoHeaderDisplay {
-      display: flex;
-      background-color: yellow;
-      height: 100px;
-      align-items: center;
-      justify-content: end;
-
-      .LogoutButton {
-        margin: 10px;
-        
-        @include btnStyle()
-      }
-    }
-  }
-
-  .MyInfoTabs {
-    // display: flex;
-    // align-items: center;
-    // justify-content: center;
-    // overflow: hidden;
-
-    width: 80%;
-    height: auto;
-    min-height: 400px;
-    background: #053742;
-    margin: 3.5rem auto 1.5rem;
-    padding: 2rem 1rem;
-    color: #E8F0F2;
-    border-radius: 2rem;
-    @media (max-width: 769px) {
-      padding: 2rem 0;
-    }
-
-    //Tab 고르는 상단 바
-    .TabNav {
-      width: 80%;
-      margin: 0 auto 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border: 1px solid #39A2DB;
-      border-radius: 2rem;
-      @media (max-width: 768px) {
-        width: 90%;
-      }
-
-      li {
-        width: 33%;
-      padding: 1rem;
-      list-style: none;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.7s;
-      border-bottom-left-radius: 2rem;
-      border-top-left-radius: 2rem;
-
-        &:nth-child(3) {
-          border-radius: 0;
-          border-bottom-right-radius: 2rem;
-          border-top-right-radius: 2rem;
-        }
-
-        &:hover {
-          background: rgba(50, 224, 196, 0.15);
-        }
-
-        .active {
-          background: #39A2DB;
-        }
-      }
-
-    }
-    
-    // 각 tab 컴포넌트 내부의 p태그 꾸미는 css
-    .FirstTab p,
-    .SecondTab p,
-    .ThirdTab p {
-    font-size: 2rem;
-    text-align: center;
-    }
-      
-
-  }
-    
+		// 각 tab 컴포넌트 내부의 p태그 꾸미는 css
+		.FirstTab p,
+		.SecondTab p,
+		.ThirdTab p {
+			font-size: 2rem;
+			text-align: center;
+			background: white;
+			border-radius: 2rem;
+			height: 400px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+	}
 }
-
-
-
-
-
-
