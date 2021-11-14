@@ -5,8 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 module.exports = async (req, res, next) => {
-  // const token = req.header('x-auth-token');
-  const token = localStorage.getItem("jwt");
+  const token = req.header('x-auth-token');
 
   if (!token) {
     return res.status(403).json({
