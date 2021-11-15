@@ -1,13 +1,19 @@
-import React from "react";
-import "./styles/App.scss";
-import { Route } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
+import Layout from "./components/MainPage/component/Layout";
 import MainPage from "./pages/MainPage";
+import RegisterPage from "./pages/RegisterPage";
+import "./styles/App.scss";
+import MyInfo from "./pages/MyInfo";
 
 function App() {
   return (
-    <div className="App">
-      <Route path="/" component={MainPage} />
-    </div>
+    <Layout>
+      <Switch>
+        <Route path="/" exact component={MainPage} />
+        <Route path="/register" component={RegisterPage} />
+        <Route path="/my-info" component={MyInfo} />
+      </Switch>
+    </Layout>
   );
 }
 
