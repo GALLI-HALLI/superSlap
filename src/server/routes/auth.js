@@ -6,13 +6,6 @@ const path = require("path");
 const passport = require("../config/passport");
 const asyncHandler = require("express-async-handler");
 
-const LocalStorage = require('node-localstorage').LocalStorage;
-localStorage = new LocalStorage('./scratch')
-
-const wrap = require('express-async-wrap');
-const asyncHandler = require('express-async-handler');
-const dotenv = require('dotenv');
-
 //DB
 const User = require("../models/User");
 
@@ -31,6 +24,16 @@ router.get(
 function authSuccess(req, res) {
   res.redirect("/post/public"); // ########### 로그인 후, 나중에 추가 ##########################
 }
+// kakao-oauth
+router.get(
+  "/kakao",
+  passport.authenticate("kakao", { failureRedirect: "#!/login" })
+);
+
+router.get(
+  "/kakao/callbak",
+  passport.authenticate("kakao", { failureRedirect: "#!/login" })
+);
 
 router.get("/login", (req, res) => {
   res.render(path.join(__dirname, "../../view/login.ejs")); // ############# 프론트엔드 합칠 때 수정 ###
@@ -78,7 +81,7 @@ router.post(
       name,
       id,
       password: hashedPassword,
-      type: "superslap",
+      type: userType.superslap,
     });
 
     await user.save(); // db에 user 저장
@@ -104,7 +107,7 @@ router.post(
   "/login",
   asyncHandler(async (req, res) => {
     const { password, id } = req.body;
-    let user = await User.findOne({ id: id, type: "superslap" });
+    let user = await User.findOne({ id: id, type: userType.superslap });
     if (!user) {
       return res.json({ success: false, msg: "유효하지 않은 아이디입니다." });
     }
@@ -132,18 +135,5 @@ router.post(
     });
   })
 );
-
-router.post("/kakao", (req, res) => {
-  console.log(req.body);
-  User.findOne({ id: req.body.id, type: "kakao" }).then((existingUser) => {
-    if (!existingUser) {
-      new User({
-        id: req.body.id,
-        name: req.body.name,
-        type: req.body.type,
-      }).save();
-    }
-  });
-});
 
 module.exports = router;

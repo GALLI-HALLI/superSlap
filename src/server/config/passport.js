@@ -1,10 +1,12 @@
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
+const KakaoStrategy = require("passport-kakao").Strategy;
 const User = require("../models/User");
 
 const dotenv = require("dotenv");
 dotenv.config();
 
+// Google-oauth
 passport.serializeUser(function (user, done) {
   // user를 session에 저장
   done(null, user);
@@ -19,7 +21,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_SECRET,
-      callbackURL: "/auth/google/callback", // 구글에 로그인이 이루어진 후 구글이 다시 사이트로 돌려보내는 주소 설정하는 부분
+      callbackURL: "/auth/google/callback",
       passReqToCallback: true,
     },
     function (request, accessToken, refreshToken, profile, done) {
@@ -32,7 +34,7 @@ passport.use(
             new User({
               id: profile.email,
               name: profile.displayName,
-              type: "google",
+              type: profile.provider,
             })
               .save()
               .then((user) => {
@@ -41,6 +43,36 @@ passport.use(
           }
         }
       );
+    }
+  )
+);
+
+// Kakao oauth
+passport.use(
+  new KakaoStrategy(
+    {
+      clientID: process.env.KAKAO_CLIENT_ID,
+      clientSecret: process.env.KAKAO_SECRET,
+      redirectURI: "http://localhost:5000/auth/kakao/callback",
+      passReqToCallback: true,
+    },
+    function (accessToken, refreshToken, profile, done) {
+      console.log("profile: ", profile);
+      User.findOne({ id: profile.id, type: "kakao" }).then((existingUser) => {
+        if (existingUser) {
+          done(null, existingUser);
+        } else {
+          new User({
+            id: profile.id,
+            name: profile.nickname,
+            type: profile.provider,
+          })
+            .save()
+            .then((user) => {
+              done(null, user);
+            });
+        }
+      });
     }
   )
 );
