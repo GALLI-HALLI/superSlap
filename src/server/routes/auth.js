@@ -22,11 +22,11 @@ router.get(
 );
 
 function authSuccess(req, res) {
-  //   res.redirect('/post/public');    // ########### 로그인 후, 나중에 추가 ##########################
+  res.redirect("/post/public"); // ########### 로그인 후, 나중에 추가 ##########################
 }
 
 router.get("/login", (req, res) => {
-  // res.render(path.join(__dirname, "../../view/login.ejs"));  // ############# 프론트엔드 합칠 때 수정 ###
+  res.render(path.join(__dirname, "../../view/login.ejs")); // ############# 프론트엔드 합칠 때 수정 ###
 });
 
 router.post(
