@@ -4,4 +4,16 @@
   align-items: center;
   margin-top: 50px;
   flex-direction: column;
+
+  .buttonContainer {
+    display: flex;
+    width: 90%;
+    margin: 250px 0 0 0;
+    justify-content: space-between;
+    align-items: center;
+    button {
+      height: 100px;
+      width: 100px;
+    }
+  }
 }

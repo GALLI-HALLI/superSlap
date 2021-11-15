@@ -4,7 +4,7 @@ import MainPage from "./pages/MainPage";
 import RegisterPage from "./pages/RegisterPage";
 import "./styles/App.scss";
 import MyInfo from "./pages/MyInfo";
-import lobbyPage from "./pages/lobbyPage";
+import LobbyPage from "./pages/LobbyPage";
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
         <Route path="/" exact component={MainPage} />
         <Route path="/register" component={RegisterPage} />
         <Route path="/my-info" component={MyInfo} />
-        <Route path="/lobby" component={lobbyPage} />
+        <Route path="/lobby" component={LobbyPage} />
       </Switch>
     </Layout>
   );
