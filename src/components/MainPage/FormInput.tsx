@@ -1,6 +1,7 @@
 import React, { InputHTMLAttributes, useEffect, useState } from "react";
 import { unPack } from "../../utils/promise";
 import styles from "./FormInput.module.scss";
+import classnames from "classnames";
 
 type TFormInputProps = {
   label: string;
@@ -77,11 +78,12 @@ const FormInput = ({
         {...props}
       />
       <div
-        className={
+        className={classnames(
+          styles.inputHint,
           status === ValidStatus.Invalid
             ? styles.inputHintRed
             : styles.inputHintBlack
-        }
+        )}
       >
         {getMessage()}
       </div>
