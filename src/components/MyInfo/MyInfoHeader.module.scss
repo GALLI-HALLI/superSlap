@@ -10,17 +10,17 @@
   margin: 10px;
 }
 
-.Top {
+.top {
   height: 60px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  .Title {
+  .title {
     font-size: 30px;
   }
 
-  .Btn {
+  .btn {
     @include btnStyle()
   }
 }
