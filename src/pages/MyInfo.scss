@@ -1,19 +1,7 @@
-@mixin btnStyle {
-  width: 80px;
-  height: 40px;
-  border-radius: 10px;
-  border: none;
-  background: #974dcb;
-  &:hover {
-    background: #6937a1;
-  }
-  margin: 10px;
-}
-
 .myInfo {
   margin-top: 100px;
   width: 450px;
-  font-family: 'Jua-Regular';
+  font-family: "Jua-Regular";
 
   .myInfoTabs {
     width: 100%;

@@ -1,6 +1,7 @@
 import React from "react";
 import "../../pages/MyInfo.scss";
 import styles from "./MyInfoHeaderDisplay.module.scss";
+import Button from "../common/Button";
 
 const MyInfoHeaderDisplay = () => {
   const userInfo = {
@@ -21,7 +22,7 @@ const MyInfoHeaderDisplay = () => {
           <p>{userInfo.achievementTitle}</p>
         </div>
       </div>
-      <button className={styles.btn}>정보 수정</button>
+      <Button className={styles.btn}>정보 수정</Button>
     </div>
   );
 };
