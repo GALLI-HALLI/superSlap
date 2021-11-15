@@ -5,7 +5,7 @@ import MyInfoTabs from "../components/MyInfo/MyInfoTabs";
 
 const MyInfo = () => {
   return (
-    <div className="MyInfo">
+    <div className="myInfo">
       <MyInfoHeader />
       <MyInfoTabs />
     </div>
