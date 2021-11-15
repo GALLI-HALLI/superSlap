@@ -5,11 +5,10 @@ import SecondTab from "./SecondTab";
 import ThirdTab from "./ThirdTab";
 import cn from "classnames"
 
+// 탭 이름들 가제
+const Menus = ["통계", "캐릭터 선택", "칭호"]
+
 const MyInfoTabs = () => {
-
-  // 탭 이름들 가제
-  const Menus = ["통계", "캐릭터 선택", "칭호"]
-
   // 어떤 탭이 처음에 보여질지.
   const [activeTab, setActiveTab] = useState(Menus[0]);
 
