@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "./MainPage.module.scss";
 import FormInput from "../components/MainPage/FormInput";
 import LogoImg from "../components/MainPage/LogoImg";
+import Button from "../components/common/Button";
 
 const MainPage = ({ children }: PropsWithChildren<{}>) => {
   return (
@@ -23,11 +24,11 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
           />
         </div>
         <div className={styles.submitBtnContainer}>
-          <button type="submit" className={styles.submitBtn}>
+          <Button type="submit" className={styles.submitBtn}>
             로그인
-          </button>
+          </Button>
           <Link to="/register">
-            <button>회원가입</button>
+            <Button>회원가입</Button>
           </Link>
         </div>
       </form>

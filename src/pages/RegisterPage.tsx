@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import FormInput from "../components/MainPage/FormInput";
 import LogoImg from "../components/MainPage/LogoImg";
 import styles from "./RegisterPage.module.scss";
+import Button from "../components/common/Button";
 
 const existingIds = ["kqjatjr@gmail.com"];
 
@@ -57,7 +58,7 @@ const RegisterPage = () => {
         </div>
         <div className={styles.regiBtnContainer}>
           <Link to="/" onClick={() => alert("가입되었습니다!")}>
-            <button className={styles.regiBtn}>가입 하기</button>
+            <Button className={styles.regiBtn}>가입 하기</Button>
           </Link>
         </div>
       </form>
