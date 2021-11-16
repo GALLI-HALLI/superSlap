@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const RoomManager = require("./roomManager.js");
+const { nanoid } = require("nanoid");
 
 let roomManager = new RoomManager();
 
@@ -11,14 +12,9 @@ router.get("/", (req, res) => {
 router.post("/", (req, res) => {
   const id = req.body.id; //아마 토큰 받아서 토큰을 아이디로 변환해야할 것 같다-> 우선 임시로 id를 받는다
 
-  const randomChar =
-    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
   let code = "";
   do {
-    code = "";
-    for (var i = 0; i < 6; i++) {
-      code += randomChar.charAt(Math.floor(Math.random() * randomChar.length));
-    }
+    code = nanoid(7);
   } while (!roomManager.createRoom(code, id));
 
   res.json({
