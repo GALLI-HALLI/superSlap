@@ -1,11 +1,9 @@
 //DOM-> Document Object Model
 const id = document.querySelector("#id"),
   password = document.querySelector("#password"),
-  loginBtn = document.querySelector("#login-button"),
-  kakaoBtn = document.querySelector("#kakao-login");
+  loginBtn = document.querySelector("#login-button");
 
 loginBtn.addEventListener("click", login);
-kakaoBtn.addEventListener("click", kakaoLogin);
 
 function login(e) {
   e.preventDefault();
@@ -25,8 +23,9 @@ function login(e) {
     .then((res) => res.json())
     .then((res) => {
       if (res.success) {
-        location.href = "/post/public";
-        setheader("x-auth-token", res.token);
+        // 프론트엔드 연동 시 재설정
+        // location.href = "/post/public";
+        // setheader("x-auth-token", res.token);
       } else {
         alert(res.msg);
       }

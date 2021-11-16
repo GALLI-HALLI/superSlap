@@ -24,16 +24,6 @@ router.get(
 function authSuccess(req, res) {
   res.redirect("/post/public"); // ########### 로그인 후, 나중에 추가 ##########################
 }
-// kakao-oauth
-router.get(
-  "/kakao",
-  passport.authenticate("kakao", { failureRedirect: "#!/login" })
-);
-
-router.get(
-  "/kakao/callbak",
-  passport.authenticate("kakao", { failureRedirect: "#!/login" })
-);
 
 router.get("/login", (req, res) => {
   res.render(path.join(__dirname, "../../view/login.ejs")); // ############# 프론트엔드 합칠 때 수정 ###
@@ -77,11 +67,11 @@ router.post(
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    user = new User({
+    let user = new User({
       name,
       id,
       password: hashedPassword,
-      type: userType.superslap,
+      type: "superslap",
     });
 
     await user.save(); // db에 user 저장
@@ -107,7 +97,7 @@ router.post(
   "/login",
   asyncHandler(async (req, res) => {
     const { password, id } = req.body;
-    let user = await User.findOne({ id: id, type: userType.superslap });
+    let user = await User.findOne({ id: id, type: "superslap" });
     if (!user) {
       return res.json({ success: false, msg: "유효하지 않은 아이디입니다." });
     }

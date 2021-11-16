@@ -16,11 +16,10 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      // required:true,
     },
     type: {
       type: String,
-      enum: ["google", "kakao", "superslap"],
+      enum: ["google", "superslap"],
       default: "superslap",
       required: true,
     },

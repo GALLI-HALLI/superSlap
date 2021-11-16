@@ -4,6 +4,8 @@ const auth = require("./routes/auth");
 const post = require("./routes/post");
 const dotenv = require("dotenv");
 dotenv.config();
+const path = require("path");
+// var http = require("http");
 
 const app = express();
 
@@ -23,6 +25,11 @@ app.use(express.urlencoded({ extend: true }));
 
 app.use("/auth", auth); //auth주소는 auth파일로 간다
 app.use("/post", post);
+app.use(express.static(path.join(__dirname, "../../build")));
+
+app.get("/", function (request, response) {
+  response.sendFile(path.join(__dirname, "../../build/index.html"));
+});
 
 mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
   if (err) {
