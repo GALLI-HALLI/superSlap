@@ -4,7 +4,7 @@ import { Redirect, useLocation } from "react-router-dom";
 
 const AuthRedirect = () => {
   const { search } = useLocation();
-  const { token } = qs.parse(search.slice(1));
+  const { token } = qs.parse(search.slice(1)); // 쿼리 스트링 문자열을 객체로 만들어준다. {}
 
   useEffect(() => {
     if (token && typeof token === "string") {
