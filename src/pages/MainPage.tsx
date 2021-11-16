@@ -24,9 +24,9 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
           />
         </div>
         <div className={styles.submitBtnContainer}>
-          <Button type="submit" className={styles.submitBtn}>
-            로그인
-          </Button>
+          <Link to="/lobby">
+            <Button className={styles.submitBtn}>로그인</Button>
+          </Link>
           <Link to="/register">
             <Button>회원가입</Button>
           </Link>
