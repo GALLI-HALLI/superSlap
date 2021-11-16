@@ -31,10 +31,10 @@ app.use(express.urlencoded({ extend: true }));
 app.use("/auth", auth);
 app.use("/post", post);
 
-app.use(express.static(path.join(__dirname, "build")));
+app.use(express.static(path.join(__dirname, "../../build")));
 
 app.get("/", function (request, response) {
-  response.sendFile(path.join(__dirname, "/build/index.html"));
+  response.sendFile(path.join(__dirname, "../../build/index.html"));
 });
 
 mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
@@ -50,3 +50,9 @@ mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
     });
   }
 });
+
+app.use(express.json());
+
+//room
+const lobby = require("./room/lobby");
+app.use("/lobby", lobby);
