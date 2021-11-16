@@ -4,7 +4,7 @@ import MainPage from "./pages/MainPage";
 import RegisterPage from "./pages/RegisterPage";
 import "./styles/App.scss";
 import MyInfo from "./pages/MyInfo";
-import LobbyPage from "./pages/LobbyPage";
+import LobbyPage from "./pages/lobbyPage";
 
 function App() {
   return (
