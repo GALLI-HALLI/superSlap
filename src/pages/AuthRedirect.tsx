@@ -12,7 +12,7 @@ const AuthRedirect = () => {
     }
   }, []);
 
-  return <Redirect to="/" push={false} />;
+  return <Redirect to={token ? "/lobby" : "/"} push={false} />;
 };
 
 export default AuthRedirect;
