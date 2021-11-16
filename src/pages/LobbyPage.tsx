@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Button from "../components/common/Button";
 import SearchRoomModal from "../components/lobbyPage/SearchRoomModal";
 import LogoImg from "../components/MainPage/LogoImg";
-import styles from "./lobbyPage.module.scss";
+import styles from "./LobbyPage.module.scss";
 
 const LobbyPage = () => {
   const [showModal, setShowModal] = useState(false);
