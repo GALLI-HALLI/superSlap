@@ -2,16 +2,18 @@ const Room = require("./room.js");
 
 module.exports = class RoomManager {
   constructor() {
-    this.rooms = [];
-    this.numRooms = 0;
+    this.rooms = new Map();
   }
 
   createRoom(code, id) {
-    if (this.rooms.includes(code)) {
+    this.rooms.set(code, new Room(code, id));
+  }
+
+  hasRoom(code) {
+    if (this.rooms.has(code)) {
       return false;
+    } else {
+      return true;
     }
-    this.rooms.push(new Room(code, id));
-    this.numRooms++;
-    return true;
   }
 };
