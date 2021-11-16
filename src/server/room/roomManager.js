@@ -10,10 +10,6 @@ module.exports = class RoomManager {
   }
 
   hasRoom(code) {
-    if (this.rooms.has(code)) {
-      return false;
-    } else {
-      return true;
-    }
+    return this.rooms.has(code);
   }
 };
