@@ -3,8 +3,9 @@ import Layout from "./components/MainPage/component/Layout";
 import MainPage from "./pages/MainPage";
 import RegisterPage from "./pages/RegisterPage";
 import "./styles/App.scss";
+import LobbyPage from "./pages/LobbyPage";
 import MyInfo from "./pages/MyInfo";
-import LobbyPage from "./pages/lobbyPage";
+import AuthRedirect from "./pages/AuthRedirect";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/register" component={RegisterPage} />
         <Route path="/my-info" component={MyInfo} />
         <Route path="/lobby" component={LobbyPage} />
+        <Route path="/auth-redirect" component={AuthRedirect} />
       </Switch>
     </Layout>
   );

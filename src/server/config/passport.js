@@ -2,9 +2,6 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
 const User = require("../models/User");
 
-const dotenv = require("dotenv");
-dotenv.config();
-
 passport.use(
   new GoogleStrategy(
     {
@@ -30,10 +27,10 @@ passport.use(
                 done(null, user);
               });
           }
-        }
+        },
       );
-    }
-  )
+    },
+  ),
 );
 
 module.exports = passport;

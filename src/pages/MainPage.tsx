@@ -1,11 +1,19 @@
-import React, { PropsWithChildren } from "react";
-import { Link } from "react-router-dom";
+import React, { PropsWithChildren, useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
 import styles from "./MainPage.module.scss";
 import FormInput from "../components/MainPage/FormInput";
 import LogoImg from "../components/MainPage/LogoImg";
 import Button from "../components/common/Button";
 
 const MainPage = ({ children }: PropsWithChildren<{}>) => {
+  const history = useHistory();
+
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      history.replace("/lobby");
+    }
+  }, []);
+
   return (
     <div className={styles.mainPage}>
       <LogoImg />
@@ -24,12 +32,11 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
           />
         </div>
         <div className={styles.submitBtnContainer}>
-          <Link to="/lobby">
-            <Button className={styles.submitBtn}>로그인</Button>
-          </Link>
+          <Button className={styles.submitBtn}>로그인</Button>
           <Link to="/register">
             <Button>회원가입</Button>
           </Link>
+          <a href="/auth/google">구글 로그인</a>
         </div>
       </form>
       {children}
