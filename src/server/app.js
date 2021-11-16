@@ -1,24 +1,21 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const mongoose = require("mongoose");
-
 const fs = require("fs");
 const express = require("express");
 const auth = require("./routes/auth");
 const post = require("./routes/post");
-const dotenv = require("dotenv");
-dotenv.config();
 const path = require("path");
-
 const socket = require("socket.io");
-var http = require("http");
 const backApi = require("./backApi");
 
 const app = express();
-
 // google-oauth
 const passport = require("passport");
 const session = require("express-session"); // express-session 설정이 반드시 passport-session 위에 있어야 함
+
 app.use(
-  session({ secret: "MySecret", resave: false, saveUninitialized: true })
+  session({ secret: "MySecret", resave: false, saveUninitialized: true }),
 );
 
 // Passport setting
@@ -43,7 +40,7 @@ mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
     console.log(err);
   } else {
     console.log("connected to data base successfully");
-    app.listen(5000, (err) => {
+    app.listen(3333, (err) => {
       console.log("server on");
       if (err) {
         return console.log(err);
