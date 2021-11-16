@@ -7,7 +7,6 @@
 
 # testing
 /coverage
-/src/view/login.ejs
 
 # production
 /build

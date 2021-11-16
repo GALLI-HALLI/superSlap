@@ -41,7 +41,7 @@ function generateUserToken(req, res) {
 }
 
 router.get("/login", (req, res) => {
-  res.render(path.join(__dirname, "../../view/login.ejs")); // ############# 프론트엔드 합칠 때 수정 ###
+  // res.render(path.join(__dirname, "../../view/login.ejs")); // ############# 프론트엔드 합칠 때 수정 ###
 });
 
 router.post(

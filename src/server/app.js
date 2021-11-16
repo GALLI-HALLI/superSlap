@@ -5,7 +5,6 @@ const post = require("./routes/post");
 const dotenv = require("dotenv");
 dotenv.config();
 const path = require("path");
-// var http = require("http");
 
 const app = express();
 
@@ -30,8 +29,6 @@ app.use(express.static(path.join(__dirname, "../../build")));
 app.get("/", function (request, response) {
   response.sendFile(path.join(__dirname, "../../build/index.html"));
 });
-
-// app.use(express.static(path.join(__dirname, "./routes")));  // 프론트엔드 작성 시 삭제
 
 mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
   if (err) {
