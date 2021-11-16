@@ -31,7 +31,8 @@ app.use("/api", backApi);
 
 app.use(express.static(path.join(__dirname, "../../build")));
 
-app.get("/", function (request, response) {
+// '/*' : /에 글자 상관없이 매칭 된다.
+app.get("/*", function (request, response) {
   response.sendFile(path.join(__dirname, "../../build/index.html"));
 });
 
