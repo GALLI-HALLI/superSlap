@@ -36,7 +36,7 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
           <Link to="/register">
             <Button>회원가입</Button>
           </Link>
-          <a href="/auth/google">구글 로그인</a>
+          <a href="/api/auth/google">구글 로그인</a>
         </div>
       </form>
       {children}
