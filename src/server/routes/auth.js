@@ -12,17 +12,32 @@ const User = require("../models/User");
 // google-oauth
 router.get(
   "/google",
-  passport.authenticate("google", { scope: ["email", "profile"] }) // 구글 로그인 페이지로 이동하여 로그인 이루어짐
+  passport.authenticate("google", {
+    session: false,
+    scope: ["email", "profile"],
+  }) // 구글 로그인 페이지로 이동하여 로그인 이루어짐
 );
 
 router.get(
   "/google/callback", // 로그인 성공 시 callbackURL 설정에 따라 이 라우터로 이동
-  passport.authenticate("google"),
-  authSuccess // 여기서 callback 함수 호출
+  passport.authenticate("google", { session: false }),
+  generateUserToken
 );
 
-function authSuccess(req, res) {
-  res.redirect("/post/public"); // ########### 로그인 후, 나중에 추가 ##########################
+function generateUserToken(req, res) {
+  const id = req.user.id;
+  const token = JWT.sign(
+    {
+      id,
+    },
+    process.env.JWT_KEY,
+    {
+      expiresIn: 3600000,
+    }
+  );
+  res.json({
+    token,
+  });
 }
 
 router.get("/login", (req, res) => {
@@ -55,15 +70,15 @@ router.post(
       });
     }
 
-    // email을 비교하여 user가 이미 존재하는지 확인
-    let user1 = await User.findOne({ id });
-    if (user1) {
-      return res.status(400).json({ errors: [{ msg: "아이디 이미 존재" }] });
-    }
-    let user2 = await User.findOne({ name });
-    if (user2) {
-      return res.status(400).json({ errors: [{ msg: "닉네임 이미 존재" }] });
-    }
+    // // email을 비교하여 user가 이미 존재하는지 확인
+    // let user1 = await User.findOne({ id });
+    // if (user1) {
+    //   return res.status(400).json({ errors: [{ msg: "아이디 이미 존재" }] });
+    // }
+    // let user2 = await User.findOne({ name });
+    // if (user2) {
+    //   return res.status(400).json({ errors: [{ msg: "닉네임 이미 존재" }] });
+    // }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
