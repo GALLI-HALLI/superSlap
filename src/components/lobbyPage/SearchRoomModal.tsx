@@ -7,10 +7,10 @@ type TSearchRoom = {
 };
 
 const SearchRoomModal = ({ close }: TSearchRoom) => {
-  const [value, setValue] = useState("");
+  const [roomId, setRoomId] = useState("");
 
   const hanedleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
+    setRoomId(e.target.value);
   };
 
   return (
@@ -22,7 +22,7 @@ const SearchRoomModal = ({ close }: TSearchRoom) => {
             <input
               className={styles.input}
               onChange={hanedleChange}
-              value={value}
+              value={roomId}
             />
           </div>
           <div className={styles.footer}>
