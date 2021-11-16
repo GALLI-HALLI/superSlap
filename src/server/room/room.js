@@ -1,4 +1,4 @@
-module.exports = class room {
+module.exports = class Room {
   constructor(code, readerId) {
     this.code = code;
     this.players = [];

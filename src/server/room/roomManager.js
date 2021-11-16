@@ -1,6 +1,6 @@
 const Room = require("./room.js");
 
-module.exports = class room_manager {
+module.exports = class RoomManager {
   constructor() {
     this.rooms = [];
     this.numRooms = 0;
