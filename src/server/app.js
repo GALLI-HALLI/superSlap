@@ -30,8 +30,6 @@ app.use(express.urlencoded({ extend: true }));
 
 app.use("/auth", auth);
 app.use("/post", post);
-
-app.use(express.json());
 app.use("/api", backApi);
 
 app.use(express.static(path.join(__dirname, "../../build")));

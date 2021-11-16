@@ -15,7 +15,7 @@ router.post("/", (req, res) => {
   let code = "";
   do {
     code = nanoid(7);
-  } while (!roomManager.hasRoom(code));
+  } while (roomManager.hasRoom(code));
 
   roomManager.createRoom(code, id);
 
