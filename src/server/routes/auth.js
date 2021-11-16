@@ -48,7 +48,6 @@ router.post(
   "/signup",
   [
     check("id", "6자 이상의 아이디를 입력해 주세요").isLength({
-      //이메일 할거면 isEmail도 있음
       min: 6,
     }),
     check("password", "6자 이상의 비밀번호를 입력해 주세요").isLength({

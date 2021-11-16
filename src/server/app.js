@@ -23,13 +23,15 @@ app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extend: true }));
 
-app.use("/auth", auth); //auth주소는 auth파일로 간다
+app.use("/auth", auth);
 app.use("/post", post);
 app.use(express.static(path.join(__dirname, "../../build")));
 
 app.get("/", function (request, response) {
   response.sendFile(path.join(__dirname, "../../build/index.html"));
 });
+
+// app.use(express.static(path.join(__dirname, "./routes")));  // 프론트엔드 작성 시 삭제
 
 mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
   if (err) {
