@@ -15,11 +15,8 @@ const io = socket(server);
 const passport = require("passport");
 const session = require("express-session"); // express-session 설정이 반드시 passport-session 위에 있어야 함
 
-// path of api
-app.use("/api", backApi);
-
 app.use(
-  session({ secret: "MySecret", resave: false, saveUninitialized: true })
+  session({ secret: "MySecret", resave: false, saveUninitialized: true }),
 );
 
 // Passport setting
@@ -28,6 +25,9 @@ app.use(passport.session());
 
 app.use(express.json());
 app.use(express.urlencoded({ extend: true }));
+
+// path of api
+app.use("/api", backApi);
 
 app.use(express.static(path.join(__dirname, "../../build")));
 
