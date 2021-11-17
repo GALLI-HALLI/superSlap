@@ -1,9 +1,14 @@
 import React, { PropsWithChildren, useEffect } from "react";
+import GoogleButton from "react-google-button";
 import { Link, useHistory } from "react-router-dom";
 import styles from "./MainPage.module.scss";
 import FormInput from "../components/MainPage/FormInput";
 import LogoImg from "../components/MainPage/LogoImg";
 import Button from "../components/common/Button";
+
+const googleButtonStyle = {
+  width: "310px",
+};
 
 const MainPage = ({ children }: PropsWithChildren<{}>) => {
   const history = useHistory();
@@ -36,7 +41,11 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
           <Link to="/register">
             <Button>회원가입</Button>
           </Link>
-          <a href="/api/auth/google">구글 로그인</a>
+        </div>
+        <div className={styles.social}>
+          <a href="/api/auth/google">
+            <GoogleButton type="light" style={googleButtonStyle}></GoogleButton>
+          </a>
         </div>
       </form>
       {children}
