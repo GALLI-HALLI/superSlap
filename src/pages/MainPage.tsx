@@ -1,23 +1,23 @@
-import React, { PropsWithChildren, useEffect } from "react";
+import React, { PropsWithChildren } from "react";
 import GoogleButton from "react-google-button";
-import { Link, useHistory } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import styles from "./MainPage.module.scss";
 import FormInput from "../components/MainPage/FormInput";
 import LogoImg from "../components/MainPage/LogoImg";
 import Button from "../components/common/Button";
+import useProfile from "../hooks/useProfile";
+import { AsyncActionStatus } from "../constants/redux";
 
 const googleButtonStyle = {
   width: "310px",
 };
 
 const MainPage = ({ children }: PropsWithChildren<{}>) => {
-  const history = useHistory();
+  const { status, data } = useProfile();
 
-  useEffect(() => {
-    if (localStorage.getItem("token")) {
-      history.replace("/lobby");
-    }
-  }, []);
+  if (status === AsyncActionStatus.Success && data) {
+    return <Redirect to="/lobby" push={false} />;
+  }
 
   return (
     <div className={styles.mainPage}>
