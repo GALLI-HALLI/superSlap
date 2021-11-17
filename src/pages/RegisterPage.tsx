@@ -3,6 +3,7 @@ import FormInput from "../components/MainPage/FormInput";
 import LogoImg from "../components/MainPage/LogoImg";
 import styles from "./RegisterPage.module.scss";
 import Button from "../components/common/Button";
+import { useState } from "react";
 
 const existingIds = ["kqjatjr@gmail.com"];
 
@@ -10,6 +11,10 @@ const checkDuplicate = (value: string) =>
   Promise.resolve(!existingIds.includes(value) && value.length > 4);
 
 const RegisterPage = () => {
+  const [id, setId] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [password, setPassword] = useState("");
+
   return (
     <div className={styles.registerPage}>
       <LogoImg />
@@ -25,6 +30,7 @@ const RegisterPage = () => {
             placeholder="아이디를 입력해 주세요"
             validator={checkDuplicate}
             onChange={({ value, isValid }) => {
+              setId(value);
               console.log(`값은 ${value}, 검증결과는 ${isValid}입니다.`);
             }}
           />
@@ -38,6 +44,7 @@ const RegisterPage = () => {
             }}
             validator={(value: string) => value.length >= 2}
             onChange={({ value, isValid }) => {
+              setNickname(value);
               console.log(`값은 ${value}, 검증결과는 ${isValid}입니다.`);
             }}
           />
@@ -52,6 +59,7 @@ const RegisterPage = () => {
             }}
             validator={(value: string) => value.length >= 8}
             onChange={({ value, isValid }) => {
+              setPassword(value);
               console.log(`값은 ${value}, 검증결과는 ${isValid}입니다.`);
             }}
           />
