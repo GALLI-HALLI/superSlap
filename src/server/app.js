@@ -39,6 +39,10 @@ app.get("/*", function (request, response) {
   response.sendFile(path.join(__dirname, "../../build/index.html"));
 });
 
+app.get("/game/:code", function (request, response) {
+  response.sendFile(path.join(__dirname, "/room/game.html")); //*****FE 바꾸기********
+});
+
 const gameSocket = io.of("/game");
 
 const userConnect = require("./room/group.js");
