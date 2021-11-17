@@ -18,7 +18,7 @@ module.exports = class Room {
       id: id, //userId
       nickname: nickname,
     };
-    this.players.push(id, player);
+    this.players.set(id, player);
   }
 
   removePlayer(id) {
