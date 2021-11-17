@@ -43,7 +43,7 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
           </Link>
         </div>
         <div className={styles.social}>
-          <a href="/auth/google">
+          <a href="/api/auth/google">
             <GoogleButton type="light" style={googleButtonStyle}></GoogleButton>
           </a>
         </div>
