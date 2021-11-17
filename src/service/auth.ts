@@ -16,10 +16,11 @@ export const getCurrentUserProfile = (): Promise<TProfile> => {
     .then(({ user }) => user);
 };
 
-export const postCurrentUser = (user: TRegister): Promise<TRegister> => {
-  return fetch("/api/login", {
+export const signUpUser = (user: TRegister): Promise<any> => {
+  return fetch("/api/auth/signup", {
     method: "POST",
-    body: JSON.stringify({ user }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(user),
   }).then((res) => {
     if (res.status !== 200) {
       throw new Error("Failed to fetch user register");

@@ -1,5 +1,5 @@
 import { createAction, Dispatch } from "@reduxjs/toolkit";
-import { getCurrentUserProfile, postCurrentUser } from "../../service/auth";
+import { getCurrentUserProfile, signUpUser } from "../../service/auth";
 import { TProfile, TRegister } from "../../types/api";
 
 export const registerLoading = createAction("REGISTER_LOADING");
@@ -24,10 +24,14 @@ export const getProfile = () => async (dispatch: Dispatch) => {
   }
 };
 
-export const postRegister = ({user}: TRegister) => async (dispatch: Dispatch) => {
-  dispatch(registerLoading());
-  try {
-    const register = await postCurrentUser(user);
-    
-  }
-};
+export const registerUser =
+  ({ id, name, password }: TRegister) =>
+  async (dispatch: Dispatch) => {
+    dispatch(registerLoading());
+    try {
+      const token = await signUpUser({ id, name, password });
+      dispatch(registerSuccess());
+    } catch {
+      dispatch(registerFailure());
+    }
+  };
