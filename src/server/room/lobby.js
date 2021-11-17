@@ -24,4 +24,7 @@ router.post("/", (req, res) => {
   }); //code 받아서 그 라우터로 이동(ex localhost:3000/game/code번호)
 });
 
-module.exports = router;
+module.exports = {
+  router: router,
+  roomManager: roomManager,
+};
