@@ -7,11 +7,10 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_SECRET,
-      callbackURL: "/auth/google/callback",
+      callbackURL: "/api/auth/google/callback",
       passReqToCallback: true,
     },
     function (request, accessToken, refreshToken, profile, done) {
-      console.log("profile: ", profile);
       User.findOne({ id: profile.email, type: "google" }).then(
         (existingUser) => {
           if (existingUser) {
