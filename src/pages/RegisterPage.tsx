@@ -76,11 +76,11 @@ const RegisterPage = () => {
           />
         </div>
         <div className={styles.regiBtnContainer}>
-          {/* <Link to="/" onClick={() => alert("가입되었습니다!")}> */}
-          <Button type="submit" className={styles.regiBtn}>
-            가입 하기
-          </Button>
-          {/* </Link> */}
+          <Link to="/" onClick={() => alert("가입되었습니다!")}>
+            <Button type="submit" className={styles.regiBtn}>
+              가입 하기
+            </Button>
+          </Link>
         </div>
       </form>
     </div>

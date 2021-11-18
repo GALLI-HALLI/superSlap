@@ -82,7 +82,7 @@ router.post(
 
     await user.save(); // db에 user 저장
 
-    res.json({
+    return res.json({
       token: generateUserToken(user.id),
     });
   })

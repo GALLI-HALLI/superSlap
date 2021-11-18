@@ -30,6 +30,7 @@ export const registerUser =
     dispatch(registerLoading());
     try {
       const token = await signUpUser({ id, name, password });
+      localStorage.setItem("token", token.token);
       dispatch(registerSuccess());
     } catch {
       dispatch(registerFailure());
