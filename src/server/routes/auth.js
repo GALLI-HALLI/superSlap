@@ -37,8 +37,8 @@ router.get(
   "/google/callback", // 로그인 성공 시 callbackURL 설정에 따라 이 라우터로 이동
   passport.authenticate("google", { session: false }),
   (req, res) => {
-    const { id } = req.user;
-    const { name } = req.name;
+    const { id } = req.user.id;
+    const { name } = req.user.name;
     const token = generateUserToken(id, name);
     const query = qs.stringify({ token }); // token=string , 객체를 쿼리스트링으로 만들어준다.
     res.redirect(`/auth-redirect?${query}`);
@@ -68,6 +68,11 @@ router.post(
       return res.status(400).json({
         errors: errors.array(),
       });
+    }
+
+    let user1 = await User.findOne({ id });
+    if (user1) {
+      return res.status(400).json({ errors: [{ msg: "아이디 이미 존재" }] });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
