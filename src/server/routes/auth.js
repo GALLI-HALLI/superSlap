@@ -70,11 +70,6 @@ router.post(
       });
     }
 
-    let user1 = await User.findOne({ id });
-    if (user1) {
-      return res.status(400).json({ errors: [{ msg: "아이디 이미 존재" }] });
-    }
-
     const hashedPassword = await bcrypt.hash(password, 10);
 
     let user = new User({
