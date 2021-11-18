@@ -8,3 +8,8 @@ export type TRegister = {
   name: string;
   password: string;
 };
+
+export type TLogin = {
+  id: string;
+  password: string;
+};
