@@ -6,6 +6,9 @@ import {
   registerLoading,
   registerSuccess,
   registerFailure,
+  loginLoading,
+  loginFailure,
+  loginSuccess,
 } from "../user/user.action";
 import { TProfile } from "../../types/api";
 import { AsyncActionStatus } from "../../constants/redux";
@@ -18,6 +21,9 @@ type TUserStore = {
   register: {
     status: AsyncActionStatus;
   };
+  login: {
+    status: AsyncActionStatus;
+  };
 };
 
 const initialState: TUserStore = {
@@ -25,6 +31,9 @@ const initialState: TUserStore = {
     status: AsyncActionStatus.Idle,
   },
   register: {
+    status: AsyncActionStatus.Idle,
+  },
+  login: {
     status: AsyncActionStatus.Idle,
   },
 };
@@ -50,6 +59,15 @@ const user = createReducer(initialState, (builder) => {
   });
   builder.addCase(registerFailure, (state) => {
     state.register.status = AsyncActionStatus.Failure;
+  });
+  builder.addCase(loginLoading, (state) => {
+    state.login.status = AsyncActionStatus.Loading;
+  });
+  builder.addCase(loginSuccess, (state) => {
+    state.login.status = AsyncActionStatus.Success;
+  });
+  builder.addCase(loginFailure, (state) => {
+    state.login.status = AsyncActionStatus.Failure;
   });
 });
 
