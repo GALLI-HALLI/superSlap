@@ -25,7 +25,7 @@ const RegisterPage = () => {
 
   useEffect(() => {
     if (registerStatus === AsyncActionStatus.Success) {
-      alert("로그인 성공");
+      alert("회원가입 성공");
       history.push("/");
     }
   }, [registerStatus]);
