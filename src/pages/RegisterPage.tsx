@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import FormInput from "../components/MainPage/FormInput";
 import LogoImg from "../components/MainPage/LogoImg";
 import styles from "./RegisterPage.module.scss";
@@ -6,6 +6,9 @@ import Button from "../components/common/Button";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../store/user/user.action";
+import { useSelector } from "../hooks/typeReduxHook";
+import { AsyncActionStatus } from "../constants/redux";
+import { useHistory } from "react-router";
 
 const existingIds = ["kqjatjr@gmail.com"];
 
@@ -16,6 +19,16 @@ const RegisterPage = () => {
   const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+
+  const registerStatus = useSelector((store) => store.user.register.status);
+  const history = useHistory();
+
+  useEffect(() => {
+    if (registerStatus === AsyncActionStatus.Success) {
+      alert("로그인 성공");
+      history.push("/");
+    }
+  }, [registerStatus]);
 
   const dispatch = useDispatch();
 
@@ -76,11 +89,9 @@ const RegisterPage = () => {
           />
         </div>
         <div className={styles.regiBtnContainer}>
-          <Link to="/" onClick={() => alert("가입되었습니다!")}>
-            <Button type="submit" className={styles.regiBtn}>
-              가입 하기
-            </Button>
-          </Link>
+          <Button type="submit" className={styles.regiBtn}>
+            가입 하기
+          </Button>
         </div>
       </form>
     </div>
