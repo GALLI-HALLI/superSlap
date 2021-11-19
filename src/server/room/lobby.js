@@ -10,7 +10,7 @@ const roomManager = new RoomManager();
 router.post("/make", (req, res) => {
   // const token = localStorage.getItem('x-auth-token');
   const token = req.header("x-auth-token");
-  const id = checkAuth(token).id;
+  const id = checkAuth.tokenToUser(token).id;
   let code = "";
   do {
     code = nanoid(7);

@@ -38,8 +38,7 @@ router.get(
   "/google/callback", // 로그인 성공 시 callbackURL 설정에 따라 이 라우터로 이동
   passport.authenticate("google", { session: false }),
   (req, res) => {
-    const { id } = req.user.id;
-    const { name } = req.user.name;
+    const { id, name } = req.user;
     const token = generateUserToken(id, name);
     const query = qs.stringify({ token }); // token=string , 객체를 쿼리스트링으로 만들어준다.
     res.redirect(`/auth-redirect?${query}`);
@@ -83,7 +82,7 @@ router.post(
     await user.save(); // db에 user 저장
 
     return res.json({
-      token: generateUserToken(user.id),
+      token: generateUserToken(user.id, user.name),
     });
   })
 );
@@ -112,7 +111,7 @@ router.post(
 
 router.get(
   "/user",
-  checkAuth,
+  checkAuth.headerToUserId,
   asyncHandler(async (req, res) => {
     const id = req.user;
     try {
@@ -129,7 +128,7 @@ router.get(
         message: "Internal Server Error",
       });
     }
-  }),
+  })
 );
 
 module.exports = router;
