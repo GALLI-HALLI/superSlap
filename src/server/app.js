@@ -5,9 +5,12 @@ const fs = require("fs");
 const express = require("express");
 const path = require("path");
 const socket = require("socket.io");
+const http = require("http");
 const backApi = require("./backApi");
 
 const app = express();
+const server = http.createServer(app);
+const io = socket(server);
 // google-oauth
 const passport = require("passport");
 const session = require("express-session"); // express-session 설정이 반드시 passport-session 위에 있어야 함
@@ -33,12 +36,24 @@ app.get("/*", function (request, response) {
   response.sendFile(path.join(__dirname, "../../build/index.html"));
 });
 
+app.get("/game/:code", function (request, response) {
+  response.sendFile(path.join(__dirname, "/room/game.html")); //*****FE 바꾸기********
+});
+
+const gameSocket = io.of("/game");
+
+const userConnect = require("./room/group.js");
+
+gameSocket.on("connection", (socket) => {
+  userConnect(socket);
+});
+
 mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
   if (err) {
     console.log(err);
   } else {
     console.log("connected to data base successfully");
-    app.listen(3333, (err) => {
+    server.listen(3333, (err) => {
       console.log("server on");
       if (err) {
         return console.log(err);

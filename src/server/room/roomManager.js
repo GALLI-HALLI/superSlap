@@ -12,4 +12,8 @@ module.exports = class RoomManager {
   hasRoom(code) {
     return this.rooms.has(code);
   }
+
+  destroyRoom(code) {
+    this.rooms.delete(code);
+  }
 };

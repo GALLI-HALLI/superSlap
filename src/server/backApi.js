@@ -6,6 +6,6 @@ const lobby = require("./room/lobby");
 
 router.use("/auth", auth);
 router.use("/post", post);
-router.use("/lobby", lobby);
+router.use("/lobby", lobby.router);
 
 module.exports = router;
