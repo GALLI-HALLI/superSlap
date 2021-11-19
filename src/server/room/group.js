@@ -13,7 +13,7 @@ const userConnect = (socket) => {
       socket.emit("noRoom");
     } else {
       room = roomManager.rooms.get(code);
-      let user = checkAuth(token);
+      let user = checkAuth.tokenToUser(token);
       id = user.id;
       name = user.name;
       room.addPlayer(id, name);

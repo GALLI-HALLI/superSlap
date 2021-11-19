@@ -4,7 +4,7 @@ const JWT = require("jsonwebtoken");
 const dotenv = require("dotenv");
 dotenv.config();
 
-module.exports = async (token) => {
+let tokenToUser = async (token) => {
   //현재 토큰에는 id만 들어있지만 곧 수정 예정
   try {
     let user = await JWT.verify(token, process.env.JWT_KEY);
@@ -14,29 +14,34 @@ module.exports = async (token) => {
   }
 };
 
-// module.exports = async (req, res, next) => {
-//   const token = req.header('x-auth-token');
+let headerToUserId = async (req, res, next) => {
+  const token = req.header("x-auth-token");
 
-//   if (!token) {
-//     return res.status(403).json({
-//       errors: [
-//         {
-//           msg: "no token found",
-//         },
-//       ],
-//     });
-//   }
-//   try {
-//     let user = await JWT.verify(token, process.env.JWT_KEY);
-//     req.user = user.id;
-//     next();
-//   } catch (error) {
-//     return res.status(400).json({
-//       errors: [
-//         {
-//           msg: "유효하지 않은 토큰",
-//         },
-//       ],
-//     });
-//   }
-// };
+  if (!token) {
+    return res.status(403).json({
+      errors: [
+        {
+          msg: "no token found",
+        },
+      ],
+    });
+  }
+  try {
+    let user = await JWT.verify(token, process.env.JWT_KEY);
+    req.user = user.id;
+    next();
+  } catch (error) {
+    return res.status(400).json({
+      errors: [
+        {
+          msg: "유효하지 않은 토큰",
+        },
+      ],
+    });
+  }
+};
+
+module.exports = {
+  tokenToUser,
+  headerToUserId,
+};
