@@ -1,8 +1,14 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
 import FormInput from "../components/MainPage/FormInput";
 import LogoImg from "../components/MainPage/LogoImg";
 import styles from "./RegisterPage.module.scss";
 import Button from "../components/common/Button";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { registerUser } from "../store/user/user.action";
+import { useSelector } from "../hooks/typeReduxHook";
+import { AsyncActionStatus } from "../constants/redux";
+import { useHistory } from "react-router";
 
 const existingIds = ["kqjatjr@gmail.com"];
 
@@ -10,10 +16,36 @@ const checkDuplicate = (value: string) =>
   Promise.resolve(!existingIds.includes(value) && value.length > 4);
 
 const RegisterPage = () => {
+  const [id, setId] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+
+  const registerStatus = useSelector((store) => store.user.register.status);
+  const history = useHistory();
+
+  useEffect(() => {
+    if (registerStatus === AsyncActionStatus.Success) {
+      alert("회원가입 성공");
+      history.push("/");
+    }
+  }, [registerStatus]);
+
+  const dispatch = useDispatch();
+
+  const onSubmit = (form: { id: string; password: string; name: string }) => {
+    dispatch(registerUser(form));
+  };
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const data = { id, name, password };
+    onSubmit(data);
+  };
+
   return (
     <div className={styles.registerPage}>
       <LogoImg />
-      <form>
+      <form method="POST" onSubmit={handleFormSubmit}>
         <div>
           <FormInput
             name="id"
@@ -24,8 +56,8 @@ const RegisterPage = () => {
             }}
             placeholder="아이디를 입력해 주세요"
             validator={checkDuplicate}
-            onChange={({ value, isValid }) => {
-              console.log(`값은 ${value}, 검증결과는 ${isValid}입니다.`);
+            onChange={({ value }) => {
+              setId(value);
             }}
           />
           <FormInput
@@ -37,8 +69,8 @@ const RegisterPage = () => {
               invalid: "사용 불가능한 닉네임 입니다.",
             }}
             validator={(value: string) => value.length >= 2}
-            onChange={({ value, isValid }) => {
-              console.log(`값은 ${value}, 검증결과는 ${isValid}입니다.`);
+            onChange={({ value }) => {
+              setName(value);
             }}
           />
           <FormInput
@@ -51,15 +83,15 @@ const RegisterPage = () => {
               invalid: "사용 불가능한 비밀번호 입니다.",
             }}
             validator={(value: string) => value.length >= 8}
-            onChange={({ value, isValid }) => {
-              console.log(`값은 ${value}, 검증결과는 ${isValid}입니다.`);
+            onChange={({ value }) => {
+              setPassword(value);
             }}
           />
         </div>
         <div className={styles.regiBtnContainer}>
-          <Link to="/" onClick={() => alert("가입되었습니다!")}>
-            <Button className={styles.regiBtn}>가입 하기</Button>
-          </Link>
+          <Button type="submit" className={styles.regiBtn}>
+            가입 하기
+          </Button>
         </div>
       </form>
     </div>

@@ -3,6 +3,7 @@ const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcrypt");
 const JWT = require("jsonwebtoken");
 const passport = require("../config/passport");
+const checkAuth = require("../middleware/checkAuth");
 const asyncHandler = require("express-async-handler");
 const qs = require("qs");
 
@@ -81,7 +82,7 @@ router.post(
 
     await user.save(); // db에 user 저장
 
-    res.json({
+    return res.json({
       token: generateUserToken(user.id),
     });
   })
@@ -107,6 +108,28 @@ router.post(
       success: true,
     });
   })
+);
+
+router.get(
+  "/user",
+  checkAuth,
+  asyncHandler(async (req, res) => {
+    const id = req.user;
+    try {
+      const user = await User.findOne({ id }, { id: 1, name: 1 });
+      if (!user) {
+        res.status(404).json({
+          message: "유저가 존재하지 않습니다.",
+        });
+      } else {
+        res.json({ user });
+      }
+    } catch {
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
+    }
+  }),
 );
 
 module.exports = router;
