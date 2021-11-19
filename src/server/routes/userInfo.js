@@ -7,12 +7,11 @@ const User = require("../models/User");
 //닉네임 수정 버튼 눌렀을 때(/api/user-info/rename)
 router.post(
   "/rename",
+  checkAuth.headerToUserId,
   asyncHandler(async (req, res) => {
     const { name } = req.body;
-    const token = req.header("x-auth-token");
-    const id = await checkAuth(token).id;
-    console.log(id);
-    User.findOneAndUpdate({ id: id }, { $set: { name: name } });
+    const id = req.user;
+    await User.findOneAndUpdate({ id: id }, { $set: { name: name } });
     return res.json({
       id: id,
       success: true,
