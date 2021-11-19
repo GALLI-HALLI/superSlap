@@ -1,0 +1,44 @@
+.GameListContainer {
+  display: flex;
+  flex-direction: column;
+
+  padding: 10px 10px 0 10px;
+  .gameContainer {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0 20px 0;
+    border: none;
+    border-radius: 20px;
+  }
+  .gameListTitle {
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    border-radius: 20px 20px 0 0;
+    height: 35px;
+    background-color: #974dcb;
+    .roomNumber {
+      margin-left: auto;
+    }
+  }
+  .gameList {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background-color: white;
+    height: 410px;
+    border-radius: 0 0 20px 20px;
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+      li {
+        display: flex;
+        align-items: center;
+        list-style: none;
+        height: 50px;
+        border-bottom: 1px dotted;
+      }
+    }
+  }
+}

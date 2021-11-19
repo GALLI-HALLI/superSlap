@@ -8,6 +8,7 @@ import LobbyPage from "./pages/LobbyPage";
 import MyInfo from "./pages/MyInfo";
 import AuthRedirect from "./pages/AuthRedirect";
 import initializeStore from "./store/initializeStore";
+import RoomPage from "./pages/RoomPage";
 
 const store = initializeStore();
 
@@ -21,6 +22,7 @@ function App() {
           <Route path="/my-info" component={MyInfo} />
           <Route path="/lobby" component={LobbyPage} />
           <Route path="/auth-redirect" component={AuthRedirect} />
+          <Route path="/room" component={RoomPage} />
         </Switch>
       </Layout>
     </Provider>
