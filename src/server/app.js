@@ -40,13 +40,7 @@ if (process.env.NODE_ENV === "production") {
   });
 } else if (process.env.NODE_ENV === "development") {
   app.get("/*", proxy("http://localhost:3000"));
-  // 리액트 개발서버가 3000번으로뜨지?
-  // 익스프레스 말고.. 리액트
 }
-
-app.get("/game/:code", function (request, response) {
-  response.sendFile(path.join(__dirname, "/room/game.html")); //*****FE 바꾸기********
-});
 
 const gameSocket = io.of("/game");
 
