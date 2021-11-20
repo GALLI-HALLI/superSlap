@@ -24,7 +24,6 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
   const { status: userProfileStatus, data } = useProfile();
 
   const onSubmit = (form: { id: string; password: string }) => {
-    console.log(form);
     dispatch(userLogin(form));
   };
 

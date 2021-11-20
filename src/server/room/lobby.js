@@ -24,7 +24,6 @@ router.get("/make", checkAuth.headerToUserId, (req, res) => {
 
 router.post("/enter", (req, res) => {
   const code = req.body.code;
-
   if (roomManager.hasRoom(code)) {
     return res.json({
       succuess: true,
