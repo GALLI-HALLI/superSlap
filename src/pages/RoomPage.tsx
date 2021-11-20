@@ -14,6 +14,12 @@ const RoomPage = ({ match }: { match: string[] }) => {
     console.log("방이 없습니다");
   });
 
+  socket.on("member", (reader: string, players: string[]) => {
+    console.log(reader);
+    console.log(players);
+    console.log(players.length);
+  });
+
   return (
     <div className={styles.container}>
       <div className={styles.buttonContainer}>
