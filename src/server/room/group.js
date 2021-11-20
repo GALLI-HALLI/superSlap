@@ -6,8 +6,7 @@ const roomManager = lobby.roomManager;
 const send = (gameSocket, room, code) => {
   gameSocket.in(code).emit("metadata", room); //room.id, Array.from(room.players.keys()));
 };
-
-const userConnect = (socket, gameSocket) => {
+module.exports = (socket, gameSocket) => {
   let room;
   let id;
   let name;
@@ -43,5 +42,3 @@ const userConnect = (socket, gameSocket) => {
     send(gameSocket, room, room.code);
   });
 };
-
-module.exports = userConnect;

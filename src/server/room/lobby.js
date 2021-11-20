@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const RoomManager = require("./roomManager.js");
-const asyncHandler = require("express-async-handler");
 const { nanoid } = require("nanoid");
 
 const checkAuth = require("../middleware/checkAuth");

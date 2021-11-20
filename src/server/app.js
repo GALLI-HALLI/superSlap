@@ -31,7 +31,6 @@ app.use(express.urlencoded({ extend: true }));
 app.use("/api", backApi);
 
 console.log(process.env.NODE_ENV);
-
 const gameSocket = io.of("/room");
 
 const userConnect = require("./room/group.js");

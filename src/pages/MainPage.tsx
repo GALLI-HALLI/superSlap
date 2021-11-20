@@ -9,8 +9,6 @@ import useProfile from "../hooks/useProfile";
 import { AsyncActionStatus } from "../constants/redux";
 import { useDispatch } from "react-redux";
 import { userLogin } from "../store/user/user.action";
-import { useSelector } from "../hooks/typeReduxHook";
-import { useHistory } from "react-router";
 
 const googleButtonStyle = {
   width: "310px",
