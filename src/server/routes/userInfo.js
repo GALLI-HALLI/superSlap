@@ -5,7 +5,7 @@ const User = require("../models/User");
 // const mongoose = require("mongoose");
 
 //닉네임 수정 버튼 눌렀을 때(/api/user-info/rename)
-router.post(
+router.put(
   "/rename",
   checkAuth.headerToUserId,
   asyncHandler(async (req, res) => {
