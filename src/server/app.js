@@ -6,6 +6,7 @@ const express = require("express");
 const path = require("path");
 const socket = require("socket.io");
 const http = require("http");
+const proxy = require("express-http-proxy");
 const backApi = require("./backApi");
 
 const app = express();
@@ -29,12 +30,19 @@ app.use(express.urlencoded({ extend: true }));
 // path of api
 app.use("/api", backApi);
 
-app.use(express.static(path.join(__dirname, "../../build")));
+console.log(process.env.NODE_ENV);
 
-// '/*' : /에 글자 상관없이 매칭 된다.
-app.get("/*", function (request, response) {
-  response.sendFile(path.join(__dirname, "../../build/index.html"));
-});
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../../build")));
+  // '/*' : /에 글자 상관없이 매칭 된다.
+  app.get("/*", function (request, response) {
+    response.sendFile(path.join(__dirname, "../../build/index.html"));
+  });
+} else if (process.env.NODE_ENV === "development") {
+  app.get("/*", proxy("http://localhost:3000"));
+  // 리액트 개발서버가 3000번으로뜨지?
+  // 익스프레스 말고.. 리액트
+}
 
 app.get("/game/:code", function (request, response) {
   response.sendFile(path.join(__dirname, "/room/game.html")); //*****FE 바꾸기********
