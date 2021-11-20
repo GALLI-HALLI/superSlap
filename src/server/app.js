@@ -17,7 +17,7 @@ const passport = require("passport");
 const session = require("express-session"); // express-session 설정이 반드시 passport-session 위에 있어야 함
 
 app.use(
-  session({ secret: "MySecret", resave: false, saveUninitialized: true })
+  session({ secret: "MySecret", resave: false, saveUninitialized: true }),
 );
 
 // Passport setting
