@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import "@egjs/react-flicking/dist/flicking.css";
 import Flicking from "@egjs/react-flicking";
 import io from "socket.io-client";
 import GameList from "../components/RoomPage/GameList";
