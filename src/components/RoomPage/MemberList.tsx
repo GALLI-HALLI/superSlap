@@ -1,12 +1,12 @@
 import styles from "./MemberList.module.scss";
 
-const MemberList = ({ roomCode }: { roomCode: string[] }) => {
+const MemberList = ({ roomId }: { roomId: string }) => {
   return (
     <div className={styles.MemberListContainer}>
       <div className={styles.memberContainer}>
         <div className={styles.memberCount}>
           <div>플레이어 : N명</div>
-          <div className={styles.roomNumber}>방 번호 : {roomCode}</div>
+          <div className={styles.roomNumber}>방 번호 : {roomId}</div>
         </div>
         <div className={styles.memberList}>
           <ul>

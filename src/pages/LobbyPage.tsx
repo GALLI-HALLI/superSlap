@@ -27,7 +27,7 @@ const LobbyPage = () => {
     if (roomStatus === AsyncActionStatus.Success) {
       history.replace(`/room/${roomData}`);
     }
-  }, [roomStatus]);
+  }, [roomStatus, roomData, history]);
 
   const makeRoom = () => {
     dispatch(getRoomId());

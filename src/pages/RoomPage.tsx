@@ -1,24 +1,25 @@
+import { useState, useEffect } from "react";
 import Flicking from "@egjs/react-flicking";
 import io from "socket.io-client";
 import GameList from "../components/RoomPage/GameList";
 import MemberList from "../components/RoomPage/MemberList";
 import styles from "./RoomPage.module.scss";
 import Button from "../components/common/Button";
+import { useParams } from "react-router-dom";
+const RoomPage = () => {
+  const { roomId } = useParams<{ roomId: string }>();
+  // const { leader } = useSelector((state) => state.room.leader);
+  const [socket] = useState(() => io("/room"));
+  useEffect(() => {
+    let token = localStorage.getItem("token");
 
-const RoomPage = ({ match }: { match: string[] }) => {
-  const socket = io(`/room`);
-  let code = document.location.href.split("room/");
-  let token = localStorage.getItem("token");
-  socket.emit("enter", code[1], token);
-  socket.on("noRoom", () => {
-    console.log("방이 없습니다");
-  });
+    socket.emit("enter", roomId, token);
 
-  socket.on("member", (reader: string, players: string[]) => {
-    console.log(reader);
-    console.log(players);
-    console.log(players.length);
-  });
+    // socket.on("metadata", (data) => {
+    //   // 폭탄을 옮겨준다.
+    //   dispatch(setMetadata(data));
+    // });
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -28,7 +29,7 @@ const RoomPage = ({ match }: { match: string[] }) => {
       </div>
       <Flicking className={styles.roomPageContainer}>
         <div style={{ width: "360px", height: "540px" }}>
-          <MemberList roomCode={match} />
+          <MemberList roomId={roomId} />
         </div>
         <div style={{ width: "360px", height: "540px" }}>
           <GameList />
