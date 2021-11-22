@@ -5,6 +5,7 @@ const socketEvents = require("../constants/socketEvents");
 const { sendMetaData } = require("./utils");
 const roomManager = lobby.roomManager;
 
+
 module.exports = (socket, gameSocket) => {
   let room;
   let id;
@@ -25,7 +26,9 @@ module.exports = (socket, gameSocket) => {
       name = user.name;
       room.addPlayer(id, name, socket);
       socket.join(code);
+
       sendMetaData(gameSocket, room, code);
+
     }
   });
 

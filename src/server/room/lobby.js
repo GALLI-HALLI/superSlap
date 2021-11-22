@@ -22,12 +22,19 @@ router.get("/make", checkAuth.headerToUserId, (req, res) => {
 router.post("/enter", (req, res) => {
   const code = req.body.code;
   if (roomManager.hasRoom(code)) {
+    if (roomManager.rooms.get(code).players.length > 7) {
+      return res.json({
+        succuess: false,
+        msg: "인원이 8명이상입니다.",
+      });
+    }
     return res.json({
       succuess: true,
     });
   } else {
     return res.json({
       succuess: false,
+      msg: "방이 존재하지 않습니다.",
     });
   }
 });
