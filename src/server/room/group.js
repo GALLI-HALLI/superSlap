@@ -4,7 +4,7 @@ const lobby = require("./lobby");
 const roomManager = lobby.roomManager;
 
 const send = (gameSocket, room, code) => {
-  gameSocket.in(code).emit("metadata", room); //room.id, Array.from(room.players.keys()));
+  gameSocket.in(code).emit("metadata", room);
 };
 
 const userConnect = (socket, gameSocket) => {
@@ -22,9 +22,6 @@ const userConnect = (socket, gameSocket) => {
       room.addPlayer(id, name);
       socket.join(code);
       send(gameSocket, room, code);
-      // gameSocket
-      //   .in(code)
-      //   .emit("member", room);//room.id, Array.from(room.players.keys()));
     }
   });
 
