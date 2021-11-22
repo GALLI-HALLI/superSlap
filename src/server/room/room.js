@@ -1,15 +1,20 @@
-const gameList = {
-  none: "none",
-  bamb: "bamb",
-  pencil: "pencil",
+const gameList = ["none", "bomb", "pencil"];
+
+const GameStatus = {
+  Idle: "Idle",
+  Started: "Started",
+  Ended: "Ended",
 };
 
 module.exports = class Room {
-  constructor(code, readerId) {
+  constructor(code, leaderId) {
     this.code = code;
-    this.players = new Map();
-    this.id = readerId;
-    this.game = gameList.none; //게임 시작되면 game명으로 바꾸기
+    this.players = [];
+    this.id = leaderId;
+    this.game = gameList[0]; //게임 시작되면 game명으로 바꾸기
+    this.gameStatus = GameStatus.Idle;
+    this.startTime = null;
+    this.gameInstance = null;
   }
 
   addPlayer(id, nickname) {
@@ -18,10 +23,21 @@ module.exports = class Room {
       id: id, //userId
       nickname: nickname,
     };
-    this.players.set(id, player);
+    this.players.push(player);
   }
 
   removePlayer(id) {
-    this.players.delete(id);
+    for (let i = 0; i < this.players.length; i++) {
+      if (this.players[i].id === id) {
+        this.players.splice(i, 1);
+        break;
+      }
+    }
+  }
+
+  startGame(type) {
+    this.gameStatus = GameStatus.Started;
+    this.game = gameList[type];
+    this.startTime = Date.now();
   }
 };
