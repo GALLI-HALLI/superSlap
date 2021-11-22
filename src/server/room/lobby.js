@@ -24,8 +24,6 @@ router.get("/make", checkAuth.headerToUserId, (req, res) => {
 
 router.post("/enter", (req, res) => {
   const code = req.body.code;
-  // console.log(roomManager.rooms[code].players.length());
-  console.log(roomManager.rooms.get(code).players.length);
   if (roomManager.hasRoom(code)) {
     if (roomManager.rooms.get(code).players.length > 7) {
       return res.json({
