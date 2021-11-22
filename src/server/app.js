@@ -30,7 +30,6 @@ app.use(express.urlencoded({ extend: true }));
 // path of api
 app.use("/api", backApi);
 
-console.log(process.env.NODE_ENV);
 const gameSocket = io.of("/room");
 
 const userConnect = require("./room/group.js");
@@ -62,3 +61,7 @@ mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
     });
   }
 });
+
+module.exports = {
+  gameSocket,
+};

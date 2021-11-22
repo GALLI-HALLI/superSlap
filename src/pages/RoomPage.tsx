@@ -7,6 +7,7 @@ import MemberList from "../components/RoomPage/MemberList";
 import styles from "./RoomPage.module.scss";
 import Button from "../components/common/Button";
 import { useParams } from "react-router-dom";
+
 const RoomPage = () => {
   const { roomId } = useParams<{ roomId: string }>();
   // const { leader } = useSelector((state) => state.room.leader);
