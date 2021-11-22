@@ -17,7 +17,7 @@ const passport = require("passport");
 const session = require("express-session"); // express-session 설정이 반드시 passport-session 위에 있어야 함
 
 app.use(
-  session({ secret: "MySecret", resave: false, saveUninitialized: true }),
+  session({ secret: "MySecret", resave: false, saveUninitialized: true })
 );
 
 // Passport setting
@@ -32,6 +32,14 @@ app.use("/api", backApi);
 
 console.log(process.env.NODE_ENV);
 
+const gameSocket = io.of("/room");
+
+const userConnect = require("./room/group.js");
+
+gameSocket.on("connection", (socket) => {
+  userConnect(socket, gameSocket);
+});
+
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../../build")));
   // '/*' : /에 글자 상관없이 매칭 된다.
@@ -41,14 +49,6 @@ if (process.env.NODE_ENV === "production") {
 } else if (process.env.NODE_ENV === "development") {
   app.get("/*", proxy("http://localhost:3000"));
 }
-
-const gameSocket = io.of("/game");
-
-const userConnect = require("./room/group.js");
-
-gameSocket.on("connection", (socket) => {
-  userConnect(socket);
-});
 
 mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
   if (err) {

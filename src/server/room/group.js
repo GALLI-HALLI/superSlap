@@ -3,6 +3,10 @@ const checkAuth = require("../middleware/checkAuth");
 const lobby = require("./lobby");
 const roomManager = lobby.roomManager;
 
+const send = (gameSocket, room, code) => {
+  gameSocket.in(code).emit("metadata", room); //room.id, Array.from(room.players.keys()));
+};
+
 const userConnect = (socket, gameSocket) => {
   let room;
   let id;
@@ -17,22 +21,26 @@ const userConnect = (socket, gameSocket) => {
       name = user.name;
       room.addPlayer(id, name);
       socket.join(code);
-      gameSocket
-        .in(code)
-        .emit("member", room.id, Array.from(room.players.keys()));
+      send(gameSocket, room, code);
+      // gameSocket
+      //   .in(code)
+      //   .emit("member", room);//room.id, Array.from(room.players.keys()));
     }
   });
 
   socket.on("disconnect", () => {
-    gameSocket
-      .in(room.code)
-      .emit("member", room.id, Array.from(room.players.keys()));
     if (room) {
       room.removePlayer(id);
       if (id === room.id) {
         roomManager.destroyRoom(room.code);
       }
     }
+    send(gameSocket, room, room.code);
+  });
+
+  socket.on("gameStart", (gameNum) => {
+    room.startGame(gameNum);
+    send(gameSocket, room, room.code);
   });
 };
 
