@@ -1,0 +1,19 @@
+.hotBombPotato {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  /* width: 360px; */
+}
+
+#canvas {
+  background-color: #38b5db;
+  border-radius: 20px;
+}
+
+.joystick {
+  margin: 20px;
+  /* background-color: black; */
+  width: 100px;
+}

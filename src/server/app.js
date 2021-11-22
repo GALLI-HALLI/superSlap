@@ -17,7 +17,7 @@ const passport = require("passport");
 const session = require("express-session"); // express-session 설정이 반드시 passport-session 위에 있어야 함
 
 app.use(
-  session({ secret: "MySecret", resave: false, saveUninitialized: true })
+  session({ secret: "MySecret", resave: false, saveUninitialized: true }),
 );
 
 // Passport setting
@@ -29,8 +29,6 @@ app.use(express.urlencoded({ extend: true }));
 
 // path of api
 app.use("/api", backApi);
-
-console.log(process.env.NODE_ENV);
 
 const gameSocket = io.of("/room");
 
@@ -63,3 +61,7 @@ mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
     });
   }
 });
+
+module.exports = {
+  gameSocket,
+};

@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const RoomManager = require("./roomManager.js");
-const asyncHandler = require("express-async-handler");
 const { nanoid } = require("nanoid");
 
 const checkAuth = require("../middleware/checkAuth");
+const { gameSocket } = require("../app");
 
 const roomManager = new RoomManager();
 
@@ -14,12 +14,9 @@ router.get("/make", checkAuth.headerToUserId, (req, res) => {
   do {
     code = nanoid(7);
   } while (roomManager.hasRoom(code));
-
-  roomManager.createRoom(code, id);
-
-  res.json({
-    code,
-  }); //code 받아서 그 라우터로 이동(ex localhost:3000/game/code번호)
+  roomManager.createRoom(code, id, gameSocket);
+  console.log(roomManager);
+  res.json({ code }); //code 받아서 그 라우터로 이동(ex localhost:3000/room/code번호)
 });
 
 router.post("/enter", (req, res) => {

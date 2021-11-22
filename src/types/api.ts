@@ -13,3 +13,7 @@ export type TLogin = {
   id: string;
   password: string;
 };
+
+export type TRoomId = {
+  roomId: string;
+};

@@ -1,4 +1,4 @@
-import { TLogin, TProfile, TRegister } from "../types/api";
+import { TLogin, TProfile, TRegister, TRoomId } from "../types/api";
 
 export const getCurrentUserProfile = (): Promise<TProfile> => {
   return fetch("/api/auth/user", {
@@ -40,4 +40,20 @@ export const loginUser = (user: TLogin): Promise<any> => {
     }
     return res.json();
   });
+};
+
+export const getRoomID = (): Promise<TRoomId> => {
+  return fetch("/api/lobby/make", {
+    method: "GET",
+    headers: {
+      "x-auth-token": localStorage.getItem("token") ?? "",
+    },
+  })
+    .then((res) => {
+      if (res.status !== 200) {
+        throw new Error("Failed to fetch room Id!!");
+      }
+      return res.json();
+    })
+    .then(({ code }) => code);
 };

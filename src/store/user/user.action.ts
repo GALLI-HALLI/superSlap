@@ -38,7 +38,6 @@ export const registerUser =
     dispatch(registerLoading());
     try {
       const { token } = await signUpUser({ id, name, password });
-      console.log(token);
       localStorage.setItem("token", token);
       dispatch(registerSuccess());
     } catch {

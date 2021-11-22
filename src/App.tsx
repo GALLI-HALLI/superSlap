@@ -22,7 +22,7 @@ function App() {
           <Route path="/my-info" component={MyInfo} />
           <Route path="/lobby" component={LobbyPage} />
           <Route path="/auth-redirect" component={AuthRedirect} />
-          <Route path="/room" component={RoomPage} />
+          <Route path="/room/:roomId" component={RoomPage} />
         </Switch>
       </Layout>
     </Provider>

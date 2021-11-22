@@ -1,13 +1,16 @@
-import React, { useEffect, useRef } from "react";
+import React, { memo, useEffect, useMemo, useRef } from "react";
 import "./App.css";
 import { Joystick } from "react-joystick-component";
-import io from "socket.io-client";
-import isWallCollision from "./isWallCollision";
-import isBallCollision from "./isBallCollision";
-import adjustBallPosition from "./adjustPosition";
-import bombImage from "./image/bomb.png";
-import backgroundImage from "./image/gameBackground.jpg";
-import backgroundImage2 from "./image/gameBackground2.jpg";
+import { Socket } from "socket.io-client";
+import bombImage from "../../image/bomb.png";
+import backgroundImage from "../image/gameBackground2.jpg";
+import {
+  adjustPosition,
+  isBallCollision,
+  isWallCollision,
+} from "../../utils/bomb";
+import { SocketServerEvent } from "../../constants/socket";
+import "./BombGame.css";
 
 /* ================== 조이스틱 관련 시작 ================== */
 type JoystickDirection = "FORWARD" | "RIGHT" | "LEFT" | "BACKWARD";
@@ -48,7 +51,7 @@ const bomb = new Image();
 bomb.src = bombImage;
 
 const gameBackground = new Image();
-gameBackground.src = backgroundImage2;
+gameBackground.src = backgroundImage;
 
 /* ================== 이미지 관련 끝 ================== */
 
@@ -181,75 +184,61 @@ function updateBomb(sid: string, sbomb: boolean, rid: string, rbomb: boolean) {
 /* ================== 게임 정보 관련 끝 ================== */
 
 /* ================== 서버 관련 시작 ================== */
-const socket = io();
+const setupSocketEvents = (socket: Socket) => {
+  socket.on("user_id", function (data) {
+    myId = data;
+  });
 
-socket.on("user_id", function (data) {
-  myId = data;
-});
+  socket.on("join_user", function (data) {
+    joinUser(data.id, data.color, data.x, data.y, data.bomb);
+  });
 
-socket.on("join_user", function (data) {
-  joinUser(data.id, data.color, data.x, data.y, data.bomb);
-});
+  socket.on("leave_user", function (data) {
+    leaveUser(data);
+  });
 
-socket.on("leave_user", function (data) {
-  leaveUser(data);
-});
+  socket.on("update_state", function (data) {
+    updateState(data.id, data.x, data.y, data.bomb);
+  });
 
-socket.on("update_state", function (data) {
-  updateState(data.id, data.x, data.y, data.bomb);
-});
+  socket.on("update_bomb", function (data) {
+    updateBomb(data.sid, data.sbomb, data.rid, data.rbomb);
+  });
 
-socket.on("update_bomb", function (data) {
-  updateBomb(data.sid, data.sbomb, data.rid, data.rbomb);
-});
+  socket.on(SocketServerEvent.GameEnd, function (data) {
+    gameFinished(data.loser, data.color);
+  });
 
-socket.on("game_end", function (data) {
-  gameFinished(data.loser, data.color);
-});
-
-function sendData(Player: playerBallType) {
-  let data: dataToServer = {
-    id: Player.id,
-    x: Player.x,
-    y: Player.y,
-  };
-  if (data) {
-    socket.emit("send_location", data);
+  function sendData(Player: playerBallType) {
+    let data: dataToServer = {
+      id: Player.id,
+      x: Player.x,
+      y: Player.y,
+    };
+    if (data) {
+      socket.emit("send_location", data);
+    }
   }
-}
 
-function bombChange(ballId1: string, ballId2: string) {
-  console.log("bomb change");
-  let data = {
-    send: ballId1,
-    receive: ballId2,
-  };
-  if (data) {
-    socket.emit("bomb_change", data);
+  function bombChange(ballId1: string, ballId2: string) {
+    console.log("bomb change");
+    let data = {
+      send: ballId1,
+      receive: ballId2,
+    };
+    if (data) {
+      socket.emit("bomb_change", data);
+    }
   }
-}
+
+  function gameFinished(loser: string, color: string) {}
+
+  return { sendData, bombChange, gameFinished };
+};
 
 const playTime = 30;
 let progressBarHeight = 0;
 let gameTime = 0;
-
-function gameStart() {
-  let data = true;
-  socket.emit("game_start", data);
-
-  progressBarHeight = 0;
-  gameTime = 0;
-  let timer = setInterval(function () {
-    gameTime += 0.1;
-    progressBarHeight += 1.666666667;
-    console.log(gameTime);
-    if (gameTime >= playTime) {
-      clearInterval(timer);
-    }
-  }, 100);
-}
-
-function gameFinished(loser: string, color: string) {}
 
 /* ================== 서버 관련 끝 ================== */
 
@@ -265,9 +254,31 @@ function ClearCanvas(ctx: any, canvas: any) {
 
 /* ================== 게임 외적 함수 끝 ================== */
 
-function App() {
+type TBombGameProps = {
+  socket: Socket;
+};
+
+const BombGame = ({ socket }: TBombGameProps) => {
   //canvas 사용을 위해 필요한 선언 1
   const canvasRef: any = useRef(null);
+
+  const { bombChange, sendData } = useMemo(
+    () => setupSocketEvents(socket),
+    [socket],
+  );
+
+  useEffect(() => {
+    progressBarHeight = 0;
+    gameTime = 0;
+    let timer = setInterval(function () {
+      gameTime += 0.1;
+      progressBarHeight += 1.666666667;
+      console.log(gameTime);
+      if (gameTime >= playTime) {
+        clearInterval(timer);
+      }
+    }, 100);
+  }, []);
 
   const render = () => {
     //canvas 사용을 위해 필요한 선언 2
@@ -387,7 +398,7 @@ function App() {
             }
 
             // 충돌 후 내 공 위치 조정
-            let adjustedBallPosition3: number[] = adjustBallPosition(
+            let adjustedBallPosition3: number[] = adjustPosition(
               curPlayer,
               otherPlayerClone,
               xySpeed,
@@ -448,15 +459,8 @@ function App() {
           throttle={120}
         ></Joystick>
       </div>
-      <button
-        onClick={() => {
-          gameStart();
-        }}
-      >
-        게임 시작
-      </button>
     </div>
   );
-}
+};
 
-export default App;
+export default memo(BombGame);
