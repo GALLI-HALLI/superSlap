@@ -37,7 +37,7 @@ class Room {
     this.players.set(id, { nickname, socket });
   }
 
-  removePlayer(id, socket) {
+  removePlayer(id) {
     this.players.delete(id);
     if (this.gameStatus === GameStatus.Started) {
       this.gameInstance.disconnect(id);

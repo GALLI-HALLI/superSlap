@@ -36,7 +36,7 @@ class BombGame extends Game {
   // 폭탄 피하기 시작 하기
   start() {
     this.gameStart = true;
-
+    this.balls[Math.floor(this.balls.length * Math.random)].bomb = true; //폭탄 랜덤생성. 해당 코드 비활성화 시 joinGame()함수에서 첫 번째 플레이어에 폭탄 true 처리하는 코드 필요함
     //생성된 ball들의 기초 정보 전송
     for (let i = 0; i < this.balls.length; i++) {
       let ball = this.balls[i];
@@ -75,7 +75,7 @@ class BombGame extends Game {
     this.getRoomSocket().emit("leave_user", id); //떠날 때 id 값 송신
   }
 
-  joinGame(id) {
+  joinGame(socket, id) {
     let ball = new PlayerBall(socket, id);
     for (let i = 0; i < 8; i++) {
       if (ballSeq[i] === false) {
@@ -88,7 +88,7 @@ class BombGame extends Game {
     ball.x = 140 + 80 * (seq % 2);
     ball.y = 100 + 100 * parseInt(seq / 2);
     ball.color = ballColor[seq];
-    if (seq === 0) ball.bomb = true;
+    // if (seq === 0) ball.bomb = true;//start()함수에서 폭탄랜덤생성 코드 활성화 시 해당 줄 주석처리(첫 번째 플레이어에 폭탄 부여하는 코드임)
 
     this.balls.push(ball);
     this.ballMap[id] = ball;
@@ -108,7 +108,7 @@ class BombGame extends Game {
       }
     }
     if(noBomb === true){
-      balls[Math.floor(this.balls.length * Math.random)].bomb = true;
+      this.balls[Math.floor(this.balls.length * Math.random)].bomb = true;
     }
     ballSeq[this.ballMap[id].seq] = false;
     delete this.ballMap[id];
@@ -118,12 +118,12 @@ class BombGame extends Game {
     console.log(`${id} is entered ${Date()}`);
 
     //게임에 필요한 ball생성 작업
-    this.joinGame(id);
+    this.joinGame(socket, id);
 
     //업데이트된 위치 정보 받아서
     socket.on("send_location", (data) => {
+      //게임시작 여부 판별
       if (this.gameStart) {
-        //게임시작 여부 판별
         let info = this.ballMap[data.id];
         info.x = data.x;
         info.y = data.y;
