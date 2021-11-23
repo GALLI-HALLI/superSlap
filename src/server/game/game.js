@@ -10,8 +10,9 @@ class Game {
   /**
    * 사용자 한명에 대한 소켓이벤트 초기화 & 게임 초기 세팅
    * @param {Socket} socket 사용자 한명에 대한 소켓 정보
+   * @param {Id} id 로그인 id 정보
    */
-  initializeSocketEvents(socket) {
+  initializeSocketEvents(id, socket) {
     throw new Error("Not implemented");
   }
 
@@ -24,9 +25,9 @@ class Game {
 
   /**
    * 사용자 한명이 나갔을 경우
-   * @param {Socket} socket 사용자 한명에 대한 소켓 정보
+   * @param {Id} id 로그인 id 정보
    */
-  disconnect(socket) {
+  disconnect(id) {
     throw new Error("Not implemented");
   }
 
