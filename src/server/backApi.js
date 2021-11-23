@@ -1,11 +1,14 @@
-const router = require("express").Router();
+const createBackApi = (io) => {
+  const router = require("express").Router();
+  const auth = require("./routes/auth");
+  const userInfo = require("./routes/userInfo");
+  const { createLobbyRoute } = require("./room/lobby");
 
-const auth = require("./routes/auth");
-const lobby = require("./room/lobby");
-const userInfo = require("./routes/userInfo");
+  router.use("/auth", auth);
+  router.use("/lobby", createLobbyRoute(io));
+  router.use("/user-info", userInfo);
 
-router.use("/auth", auth);
-router.use("/lobby", lobby.router);
-router.use("/user-info", userInfo);
+  return router;
+};
 
-module.exports = router;
+module.exports = createBackApi;

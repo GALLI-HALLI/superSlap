@@ -5,7 +5,6 @@ const socketEvents = require("../constants/socketEvents");
 const { sendMetaData } = require("./utils");
 const roomManager = lobby.roomManager;
 
-
 module.exports = (socket, gameSocket) => {
   let room;
   let id;
@@ -28,20 +27,20 @@ module.exports = (socket, gameSocket) => {
       socket.join(code);
 
       sendMetaData(gameSocket, room, code);
-
     }
   });
 
   // 연결이 해제되었을때 방장이 나갔는지 체크하고 나갔다면 방을 없앤다.
   socket.on(socketEvents.disconnect, (reason) => {
     console.log(socket.id + " has left because of " + reason + " " + Date());
+
     if (room) {
       room.removePlayer(id);
+      sendMetaData(gameSocket, room, room.code);
       if (id === room.id) {
         roomManager.destroyRoom(room.code);
       }
     }
-    sendMetaData(gameSocket, room, room.code);
   });
 
   // 게임시작시 게임시작했다고 정보를 바꿔준다.
