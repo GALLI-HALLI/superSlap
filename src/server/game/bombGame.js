@@ -100,14 +100,14 @@ class BombGame extends Game {
     let noBomb = false;
     for (let i = 0; i < this.balls.length; i++) {
       if (this.balls[i].id === id) {
-        if(this.balls[i].bomb === true){
+        if(this.balls[i].bomb){
           noBomb = true;
         }
         this.balls.splice(i, 1);
         break;
       }
     }
-    if(noBomb === true){
+    if(noBomb){
       this.balls[Math.floor(this.balls.length * Math.random)].bomb = true;
     }
     ballSeq[this.ballMap[id].seq] = false;

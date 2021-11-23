@@ -36,12 +36,12 @@ module.exports = (socket, gameSocket) => {
   socket.on(socketEvents.disconnect, (reason) => {
     console.log(socket.id + " has left because of " + reason + " " + Date());
     if (room) {
+      sendMetaData(gameSocket, room, room.code);
       room.removePlayer(id);
       if (id === room.id) {
         roomManager.destroyRoom(room.code);
       }
     }
-    sendMetaData(gameSocket, room, room.code);
   });
 
   // 게임시작시 게임시작했다고 정보를 바꿔준다.
