@@ -1,14 +1,11 @@
 const dotenv = require("dotenv");
 dotenv.config();
 const mongoose = require("mongoose");
-const fs = require("fs");
 const express = require("express");
 const path = require("path");
 const socket = require("socket.io");
 const http = require("http");
 const proxy = require("express-http-proxy");
-const backApi = require("./backApi");
-
 const app = express();
 const server = http.createServer(app);
 const io = socket(server);
@@ -27,16 +24,15 @@ app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extend: true }));
 
-// path of api
-app.use("/api", backApi);
-
-const gameSocket = io.of("/room");
-
+const gameSocket = io.of("/api/room");
 const userConnect = require("./room/group.js");
-
 gameSocket.on("connection", (socket) => {
   userConnect(socket, gameSocket);
 });
+
+const createBackApi = require("./backApi");
+// path of api
+app.use("/api", createBackApi(gameSocket));
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../../build")));
@@ -61,7 +57,3 @@ mongoose.connect(process.env.MONGODB_URL, { useNewUrlParser: true }, (err) => {
     });
   }
 });
-
-module.exports = {
-  gameSocket,
-};
