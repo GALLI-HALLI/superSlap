@@ -41,7 +41,8 @@ const RoomPage = () => {
       });
       socket.on(SocketServerEvent.GameAlreadyStarted, () => {
         alert("이미 진행중이라고~~~");
-        window.location.replace("/lobby");
+        socket.disconnect();
+        history.push("/lobby");
       });
     }
   }, [socket, dispatch, roomId, history]);
