@@ -113,7 +113,7 @@ class BombGame extends Game {
   }
 
   initializeSocketEvents(socket) {
-    console.log(`${this.socket.id} is entered ${Date()}`);
+    console.log(`${socket.id} is entered ${Date()}`);
 
     //게임에 필요한 ball생성 작업
     this.joinGame(socket);
