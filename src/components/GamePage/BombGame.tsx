@@ -129,7 +129,6 @@ const balls: TPlayerBall[] = [];
 const ballMap: Record<string, playerBall> = {};
 let myId: string;
 
-
 function joinUser(data: TPlayerBall) {
   console.log("join user");
   let ball = new playerBall();
@@ -295,7 +294,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
   const { bombChange, sendData } = useMemo(
     () => setupSocketEvents(socket),
-    [socket],
+    [socket]
   );
 
   useEffect(() => {
@@ -304,7 +303,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
     let timer = setInterval(function () {
       gameTime += 0.1;
       progressBarHeight += 1.666666667;
-      console.log(gameTime);
       if (gameTime >= maxPlayTime) {
         clearInterval(timer);
       }
@@ -339,7 +337,9 @@ const BombGame = ({ socket }: TBombGameProps) => {
       }
     }
 
-    ctx.drawImage(gameBackground, 0, 0, 360, 500);
+    gameBackground.onload = function () {
+      ctx.drawImage(gameBackground, 0, 0, 360, 500);
+    };
 
     // 공들 출력
     ctx.save();
@@ -358,7 +358,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           ball.x - ballRad - 15,
           ball.y - ballRad - 14,
           57,
-          57,
+          57
         );
       }
 
@@ -425,7 +425,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           const collision: boolean = isBallCollision(
             curPlayerClone,
             otherPlayerClone,
-            ballRad,
+            ballRad
           );
 
           // 충돌했을때
@@ -449,7 +449,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
                 otherPlayerClone,
                 gameCanvas,
                 ballRad
-
               );
               otherPlayerClone.x = adjustedBallPosition1[0];
               otherPlayerClone.y = adjustedBallPosition1[1];
@@ -464,7 +463,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
               curPlayer,
               otherPlayerClone,
               xySpeed,
-              ballRad,
+              ballRad
             );
             curPlayerClone.x += adjustedBallPosition3[0];
             curPlayerClone.y += adjustedBallPosition3[1];
