@@ -1,40 +1,84 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, memo } from "react";
 import "@egjs/react-flicking/dist/flicking.css";
 import Flicking from "@egjs/react-flicking";
 import io from "socket.io-client";
-import GameList from "../components/RoomPage/GameList";
 import MemberList from "../components/RoomPage/MemberList";
 import styles from "./RoomPage.module.scss";
 import Button from "../components/common/Button";
-import { useParams } from "react-router-dom";
+import { useSelector } from "../hooks/typeReduxHook";
+import { useParams, useHistory } from "react-router-dom";
+import { setMetaData } from "../store/room/room.action";
+import { useDispatch } from "react-redux";
+import { TMetadata } from "../types/api";
+import { GameStatus, GameType } from "../constants/game";
+import { SocketServerEvent } from "../constants/socket";
+import BombGame from "../components/GamePage/BombGame";
+import GameList from "../components/RoomPage/GameList";
 
+const GameMap = {
+  [GameType.None]: () => (
+    <div>
+      서버에서 문제가 발생했습니다. 게임을 지정하지 않고 게임을 시작할수
+      없습니다.
+    </div>
+  ),
+  [GameType.Bomb]: BombGame,
+};
+
+// 룸페이지 컴포넌트안에 게임리스트 컨포넌트가잇음 지금 원래는이렇게생긴게 아니고
+// 소켓 에밋을 못하던데 저기선
 const RoomPage = () => {
   const { roomId } = useParams<{ roomId: string }>();
-  // const { leader } = useSelector((state) => state.room.leader);
-  const [socket] = useState(() => io("/room"));
+  const [socket] = useState(() => io("/api/room"));
+  const history = useHistory();
+  const metadata = useSelector((state) => state.room.metadata);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     let token = localStorage.getItem("token");
+    if (token) {
+      socket.emit("enter", roomId, token);
+      socket.on("metadata", (data: TMetadata) => {
+        dispatch(setMetaData({ data }));
+      });
+      socket.on(SocketServerEvent.GameAlreadyStarted, () => {
+        alert("이미 진행중이라고~~~");
+        history.push("/lobby");
+      });
+    }
+  }, [socket, dispatch, roomId, history]);
 
-    socket.emit("enter", roomId, token);
+  console.log(metadata);
 
-    // socket.on("metadata", (data) => {
-    //   // 폭탄을 옮겨준다.
-    //   dispatch(setMetadata(data));
-    // });
-  }, []);
+  const joinGame = (type: GameType) => {
+    if (type === GameType.None) {
+      return;
+    }
+    socket.emit("gameStart", type);
+  };
+
+  if (!metadata) {
+    return <div>로딩중 입니다.</div>;
+  }
+
+  if (metadata.gameStatus === GameStatus.Started) {
+    console.log("what?");
+    const GameComponent = GameMap[metadata.type];
+    return <GameComponent socket={socket} />;
+  }
 
   return (
     <div className={styles.container}>
       <div className={styles.buttonContainer}>
         <Button>뒤로가기</Button>
-        <label className={styles.masterName}>방장: 장덕수</label>
+        <label className={styles.masterName}>방장 아이디: {metadata.id}</label>
       </div>
       <Flicking className={styles.roomPageContainer}>
         <div style={{ width: "360px", height: "540px" }}>
-          <MemberList roomId={roomId} />
+          <MemberList roomId={roomId} players={metadata.players} />
         </div>
         <div style={{ width: "360px", height: "540px" }}>
-          <GameList />
+          <GameList onClickGame={joinGame} />
         </div>
       </Flicking>
     </div>
