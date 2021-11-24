@@ -28,6 +28,7 @@ import {
   TGameOngoingData,
   TTimerData,
   TImages,
+  TBombFlick,
 } from "../../types/bombGameTypes";
 
 /* ================== 조이스틱 관련 시작 ================== */
@@ -121,13 +122,17 @@ const timerData: TTimerData = {
   progressBarHeight: 0,
 };
 
+const bombFlick: TBombFlick = {
+  x: 0,
+  a: 1,
+  frameCnt: 0,
+  period: 350,
+};
+
 const balls: TPlayerBall[] = [];
 const ballMap: Record<string, playerBall> = {};
 let myId: string;
 
-const maxPlayTime = 30;
-let progressBarHeight = 0;
-let gameTime = 0;
 let gameEnded = false;
 
 function joinUser(data: TPlayerBall) {
@@ -281,10 +286,6 @@ function ClearCanvas(ctx: any, canvas: any) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-/* ================== 캔버스 출력 관련 끝================== */
-
-/* ================== 게임 외적 함수 시작 ================== */
-
 function shakeGenerator(amplitude: number) {
   let shakeArr: number[] = [
     Math.random() * amplitude,
@@ -293,7 +294,19 @@ function shakeGenerator(amplitude: number) {
   return shakeArr;
 }
 
-/* ================== 게임 외적 함수 끝 ================== */
+function bombFlickering(bombflick: TBombFlick) {
+  bombFlick.frameCnt += 1;
+  bombFlick.x += 0.003 * bombFlick.a;
+
+  if (bombFlick.frameCnt > bombFlick.period) {
+    bombFlick.a += 1;
+    bombFlick.frameCnt = 0;
+  }
+
+  return Math.sin(bombFlick.x - 1.57) / 4 + 0.25;
+}
+
+/* ================== 캔버스 출력 관련 끝================== */
 
 type TBombGameProps = {
   socket: Socket;
@@ -365,7 +378,9 @@ const BombGame = ({ socket }: TBombGameProps) => {
       ctx.fill();
       ctx.stroke();
 
+      //폭탄을 들고 있는 공일 경우
       if (ball.bomb === true) {
+        //폭탄 그리기
         ctx.drawImage(
           bomb,
           ball.x - initialData.ballRad - 15,
@@ -373,6 +388,18 @@ const BombGame = ({ socket }: TBombGameProps) => {
           57,
           57
         );
+
+        //폭탄이 점멸하게
+        // f(x) = sin(x * a) * (1/2)
+        let trans = bombFlickering(bombFlick);
+        ctx.save();
+        ctx.globalAlpha = trans;
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, initialData.ballRad, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
 
         /*==== 추가사항 ====*/
         if (ongoingData.otherBombChangeFreeze) {
