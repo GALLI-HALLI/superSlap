@@ -15,12 +15,12 @@ import {
 import bombImage from "../../image/bomb.png";
 import backgroundImage from "../../image/gameBackground.jpg";
 import explosionImage from "../../image/explosion.png";
+import electricImage from "../../image/electric.png";
 
 // type
 import {
   TPlayerBall,
   TDataToServer,
-  JoystickDirection,
   IJoystickUpdateEvent,
   TJoystickData,
   TGameCanvas,
@@ -66,6 +66,9 @@ gameBackground.src = backgroundImage;
 const explosion = new Image();
 explosion.src = explosionImage;
 
+const electric = new Image();
+electric.src = electricImage;
+
 const Images: TImages = {
   bombIm: bomb,
   gameBackgroundIm: gameBackground,
@@ -100,16 +103,18 @@ const gameCanvas: TGameCanvas = {
   height: 500,
 };
 
-const gameInitialData: TGameIntialData = {
+const initialData: TGameIntialData = {
   ballRad: 20,
-  ballMoveSpeed: 2,
-  bombMoveSpeed: 3,
-  MaxPlayTime: 30,
+  ballMoveSpeed: 2, // 1 보다 큰 수로 속도 배율
+  bombMoveSpeed: 3, // 폭탄은 유저보다 빠르게
+  maxPlayTime: 30,
 };
 
-const gameOngoingData: TGameOngoingData = {
+const ongoingData: TGameOngoingData = {
   gameTime: 0,
   gameEnded: false,
+  myBombChangeFreeze: false,
+  otherBombChangeFreeze: false,
 };
 
 const timerData: TTimerData = {
@@ -119,10 +124,6 @@ const timerData: TTimerData = {
 const balls: TPlayerBall[] = [];
 const ballMap: Record<string, playerBall> = {};
 let myId: string;
-
-const ballRad = 20;
-const ballMoveSpeed = 2; // 1 보다 큰 수로 속도 배율
-const bombMoveSpeed = 3; // 폭탄은 유저보다 빠르게
 
 const maxPlayTime = 30;
 let progressBarHeight = 0;
@@ -198,6 +199,18 @@ function updateBomb(sid: string, sbomb: boolean, rid: string, rbomb: boolean) {
   sball.bomb = sbomb;
   rball.bomb = rbomb;
 
+  // 내가 폭탄일 경우 5초간 조작 금지.
+  if (rid === myId) {
+    ongoingData.myBombChangeFreeze = true;
+    setTimeout(function () {
+      ongoingData.myBombChangeFreeze = false;
+    }, 5000);
+  }
+
+  ongoingData.otherBombChangeFreeze = true;
+  setTimeout(function () {
+    ongoingData.otherBombChangeFreeze = false;
+  }, 5000);
   //클라이언트 사이드에서 생긴 변경사항을 서버에 다시 보내서 정확한 데이터를 돌려 받게함
   // sendData(sball);
   // sendData(rball);
@@ -290,26 +303,27 @@ const BombGame = ({ socket }: TBombGameProps) => {
   //canvas 사용을 위해 필요한 선언 1
   const canvasRef: any = useRef(null);
 
-  let frameCnt = 0;
-
   const { bombChange, sendData } = useMemo(
     () => setupSocketEvents(socket),
     [socket]
   );
 
+  //타이머 용
   useEffect(() => {
-    progressBarHeight = 0;
-    gameTime = 0;
+    timerData.progressBarHeight = 0;
+    ongoingData.gameTime = 0;
     let timer = setInterval(function () {
-      gameTime += 0.1;
-      progressBarHeight += 1.666666667;
-      if (gameTime >= maxPlayTime) {
+      ongoingData.gameTime += 0.1;
+      timerData.progressBarHeight += 1.666666667;
+      if (ongoingData.gameTime >= initialData.maxPlayTime) {
         clearInterval(timer);
       }
     }, 100);
   }, []);
 
-  /* 필요한 변수
+  let frameCnt = 0;
+
+  /* 사용되는변수
     1. canvasRef
     2. gameEnded, framecnt
     3. gameBackGround
@@ -347,31 +361,63 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
       ctx.fillStyle = ball.color;
       ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ballRad, 0, 2 * Math.PI);
+      ctx.arc(ball.x, ball.y, initialData.ballRad, 0, 2 * Math.PI);
       ctx.fill();
       ctx.stroke();
 
       if (ball.bomb === true) {
         ctx.drawImage(
           bomb,
-          ball.x - ballRad - 15,
-          ball.y - ballRad - 14,
+          ball.x - initialData.ballRad - 15,
+          ball.y - initialData.ballRad - 14,
           57,
           57
         );
+
+        /*==== 추가사항 ====*/
+        if (ongoingData.otherBombChangeFreeze) {
+          ctx.save();
+          const shake = shakeGenerator(10);
+          ctx.translate(shake[0], shake[1]);
+          ctx.drawImage(
+            electric,
+            ball.x - initialData.ballRad - 25,
+            ball.y - initialData.ballRad - 25,
+            80,
+            80
+          );
+          ctx.restore();
+        }
+        /*==== 추가사항 ====*/
       }
 
-      ctx.beginPath();
-      ctx.font = "15px Arial";
-      ctx.fillText(`player ${i}`, ball.x - ballRad - 7, ball.y - ballRad - 4);
-      ctx.closePath();
+      // 플레이어 이름 출력
+      if (ball.id === myId) {
+        ctx.beginPath();
+        ctx.font = "15px Arial";
+        ctx.fillText(
+          "나야 나!",
+          ball.x - initialData.ballRad - 7,
+          ball.y - initialData.ballRad - 4
+        );
+        ctx.closePath();
+      } else {
+        ctx.beginPath();
+        ctx.font = "15px Arial";
+        ctx.fillText(
+          `player ${i}`,
+          ball.x - initialData.ballRad - 7,
+          ball.y - initialData.ballRad - 4
+        );
+        ctx.closePath();
+      }
     }
     ctx.restore();
 
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = "red";
-    ctx.fillRect(355, 500, 5, -progressBarHeight);
+    ctx.fillRect(355, 500, 5, -timerData.progressBarHeight);
     ctx.stroke();
     ctx.restore();
 
@@ -385,46 +431,43 @@ const BombGame = ({ socket }: TBombGameProps) => {
     requestAnimationFrame(render);
   };
 
-  /* 필요한 변수
+  /* 사용되는변수
     1. balls, ballMap
     2. joystickData
-    3. ballRad, ballMoveSpeed, bombMoveSpeed
+    3. initialData.ballRad, ballMoveSpeed, bombMoveSpeed
     4. canvas height, width 
     5. 타이머 요소
   */
   const handleGameEvents = () => {
     /*==== 데이터 조작 후 서버 전송 ====*/
-    // 내가 직접 공 위치 바꾸면 안됌1(수정예정)
     const curPlayer = ballMap[myId];
-
+    // 내가 직접 공 위치 클라 꺼는 바꾸면 안됌
     const curPlayerClone: TPlayerBall = JSON.parse(JSON.stringify(curPlayer));
 
-    // const curPlayerClone: TPlayerBall = curPlayer;
-
-    if (joystickData.state === "move") {
+    if (joystickData.state === "move" && !ongoingData.myBombChangeFreeze) {
       let xySpeed: number[] = [joystickData.moveX, joystickData.moveY];
 
       // 조이스틱 이동 값에 따라 공 이동
       if (curPlayerClone.bomb) {
-        curPlayerClone.x += xySpeed[0] * bombMoveSpeed;
-        curPlayerClone.y += xySpeed[1] * bombMoveSpeed;
+        curPlayerClone.x += xySpeed[0] * initialData.bombMoveSpeed;
+        curPlayerClone.y += xySpeed[1] * initialData.bombMoveSpeed;
       } else {
-        curPlayerClone.x += xySpeed[0] * ballMoveSpeed;
-        curPlayerClone.y += xySpeed[1] * ballMoveSpeed;
+        curPlayerClone.x += xySpeed[0] * initialData.ballMoveSpeed;
+        curPlayerClone.y += xySpeed[1] * initialData.ballMoveSpeed;
       }
 
       let bombChangeHappend = false;
 
       // balls 라스트 안의 공들과 내 공의 출동 확인
       for (let ball of balls) {
-        // 내가 직접 공 위치 바꾸면 안됌2(수정예정)
+        // 내가 직접 공 위치 클라 꺼는 바꾸면 안됌2
         const otherPlayerClone = JSON.parse(JSON.stringify(ball));
 
         if (curPlayerClone.id !== otherPlayerClone.id) {
           const collision: boolean = isBallCollision(
             curPlayerClone,
             otherPlayerClone,
-            ballRad
+            initialData.ballRad
           );
 
           // 충돌했을때
@@ -439,21 +482,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
               !bombChangeHappend
             ) {
               bombChange(curPlayerClone.id, otherPlayerClone.id);
-
-              // 부딕친 상대 공을 튕겨 나가게 해줌.
-              otherPlayerClone.x += xySpeed[0] * 60;
-              otherPlayerClone.y += xySpeed[1] * 60;
-
-              let adjustedBallPosition1: number[] = isWallCollision(
-                otherPlayerClone,
-                gameCanvas,
-                ballRad
-              );
-              otherPlayerClone.x = adjustedBallPosition1[0];
-              otherPlayerClone.y = adjustedBallPosition1[1];
-
-              sendData(otherPlayerClone);
-
               bombChangeHappend = true;
             }
 
@@ -462,22 +490,27 @@ const BombGame = ({ socket }: TBombGameProps) => {
               curPlayer,
               otherPlayerClone,
               xySpeed,
-              ballRad
+              initialData.ballRad
             );
             curPlayerClone.x += adjustedBallPosition3[0];
             curPlayerClone.y += adjustedBallPosition3[1];
           }
         }
       }
+
       // 벽 충돌 체크 후 tempSpeed를 업데이트
       let adjustedBallPosition2: number[] = isWallCollision(
         curPlayerClone,
         gameCanvas,
-        ballRad
+        initialData.ballRad
       );
+
       curPlayerClone.x = adjustedBallPosition2[0];
       curPlayerClone.y = adjustedBallPosition2[1];
-    } else if (joystickData.state === "stop") {
+    } else if (
+      joystickData.state === "stop" &&
+      !ongoingData.myBombChangeFreeze
+    ) {
       if (
         curPlayerClone.bomb &&
         curPlayerClone !== undefined &&
