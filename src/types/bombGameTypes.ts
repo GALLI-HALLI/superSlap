@@ -36,6 +36,13 @@ export type TGameOngoingData = {
   otherBombChangeFreeze: boolean;
 };
 
+export type TBombFlick = {
+  x: number;
+  a: number;
+  frameCnt: number;
+  period: number;
+};
+
 export type TImages = {
   bombIm: HTMLImageElement;
   gameBackgroundIm: HTMLImageElement;
