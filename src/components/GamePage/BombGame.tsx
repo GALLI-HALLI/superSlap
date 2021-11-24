@@ -10,7 +10,7 @@ import {
   adjustPosition,
   isBallCollision,
   isWallCollision,
-} from "../../utils/bomb";
+} from "../../utils/bombGameLogic";
 
 // 이미지
 import bombImage from "../../image/bomb.png";
