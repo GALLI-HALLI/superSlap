@@ -15,7 +15,6 @@ const createLobbyRoute = (gameSocket) => {
       code = nanoid(7);
     } while (roomManager.hasRoom(code));
     roomManager.createRoom(code, id, gameSocket);
-    console.log(roomManager);
     res.json({ code }); //code 받아서 그 라우터로 이동(ex localhost:3000/room/code번호)
   });
 

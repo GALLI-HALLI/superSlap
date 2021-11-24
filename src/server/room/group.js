@@ -6,6 +6,7 @@ const { sendMetaData } = require("./utils");
 const roomManager = lobby.roomManager;
 
 module.exports = (socket, gameSocket) => {
+  console.log(socket.id + "is entered");
   let room;
   let id;
   let name;
@@ -35,7 +36,6 @@ module.exports = (socket, gameSocket) => {
     console.log(socket.id + " has left because of " + reason + " " + Date());
 
     if (room) {
-      sendMetaData(gameSocket, room, room.code);
       room.removePlayer(id);
       sendMetaData(gameSocket, room, room.code);
       if (id === room.id) {

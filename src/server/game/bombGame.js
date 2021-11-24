@@ -36,7 +36,7 @@ class BombGame extends Game {
   // 폭탄 피하기 시작 하기
   start() {
     this.gameStart = true;
-    this.balls[Math.floor(this.balls.length * Math.random)].bomb = true; //폭탄 랜덤생성. 해당 코드 비활성화 시 joinGame()함수에서 첫 번째 플레이어에 폭탄 true 처리하는 코드 필요함
+    this.balls[Math.floor(this.balls.length * Math.random())].bomb = true; //폭탄 랜덤생성. 해당 코드 비활성화 시 joinGame()함수에서 첫 번째 플레이어에 폭탄 true 처리하는 코드 필요함
     //생성된 ball들의 기초 정보 전송
     for (let i = 0; i < this.balls.length; i++) {
       let ball = this.balls[i];
@@ -57,6 +57,7 @@ class BombGame extends Game {
     setTimeout(function () {
       this.gameStart = false;
       let loser;
+      if(!this.balls) return;
       for (let i = 0; i < this.balls.length; i++) {
         if (this.balls[i].bomb === true) {
           loser = this.balls[i].id;
@@ -71,7 +72,9 @@ class BombGame extends Game {
 
   // 유저가 나갔을때
   disconnect(id) {
-    this.leftGame(id);
+    if(this.ballMap[id]){
+      this.leftGame(id);
+    }
     this.getRoomSocket().emit("leave_user", id); //떠날 때 id 값 송신
   }
 
@@ -107,8 +110,9 @@ class BombGame extends Game {
         break;
       }
     }
-    if(noBomb){
-      this.balls[Math.floor(this.balls.length * Math.random)].bomb = true;
+
+    if(noBomb && this.balls.length > 0){
+      this.balls[Math.floor(this.balls.length * Math.random())].bomb = true;
     }
     ballSeq[this.ballMap[id].seq] = false;
     delete this.ballMap[id];
