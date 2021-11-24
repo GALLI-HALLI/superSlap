@@ -25,6 +25,21 @@ export type TGameIntialData = {
   MaxPlayTime: number;
 };
 
+export type TTimerData = {
+  progressBarHeight: number;
+};
+
+export type TGameOngoingData = {
+  gameTime: number;
+  gameEnded: boolean;
+};
+
+export type TImages = {
+  bombIm: HTMLImageElement;
+  gameBackgroundIm: HTMLImageElement;
+  explosionIm: HTMLImageElement;
+};
+
 //조이스틱 조작
 export type JoystickDirection = "FORWARD" | "RIGHT" | "LEFT" | "BACKWARD";
 

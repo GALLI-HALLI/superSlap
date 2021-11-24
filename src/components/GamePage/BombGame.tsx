@@ -1,5 +1,4 @@
 import React, { memo, useEffect, useMemo, useRef } from "react";
-import "./App.css";
 import { Joystick } from "react-joystick-component";
 import { Socket } from "socket.io-client";
 import { SocketServerEvent } from "../../constants/socket";
@@ -14,8 +13,8 @@ import {
 
 // 이미지
 import bombImage from "../../image/bomb.png";
-import backgroundImage from "../image/gameBackground2.jpg";
-import explosionImage from "../image//explosion.png";
+import backgroundImage from "../../image/gameBackground.jpg";
+import explosionImage from "../../image//explosion.png";
 
 // type
 import {
@@ -26,6 +25,9 @@ import {
   TJoystickData,
   TGameCanvas,
   TGameIntialData,
+  TGameOngoingData,
+  TTimerData,
+  TImages,
 } from "../../types/bombGameTypes";
 
 /* ================== 조이스틱 관련 시작 ================== */
@@ -64,6 +66,12 @@ gameBackground.src = backgroundImage;
 const explosion = new Image();
 explosion.src = explosionImage;
 
+const Images: TImages = {
+  bombIm: bomb,
+  gameBackgroundIm: gameBackground,
+  explosionIm: explosion,
+};
+
 /* ================== 이미지 관련 끝 ================== */
 
 /* ================== 타입 및 클래스 선언 시작================== */
@@ -97,6 +105,15 @@ const gameInitialData: TGameIntialData = {
   ballMoveSpeed: 2,
   bombMoveSpeed: 3,
   MaxPlayTime: 30,
+};
+
+const gameOngoingData: TGameOngoingData = {
+  gameTime: 0,
+  gameEnded: false,
+};
+
+const timerData: TTimerData = {
+  progressBarHeight: 0,
 };
 
 const ballRad = 20;
