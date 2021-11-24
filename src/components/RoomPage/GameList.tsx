@@ -1,6 +1,20 @@
+import { GameType } from "../../constants/game";
 import styles from "./GameList.module.scss";
 
-const GameList = () => {
+const GameLists = Object.values(GameType).filter(
+  (value) => value !== GameType.None,
+);
+
+const GameName: Record<GameType, string> = {
+  [GameType.None]: "없음",
+  [GameType.Bomb]: "폭탄",
+};
+
+type TGameListProps = {
+  onClickGame: (type: GameType) => void;
+};
+
+const GameList = ({ onClickGame }: TGameListProps) => {
   return (
     <div className={styles.GameListContainer}>
       <div className={styles.gameContainer}>
@@ -9,10 +23,16 @@ const GameList = () => {
         </div>
         <div className={styles.gameList}>
           <ul>
-            <li>게임 1: 김아무개</li>
-            <li>게임 1: 김아무개</li>
-            <li>게임 1: 김아무개</li>
-            <li>게임 1: 김아무개</li>
+            {GameLists.map((value, index) => {
+              return (
+                <li>
+                  게임 {index}: {GameName[value]}
+                  <button onClick={() => onClickGame(value)}>
+                    {GameName[value]}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>

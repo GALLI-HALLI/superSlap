@@ -1,16 +1,9 @@
-type playerBallType = {
-  id: string;
-  color: string;
-  x: number;
-  y: number;
-  bomb: boolean;
-};
+import { TPlayerBall, TGameCanvas } from "../types/bombGameTypes";
 
 export function isWallCollision(
   playerBall: any,
-  canvasHeight: any,
-  canvasWidth: number,
-  ballRad: number,
+  canvas: TGameCanvas,
+  ballRad: number
 ) {
   let tempX: number = playerBall.x;
   let tempY: number = playerBall.y;
@@ -19,9 +12,9 @@ export function isWallCollision(
     //천장
     tempY = ballRad;
     console.log("hit bottom");
-  } else if (tempY + ballRad >= canvasHeight) {
+  } else if (tempY + ballRad >= canvas.height) {
     //바닥
-    tempY = canvasHeight - ballRad;
+    tempY = canvas.height - ballRad;
     console.log("hit top");
   }
 
@@ -29,9 +22,9 @@ export function isWallCollision(
     //왼쪽 벽
     tempX = ballRad;
     console.log("hit left");
-  } else if (playerBall.x + ballRad >= canvasWidth) {
+  } else if (playerBall.x + ballRad >= canvas.width) {
     //오른쪽 벽
-    tempX = canvasWidth - ballRad;
+    tempX = canvas.width - ballRad;
     console.log("hit right");
   }
   // console.log(joystickData.moveX, joystickData.moveY)
@@ -39,9 +32,9 @@ export function isWallCollision(
 }
 
 export function isBallCollision(
-  ball1: playerBallType,
-  ball2: playerBallType,
-  ballRad: number,
+  ball1: TPlayerBall,
+  ball2: TPlayerBall,
+  ballRad: number
 ) {
   const radiusSum = ballRad * 2;
   const dx = ball2.x - ball1.x;
@@ -57,10 +50,10 @@ export function isBallCollision(
 }
 
 export function adjustPosition(
-  ball1: playerBallType,
-  ball2: playerBallType,
+  ball1: TPlayerBall,
+  ball2: TPlayerBall,
   xySpeed: number[],
-  ballRad: number,
+  ballRad: number
 ) {
   const radiusSum = ballRad * 2;
   const dx = ball2.x - ball1.x;
@@ -97,7 +90,7 @@ export function adjustPosition(
   return [adjustX * xDirection, adjustY * yDirection];
 }
 
-// export default function adjustPosition(ball1: playerBallType, ball2: playerBallType, xySpeed: number[], ballRad: number){
+// export default function adjustPosition(ball1: playerBall, ball2: playerBall, xySpeed: number[], ballRad: number){
 //   const radiusSum = ballRad * 2;
 //   let dx;
 //   let dy;

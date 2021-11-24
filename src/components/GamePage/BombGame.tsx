@@ -1,29 +1,38 @@
 import React, { memo, useEffect, useMemo, useRef } from "react";
-import "./App.css";
 import { Joystick } from "react-joystick-component";
 import { Socket } from "socket.io-client";
-import bombImage from "../../image/bomb.png";
-import backgroundImage from "../image/gameBackground2.jpg";
-import explosionImage from "../image//explosion.png";
+import { SocketServerEvent } from "../../constants/socket";
+import "./BombGame.css";
+
+//게임 로직
 import {
   adjustPosition,
   isBallCollision,
   isWallCollision,
-} from "../../utils/bomb";
-import { SocketServerEvent } from "../../constants/socket";
-import "./BombGame.css";
+} from "../../utils/bombGameLogic";
+
+// 이미지
+import bombImage from "../../image/bomb.png";
+import backgroundImage from "../../image/gameBackground.jpg";
+import explosionImage from "../../image//explosion.png";
+
+// type
+import {
+  TPlayerBall,
+  TDataToServer,
+  JoystickDirection,
+  IJoystickUpdateEvent,
+  TJoystickData,
+  TGameCanvas,
+  TGameIntialData,
+  TGameOngoingData,
+  TTimerData,
+  TImages,
+} from "../../types/bombGameTypes";
 
 /* ================== 조이스틱 관련 시작 ================== */
-type JoystickDirection = "FORWARD" | "RIGHT" | "LEFT" | "BACKWARD";
 
-interface IJoystickUpdateEvent {
-  type: "move" | "stop" | "start";
-  x: number | null;
-  y: number | null;
-  direction: JoystickDirection | null;
-}
-
-const joystickData = {
+const joystickData: TJoystickData = {
   moveX: 0,
   moveY: 0,
   state: "stop",
@@ -57,6 +66,12 @@ gameBackground.src = backgroundImage;
 const explosion = new Image();
 explosion.src = explosionImage;
 
+const Images: TImages = {
+  bombIm: bomb,
+  gameBackgroundIm: gameBackground,
+  explosionIm: explosion,
+};
+
 /* ================== 이미지 관련 끝 ================== */
 
 /* ================== 타입 및 클래스 선언 시작================== */
@@ -76,51 +91,56 @@ class playerBall {
   }
 }
 
-type playerBallType = {
-  id: string;
-  color: string;
-  x: number;
-  y: number;
-  bomb: boolean;
-};
-
-type dataToServer = {
-  id: string;
-  x: number;
-  y: number;
-};
-
 /* ================== 타입 및 클래스 선언 끝================== */
 
 /* ================== 게임 정보 관련 시작 ================== */
 //Note: 현재 픽셀 위치 설정은 canvas 360x500을 기준으로 맞춰져있습니다.
-const canvasWidth = 360;
-const canvasHeight = 500;
+const gameCanvas: TGameCanvas = {
+  width: 360,
+  height: 500,
+};
+
+const gameInitialData: TGameIntialData = {
+  ballRad: 20,
+  ballMoveSpeed: 2,
+  bombMoveSpeed: 3,
+  MaxPlayTime: 30,
+};
+
+const gameOngoingData: TGameOngoingData = {
+  gameTime: 0,
+  gameEnded: false,
+};
+
+const timerData: TTimerData = {
+  progressBarHeight: 0,
+};
+
 const ballRad = 20;
 const ballMoveSpeed = 2; // 1 보다 큰 수로 속도 배율
 const bombMoveSpeed = 3; // 폭탄은 유저보다 빠르게
 
-const balls: playerBallType[] = [];
+const maxPlayTime = 30;
+let progressBarHeight = 0;
+let gameTime = 0;
+let gameEnded = false;
+
+const balls: TPlayerBall[] = [];
 const ballMap: Record<string, playerBall> = {};
 let myId: string;
 
-function joinUser(
-  id: string,
-  color: string,
-  x: number,
-  y: number,
-  bomb: boolean
-) {
+
+function joinUser(data: TPlayerBall) {
   console.log("join user");
   let ball = new playerBall();
-  ball.id = id;
-  ball.color = color;
-  ball.x = x;
-  ball.y = y;
-  ball.bomb = bomb;
+  ball.id = data.id;
+  ball.color = data.color;
+  ball.x = data.x;
+  ball.y = data.y;
+  ball.bomb = data.bomb;
 
   balls.push(ball);
-  ballMap[id] = ball;
+  ballMap[data.id] = ball;
 
   return ball;
 }
@@ -135,23 +155,23 @@ function leaveUser(id: string) {
   delete ballMap[id];
 }
 
-function updateState(id: string, x: number, y: number, bomb: boolean) {
+function updateState(data: TPlayerBall) {
   for (let i = 0; i < balls.length; i++) {
-    if (balls[i].id === id) {
-      balls[i].x = x;
-      balls[i].y = y;
-      balls[i].bomb = bomb;
+    if (balls[i].id === data.id) {
+      balls[i].x = data.x;
+      balls[i].y = data.y;
+      balls[i].bomb = data.bomb;
       break;
     }
   }
 
-  let ball = ballMap[id];
+  let ball = ballMap[data.id];
   if (!ball) {
     return;
   }
-  ball.x = x;
-  ball.y = y;
-  ball.bomb = bomb;
+  ball.x = data.x;
+  ball.y = data.y;
+  ball.bomb = data.bomb;
 }
 
 function updateBomb(sid: string, sbomb: boolean, rid: string, rbomb: boolean) {
@@ -192,16 +212,16 @@ const setupSocketEvents = (socket: Socket) => {
     myId = data;
   });
 
-  socket.on("join_user", function (data) {
-    joinUser(data.id, data.color, data.x, data.y, data.bomb);
+  socket.on("join_user", function (data: TPlayerBall) {
+    joinUser(data);
   });
 
   socket.on("leave_user", function (data) {
     leaveUser(data);
   });
 
-  socket.on("update_state", function (data) {
-    updateState(data.id, data.x, data.y, data.bomb);
+  socket.on("update_state", function (data: TPlayerBall) {
+    updateState(data);
   });
 
   socket.on("update_bomb", function (data) {
@@ -212,8 +232,8 @@ const setupSocketEvents = (socket: Socket) => {
     gameFinished(data.loser, data.color);
   });
 
-  function sendData(Player: playerBallType) {
-    let data: dataToServer = {
+  function sendData(Player: TPlayerBall) {
+    let data: TDataToServer = {
       id: Player.id,
       x: Player.x,
       y: Player.y,
@@ -240,11 +260,6 @@ const setupSocketEvents = (socket: Socket) => {
 
   return { sendData, bombChange, gameFinished };
 };
-
-const playTime = 30;
-let progressBarHeight = 0;
-let gameTime = 0;
-let gameEnded = false;
 
 /* ================== 서버 관련 끝 ================== */
 
@@ -280,7 +295,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
   const { bombChange, sendData } = useMemo(
     () => setupSocketEvents(socket),
-    [socket]
+    [socket],
   );
 
   useEffect(() => {
@@ -290,12 +305,20 @@ const BombGame = ({ socket }: TBombGameProps) => {
       gameTime += 0.1;
       progressBarHeight += 1.666666667;
       console.log(gameTime);
-      if (gameTime >= playTime) {
+      if (gameTime >= maxPlayTime) {
         clearInterval(timer);
       }
     }, 100);
   }, []);
 
+  /* 필요한 변수
+    1. canvasRef
+    2. gameEnded, framecnt
+    3. gameBackGround
+    4. balls 
+    5. 타이머 요소
+    6. ballRad
+  */
   const render = () => {
     //canvas 사용을 위해 필요한 선언 2
     const canvas = canvasRef.current;
@@ -335,7 +358,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           ball.x - ballRad - 15,
           ball.y - ballRad - 14,
           57,
-          57
+          57,
         );
       }
 
@@ -365,13 +388,19 @@ const BombGame = ({ socket }: TBombGameProps) => {
     requestAnimationFrame(render);
   };
 
+  /* 필요한 변수
+    1. balls, ballMap
+    2. joystickData
+    3. ballRad, ballMoveSpeed, bombMoveSpeed
+    4. canvas height, width 
+    5. 타이머 요소
+  */
   const handleGameEvents = () => {
     /*==== 데이터 조작 후 서버 전송 ====*/
     // 내가 직접 공 위치 바꾸면 안됌1(수정예정)
     const curPlayer = ballMap[myId];
-    const curPlayerClone: playerBallType = JSON.parse(
-      JSON.stringify(curPlayer)
-    );
+
+    const curPlayerClone: TPlayerBall = JSON.parse(JSON.stringify(curPlayer));
 
     if (joystickData.state === "move") {
       let xySpeed: number[] = [joystickData.moveX, joystickData.moveY];
@@ -396,7 +425,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           const collision: boolean = isBallCollision(
             curPlayerClone,
             otherPlayerClone,
-            ballRad
+            ballRad,
           );
 
           // 충돌했을때
@@ -418,9 +447,9 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
               let adjustedBallPosition1: number[] = isWallCollision(
                 otherPlayerClone,
-                canvasHeight,
-                canvasWidth,
+                gameCanvas,
                 ballRad
+
               );
               otherPlayerClone.x = adjustedBallPosition1[0];
               otherPlayerClone.y = adjustedBallPosition1[1];
@@ -435,7 +464,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
               curPlayer,
               otherPlayerClone,
               xySpeed,
-              ballRad
+              ballRad,
             );
             curPlayerClone.x += adjustedBallPosition3[0];
             curPlayerClone.y += adjustedBallPosition3[1];
@@ -445,8 +474,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
       // 벽 충돌 체크 후 tempSpeed를 업데이트
       let adjustedBallPosition2: number[] = isWallCollision(
         curPlayerClone,
-        canvasHeight,
-        canvasWidth,
+        gameCanvas,
         ballRad
       );
       curPlayerClone.x = adjustedBallPosition2[0];
@@ -478,8 +506,8 @@ const BombGame = ({ socket }: TBombGameProps) => {
         <canvas
           id="canvas"
           ref={canvasRef}
-          height={canvasHeight}
-          width={canvasWidth}
+          height={gameCanvas.height}
+          width={gameCanvas.width}
         />
       </div>
       <div className="joystick">
