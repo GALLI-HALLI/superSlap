@@ -7,7 +7,7 @@ const sendMetaData = (gameSocket, room, code) => {
         ...acc,
         [key]: {
           id: key,
-          nickName: value.nickname,
+          nickname: value.nickname,
         },
       }),
       {},

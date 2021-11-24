@@ -2,8 +2,9 @@ import {
   getRoomIdFaliure,
   getRoomIdSuccess,
   getRoomIdLoading,
+  setMetaData,
 } from "./room.action";
-import { TRoomId } from "../../types/api";
+import { TRoomId, TMetadata } from "../../types/api";
 import { AsyncActionStatus } from "../../constants/redux";
 import { createReducer } from "@reduxjs/toolkit";
 
@@ -12,12 +13,14 @@ type TRoom = {
     roomData?: TRoomId;
     roomStatus: AsyncActionStatus;
   };
+  metadata?: TMetadata;
 };
 
 const initialState: TRoom = {
   roomId: {
     roomStatus: AsyncActionStatus.Idle,
   },
+  metadata: undefined,
 };
 
 const room = createReducer(initialState, (builder) => {
@@ -31,6 +34,10 @@ const room = createReducer(initialState, (builder) => {
   });
   builder.addCase(getRoomIdFaliure, (state) => {
     state.roomId.roomStatus = AsyncActionStatus.Failure;
+  });
+
+  builder.addCase(setMetaData, (state, { payload: { data } }) => {
+    state.metadata = data;
   });
 });
 

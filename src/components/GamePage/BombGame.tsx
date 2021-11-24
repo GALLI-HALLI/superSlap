@@ -129,6 +129,7 @@ const balls: TPlayerBall[] = [];
 const ballMap: Record<string, playerBall> = {};
 let myId: string;
 
+
 function joinUser(data: TPlayerBall) {
   console.log("join user");
   let ball = new playerBall();
@@ -294,7 +295,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
   const { bombChange, sendData } = useMemo(
     () => setupSocketEvents(socket),
-    [socket]
+    [socket],
   );
 
   useEffect(() => {
@@ -357,7 +358,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           ball.x - ballRad - 15,
           ball.y - ballRad - 14,
           57,
-          57
+          57,
         );
       }
 
@@ -398,6 +399,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
     /*==== 데이터 조작 후 서버 전송 ====*/
     // 내가 직접 공 위치 바꾸면 안됌1(수정예정)
     const curPlayer = ballMap[myId];
+
     const curPlayerClone: TPlayerBall = JSON.parse(JSON.stringify(curPlayer));
 
     if (joystickData.state === "move") {
@@ -423,7 +425,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           const collision: boolean = isBallCollision(
             curPlayerClone,
             otherPlayerClone,
-            ballRad
+            ballRad,
           );
 
           // 충돌했을때
@@ -447,6 +449,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
                 otherPlayerClone,
                 gameCanvas,
                 ballRad
+
               );
               otherPlayerClone.x = adjustedBallPosition1[0];
               otherPlayerClone.y = adjustedBallPosition1[1];
@@ -461,7 +464,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
               curPlayer,
               otherPlayerClone,
               xySpeed,
-              ballRad
+              ballRad,
             );
             curPlayerClone.x += adjustedBallPosition3[0];
             curPlayerClone.y += adjustedBallPosition3[1];

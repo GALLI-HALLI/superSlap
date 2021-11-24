@@ -1,3 +1,5 @@
+import { GameType, GameStatus } from "../constants/game";
+
 export type TProfile = {
   id: string;
   name: string;
@@ -16,4 +18,18 @@ export type TLogin = {
 
 export type TRoomId = {
   roomId: string;
+};
+
+export type TPlayer = {
+  id: string;
+  nickname: string;
+};
+
+export type TMetadata = {
+  id: string;
+  code: string;
+  players: Record<string, TPlayer>;
+  type: GameType;
+  gameStatus: GameStatus;
+  startTime: string;
 };
