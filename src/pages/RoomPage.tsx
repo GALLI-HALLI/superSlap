@@ -25,8 +25,6 @@ const GameMap = {
   [GameType.Bomb]: BombGame,
 };
 
-// 룸페이지 컴포넌트안에 게임리스트 컨포넌트가잇음 지금 원래는이렇게생긴게 아니고
-// 소켓 에밋을 못하던데 저기선
 const RoomPage = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const [socket] = useState(() => io("/api/room"));
