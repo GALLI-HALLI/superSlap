@@ -50,6 +50,7 @@ class Room {
     this.startTime = Date.now();
     // 방정보를 보내준다.
     this.gameInstance = new GameMap[this.type](this);
+    sendMetaData(this.gameSocket, this, this.code);
     // 오브젝트의 값들을 이터레이터로 만들어준다. 그것을 어레이로 만들어준다.
     // 방에 있는 플레이어들을 하나씩 돌면서 플레이어들의 소켓 인스턴스에 게임에서 설계한 소켓 로직들을 붙여준다.
     Array.from(this.players).forEach(([ key, value ]) => {
