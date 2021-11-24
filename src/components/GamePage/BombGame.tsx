@@ -14,7 +14,7 @@ import {
 // 이미지
 import bombImage from "../../image/bomb.png";
 import backgroundImage from "../../image/gameBackground.jpg";
-import explosionImage from "../../image//explosion.png";
+import explosionImage from "../../image/explosion.png";
 
 // type
 import {
@@ -116,6 +116,10 @@ const timerData: TTimerData = {
   progressBarHeight: 0,
 };
 
+const balls: TPlayerBall[] = [];
+const ballMap: Record<string, playerBall> = {};
+let myId: string;
+
 const ballRad = 20;
 const ballMoveSpeed = 2; // 1 보다 큰 수로 속도 배율
 const bombMoveSpeed = 3; // 폭탄은 유저보다 빠르게
@@ -124,10 +128,6 @@ const maxPlayTime = 30;
 let progressBarHeight = 0;
 let gameTime = 0;
 let gameEnded = false;
-
-const balls: TPlayerBall[] = [];
-const ballMap: Record<string, playerBall> = {};
-let myId: string;
 
 function joinUser(data: TPlayerBall) {
   console.log("join user");
@@ -336,10 +336,9 @@ const BombGame = ({ socket }: TBombGameProps) => {
         frameCnt += 1;
       }
     }
+    ctx.restore();
 
-    gameBackground.onload = function () {
-      ctx.drawImage(gameBackground, 0, 0, 360, 500);
-    };
+    ctx.drawImage(gameBackground, 0, 0, 360, 500);
 
     // 공들 출력
     ctx.save();
@@ -380,8 +379,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
       ctx.drawImage(explosion, 0, 70, 360, 360);
     }
 
-    ctx.restore();
-
     /*==== 캔버스 요소 조작 끝 ====*/
 
     //canvas에 애니메이션이 작동하게 하는 함수.
@@ -401,6 +398,8 @@ const BombGame = ({ socket }: TBombGameProps) => {
     const curPlayer = ballMap[myId];
 
     const curPlayerClone: TPlayerBall = JSON.parse(JSON.stringify(curPlayer));
+
+    // const curPlayerClone: TPlayerBall = curPlayer;
 
     if (joystickData.state === "move") {
       let xySpeed: number[] = [joystickData.moveX, joystickData.moveY];
