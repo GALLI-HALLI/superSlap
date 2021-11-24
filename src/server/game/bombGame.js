@@ -13,17 +13,14 @@ let ballColor = [
 ]; //8 color setting
 
 class PlayerBall {
-  constructor(socket) {
+  constructor(socket, id) {
     this.socket = socket;
+    this.id = id;
     this.seq = 0;
     this.x = 0;
     this.y = 0;
     this.color = ballColor[0];
     this.bomb = false;
-  }
-
-  get id() {
-    return this.socket.id;
   }
 }
 
@@ -34,14 +31,12 @@ class BombGame extends Game {
     this.balls = [];
     this.ballMap = {};
     this.gameStart = false;
-    this.startTime = null;
   }
 
   // 폭탄 피하기 시작 하기
   start() {
     this.gameStart = true;
-    this.startTime = Date.now() / 1000 + 60;
-
+    this.balls[Math.floor(this.balls.length * Math.random())].bomb = true; //폭탄 랜덤생성. 해당 코드 비활성화 시 joinGame()함수에서 첫 번째 플레이어에 폭탄 true 처리하는 코드 필요함
     //생성된 ball들의 기초 정보 전송
     for (let i = 0; i < this.balls.length; i++) {
       let ball = this.balls[i];
@@ -62,6 +57,7 @@ class BombGame extends Game {
     setTimeout(function () {
       this.gameStart = false;
       let loser;
+      if(!this.balls) return;
       for (let i = 0; i < this.balls.length; i++) {
         if (this.balls[i].bomb === true) {
           loser = this.balls[i].id;
@@ -75,13 +71,15 @@ class BombGame extends Game {
   }
 
   // 유저가 나갔을때
-  disconnect(socket) {
-    this.leftGame(socket);
-    socket.broadcast.emit("leave_user", socket.id); //떠날 때 socket.id 값 송신
+  disconnect(id) {
+    if(this.ballMap[id]){
+      this.leftGame(id);
+    }
+    this.getRoomSocket().emit("leave_user", id); //떠날 때 id 값 송신
   }
 
-  joinGame(socket) {
-    let ball = new PlayerBall(socket);
+  joinGame(socket, id) {
+    let ball = new PlayerBall(socket, id);
     for (let i = 0; i < 8; i++) {
       if (ballSeq[i] === false) {
         ball.seq = i;
@@ -93,39 +91,43 @@ class BombGame extends Game {
     ball.x = 140 + 80 * (seq % 2);
     ball.y = 100 + 100 * parseInt(seq / 2);
     ball.color = ballColor[seq];
-    if (seq === 0) ball.bomb = true;
+    // if (seq === 0) ball.bomb = true;//start()함수에서 폭탄랜덤생성 코드 활성화 시 해당 줄 주석처리(첫 번째 플레이어에 폭탄 부여하는 코드임)
 
     this.balls.push(ball);
-    this.ballMap[socket.id] = ball;
+    this.ballMap[id] = ball;
 
     return ball;
   }
 
-  leftGame(socket) {
+  leftGame(id) {
+    let noBomb = false;
     for (let i = 0; i < this.balls.length; i++) {
-      if (this.balls[i].id === socket.id) {
+      if (this.balls[i].id === id) {
+        if(this.balls[i].bomb){
+          noBomb = true;
+        }
         this.balls.splice(i, 1);
         break;
       }
     }
-    ballSeq[this.ballMap[socket.id].seq] = false;
-    delete this.ballMap[socket.id];
+
+    if(noBomb && this.balls.length > 0){
+      this.balls[Math.floor(this.balls.length * Math.random())].bomb = true;
+    }
+    ballSeq[this.ballMap[id].seq] = false;
+    delete this.ballMap[id];
   }
 
-  initializeSocketEvents(socket) {
-    console.log(`${socket.id} is entered ${Date()}`);
+  initializeSocketEvents(id, socket) {
+    console.log(`${id} is entered ${Date()}`);
 
     //게임에 필요한 ball생성 작업
-    this.joinGame(socket);
-
-    socket.on("timer", (data) => {
-      let timer = this.startTime - Date.now() / 1000;
-    });
+    this.joinGame(socket, id);
 
     //업데이트된 위치 정보 받아서
     socket.on("send_location", (data) => {
+      //게임시작 여부 판별
       if (this.gameStart) {
-        //게임시작 여부 판별
         let info = this.ballMap[data.id];
         info.x = data.x;
         info.y = data.y;
