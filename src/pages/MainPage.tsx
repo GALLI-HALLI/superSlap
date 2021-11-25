@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useState, useEffect } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import GoogleButton from "react-google-button";
 import { Link, Redirect } from "react-router-dom";
 import styles from "./MainPage.module.scss";

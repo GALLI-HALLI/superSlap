@@ -28,7 +28,7 @@ const RegisterPage = () => {
       alert("회원가입 성공");
       history.push("/");
     }
-  }, [registerStatus]);
+  }, [registerStatus, history]);
 
   const dispatch = useDispatch();
 

@@ -19,7 +19,8 @@ const createLobbyRoute = (gameSocket) => {
   });
 
   router.post("/enter", (req, res) => {
-    const code = req.body.code;
+    const code = req.body.roomId;
+    console.log(req.body);
     if (roomManager.hasRoom(code)) {
       if (roomManager.rooms.get(code).players.length > 7) {
         return res.json({
@@ -29,6 +30,7 @@ const createLobbyRoute = (gameSocket) => {
       }
       return res.json({
         succuess: true,
+        msg: "방에 입장합니다.",
       });
     } else {
       return res.json({
