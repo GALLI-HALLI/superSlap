@@ -7,7 +7,6 @@ const GameList = {
 const GameStatus = {
   Idle: "Idle",
   Started: "Started",
-  Ended: "Ended",
 };
 
 module.exports = {
