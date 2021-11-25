@@ -3,8 +3,12 @@ import {
   getRoomIdSuccess,
   getRoomIdLoading,
   setMetaData,
+  getJoinFailure,
+  getJoinLoading,
+  getJoinSuccess,
+  setResetRoom,
 } from "./room.action";
-import { TRoomId, TMetadata } from "../../types/api";
+import { TRoomId, TMetadata, TJoinRoom } from "../../types/api";
 import { AsyncActionStatus } from "../../constants/redux";
 import { createReducer } from "@reduxjs/toolkit";
 
@@ -14,6 +18,10 @@ type TRoom = {
     roomStatus: AsyncActionStatus;
   };
   metadata?: TMetadata;
+  joinRoom: {
+    message?: TJoinRoom;
+    joinStatus: AsyncActionStatus;
+  };
 };
 
 const initialState: TRoom = {
@@ -21,6 +29,9 @@ const initialState: TRoom = {
     roomStatus: AsyncActionStatus.Idle,
   },
   metadata: undefined,
+  joinRoom: {
+    joinStatus: AsyncActionStatus.Idle,
+  },
 };
 
 const room = createReducer(initialState, (builder) => {
@@ -38,6 +49,22 @@ const room = createReducer(initialState, (builder) => {
 
   builder.addCase(setMetaData, (state, { payload: { data } }) => {
     state.metadata = data;
+  });
+
+  builder.addCase(getJoinLoading, (state) => {
+    state.joinRoom.joinStatus = AsyncActionStatus.Loading;
+  });
+  builder.addCase(getJoinSuccess, (state, action) => {
+    const { data } = action.payload;
+    state.joinRoom.message = data;
+    state.joinRoom.joinStatus = AsyncActionStatus.Success;
+  });
+  builder.addCase(getJoinFailure, (state) => {
+    state.joinRoom.joinStatus = AsyncActionStatus.Failure;
+  });
+
+  builder.addCase(setResetRoom, (state) => {
+    return initialState;
   });
 });
 

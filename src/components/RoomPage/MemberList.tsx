@@ -8,16 +8,18 @@ const MemberList = ({
   roomId: string;
   players: Record<string, TPlayer>;
 }) => {
+  const playerList = Object.values(players);
+
   return (
     <div className={styles.MemberListContainer}>
       <div className={styles.memberContainer}>
         <div className={styles.memberCount}>
-          <div>플레이어 : {players.length}명</div>
+          <div>플레이어 : {playerList.length}명</div>
           <div className={styles.roomNumber}>방 번호 : {roomId}</div>
         </div>
         <div className={styles.memberList}>
           <ul>
-            {Object.values(players).map(({ nickname }) => (
+            {playerList.map(({ nickname }) => (
               <li>{nickname}</li>
             ))}
           </ul>

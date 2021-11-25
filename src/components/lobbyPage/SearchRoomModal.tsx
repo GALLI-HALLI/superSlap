@@ -1,6 +1,11 @@
 import styles from "./SearchRoom.module.scss";
 import Button from "../common/Button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "../../hooks/typeReduxHook";
+import { useDispatch } from "react-redux";
+import { joinUser } from "../../store/room/room.action";
+import { useHistory } from "react-router";
+import { AsyncActionStatus } from "../../constants/redux";
 
 type TSearchRoom = {
   close: () => void;
@@ -8,9 +13,26 @@ type TSearchRoom = {
 
 const SearchRoomModal = ({ close }: TSearchRoom) => {
   const [roomId, setRoomId] = useState("");
+  const joinCheck = useSelector((state) => state.room.joinRoom);
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  useEffect(() => {
+    if (joinCheck.joinStatus === AsyncActionStatus.Success) {
+      if (!joinCheck.message?.succuess) {
+        alert(joinCheck.message?.msg);
+      } else if (joinCheck.message?.succuess) {
+        history.push(`/room/${roomId}`);
+      }
+    }
+  }, [joinCheck, history, roomId]);
 
   const hanedleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRoomId(e.target.value);
+  };
+
+  const gotoRoom = () => {
+    dispatch(joinUser({ roomId }));
   };
 
   return (
@@ -29,7 +51,9 @@ const SearchRoomModal = ({ close }: TSearchRoom) => {
             <Button className={styles.closeButton} onClick={close}>
               닫기
             </Button>
-            <Button className={styles.joinButton}>입장하기</Button>
+            <Button className={styles.joinButton} onClick={gotoRoom}>
+              입장하기
+            </Button>
           </div>
         </div>
       </div>
