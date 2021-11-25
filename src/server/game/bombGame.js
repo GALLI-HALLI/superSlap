@@ -65,9 +65,9 @@ class BombGame extends Game {
           break;
         }
       }
-      let color = this.ballMap[loser].color;
-      this.getRoomSocket().emit(socketEvent.gameEnd, { loser, color });
-    }, 30000); //게임시작 30초 후 종료
+      this.getRoomSocket().emit(socketEvent.gameEnd, loser);
+      this.comebackRoom();
+    }, 20000 + parseInt(Math.random()*11)*1000); //게임시작 20~30초 후 종료
   }
 
   // 유저가 나갔을때

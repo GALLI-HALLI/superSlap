@@ -20,7 +20,7 @@ class Room {
   }
 
   destroy() {
-    sendMetaData(this.gameSocket, this, this.code);
+    this.comebackRoom();
     this.getRoomSocket().emit(socketEvents.roomDestroyed);
   }
 
@@ -60,7 +60,7 @@ class Room {
   }
 
   comebackRoom = () => {
-    this.gameStatus = GameStatus.Idle;
+    this.gameStatus = GameStatus.Ended;
     sendMetaData(this.gameSocket, this, this.code);
   };
 }
