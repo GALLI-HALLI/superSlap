@@ -272,6 +272,7 @@ const setupSocketEvents = (socket: Socket) => {
   }
 
   function gameFinished(loser: string, color: string) {
+    console.log("game ended");
     gameEnded = true;
   }
 
@@ -345,6 +346,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
     6. ballRad
   */
   const render = () => {
+    if (canvasRef.current === null) return;
     //canvas 사용을 위해 필요한 선언 2
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
