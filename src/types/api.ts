@@ -1,4 +1,5 @@
 import { GameType, GameStatus } from "../constants/game";
+import { AsyncActionStatus } from "../constants/redux";
 
 export type TProfile = {
   id: string;
@@ -18,6 +19,11 @@ export type TLogin = {
 
 export type TRoomId = {
   roomId: string;
+};
+
+export type TJoinRoom = {
+  msg: string;
+  succuess: boolean;
 };
 
 export type TPlayer = {
