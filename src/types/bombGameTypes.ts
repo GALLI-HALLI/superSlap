@@ -23,6 +23,7 @@ export type TGameIntialData = {
   ballMoveSpeed: number;
   bombMoveSpeed: number;
   maxPlayTime: number;
+  bombFreezeTime: number;
 };
 
 export type TTimerData = {
