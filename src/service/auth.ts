@@ -57,3 +57,18 @@ export const getRoomID = (): Promise<TRoomId> => {
     })
     .then(({ code }) => code);
 };
+
+export const searchRoom = (code: TRoomId): Promise<any> => {
+  console.log(code, "asdfasdf");
+  return fetch("/api/lobby/enter", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(code),
+  }).then((res) => {
+    console.log("4444");
+    if (res.status !== 200) {
+      throw new Error("Failed to fetch join");
+    }
+    return res.json();
+  });
+};
