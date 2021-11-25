@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from "react";
+import { useState, useEffect } from "react";
 import "@egjs/react-flicking/dist/flicking.css";
 import Flicking from "@egjs/react-flicking";
 import io from "socket.io-client";
@@ -7,7 +7,7 @@ import styles from "./RoomPage.module.scss";
 import Button from "../components/common/Button";
 import { useSelector } from "../hooks/typeReduxHook";
 import { useParams, useHistory } from "react-router-dom";
-import { setMetaData } from "../store/room/room.action";
+import { setMetaData, setResetRoom } from "../store/room/room.action";
 import { useDispatch } from "react-redux";
 import { TMetadata } from "../types/api";
 import { GameStatus, GameType } from "../constants/game";
@@ -30,7 +30,12 @@ const RoomPage = () => {
   const [socket] = useState(() => io("/api/room"));
   const history = useHistory();
   const metadata = useSelector((state) => state.room.metadata);
+
   const dispatch = useDispatch();
+
+  const backLobby = () => {
+    history.push("/lobby");
+  };
 
   useEffect(() => {
     let token = localStorage.getItem("token");
@@ -41,12 +46,15 @@ const RoomPage = () => {
       });
       socket.on(SocketServerEvent.GameAlreadyStarted, () => {
         alert("이미 진행중이라고~~~");
-        window.location.replace("/lobby");
+        socket.disconnect();
+        history.push("/lobby");
       });
     }
+    return () => {
+      dispatch(setResetRoom());
+      socket.disconnect();
+    };
   }, [socket, dispatch, roomId, history]);
-
-  console.log(metadata);
 
   const joinGame = (type: GameType) => {
     if (type === GameType.None) {
@@ -68,7 +76,7 @@ const RoomPage = () => {
   return (
     <div className={styles.container}>
       <div className={styles.buttonContainer}>
-        <Button>뒤로가기</Button>
+        <Button onClick={backLobby}>뒤로가기</Button>
         <label className={styles.masterName}>방장 아이디: {metadata.id}</label>
       </div>
       <Flicking className={styles.roomPageContainer}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import Button from "../components/common/Button";
@@ -10,6 +10,7 @@ import { getRoomId } from "../store/room/room.action";
 import { useSelector } from "../hooks/typeReduxHook";
 import styles from "./LobbyPage.module.scss";
 import { useHistory } from "react-router-dom";
+import useRequestSuccess from "../hooks/useRequestSuccess";
 
 const LobbyPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -23,11 +24,13 @@ const LobbyPage = () => {
     roomId: store.room.roomId,
   }));
 
+  const isRoomRequestSucceed = useRequestSuccess(roomStatus);
+
   useEffect(() => {
-    if (roomStatus === AsyncActionStatus.Success) {
+    if (isRoomRequestSucceed) {
       history.replace(`/room/${roomData}`);
     }
-  }, [roomStatus, roomData, history]);
+  }, [roomData, history, isRoomRequestSucceed]);
 
   const makeRoom = () => {
     dispatch(getRoomId());
