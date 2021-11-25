@@ -1,4 +1,5 @@
 const Game = require("./game");
+const socketEvent = require("../constants/socketEvents");
 
 let ballSeq = [false, false, false, false, false, false, false, false];
 let ballColor = [
@@ -54,7 +55,7 @@ class BombGame extends Game {
     });
 
     //게임종료 신호
-    setTimeout(function () {
+    setTimeout(() => {
       this.gameStart = false;
       let loser;
       if(!this.balls) return;
@@ -65,7 +66,7 @@ class BombGame extends Game {
         }
       }
       let color = this.ballMap[loser].color;
-      this.getRoomSocket().emit("game_end", { loser, color });
+      this.getRoomSocket().emit(socketEvent.gameEnd, { loser, color });
       this.endRoom();
     }, 30000); //게임시작 30초 후 종료
   }
