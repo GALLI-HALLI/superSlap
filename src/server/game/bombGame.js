@@ -1,7 +1,6 @@
 const Game = require("./game");
 const socketEvent = require("../constants/socketEvents");
 
-let ballSeq = [false, false, false, false, false, false, false, false];
 let ballColor = [
   "red",
   "blue",
@@ -32,6 +31,7 @@ class BombGame extends Game {
     this.balls = [];
     this.ballMap = {};
     this.gameStart = false;
+    this.ballSeq = [false, false, false, false, false, false, false, false];
   }
 
   // 폭탄 피하기 시작 하기
@@ -58,7 +58,7 @@ class BombGame extends Game {
     setTimeout(() => {
       this.gameStart = false;
       let loser;
-      if(!this.balls) return;
+      if(!this.balls || this.balls.length === 0) return;
       for (let i = 0; i < this.balls.length; i++) {
         if (this.balls[i].bomb === true) {
           loser = this.balls[i].id;
@@ -67,7 +67,6 @@ class BombGame extends Game {
       }
       let color = this.ballMap[loser].color;
       this.getRoomSocket().emit(socketEvent.gameEnd, { loser, color });
-      this.endRoom();
     }, 30000); //게임시작 30초 후 종료
   }
 
@@ -81,13 +80,17 @@ class BombGame extends Game {
 
   joinGame(socket, id) {
     let ball = new PlayerBall(socket, id);
-    for (let i = 0; i < 8; i++) {
-      if (ballSeq[i] === false) {
-        ball.seq = i;
-        ballSeq[i] = true;
-        break;
+    let startPosition = Math.floor(8 * Math.random())
+    while(this.ballSeq[startPosition]){
+      if(startPosition === 7){
+        startPosition = 0
+      }else{
+        startPosition++
       }
     }
+    ball.seq = startPosition;
+    this.ballSeq[startPosition] = true;
+    
     let seq = ball.seq;
     ball.x = 140 + 80 * (seq % 2);
     ball.y = 100 + 100 * parseInt(seq / 2);
@@ -115,7 +118,7 @@ class BombGame extends Game {
     if(noBomb && this.balls.length > 0){
       this.balls[Math.floor(this.balls.length * Math.random())].bomb = true;
     }
-    ballSeq[this.ballMap[id].seq] = false;
+    this.ballSeq[this.ballMap[id].seq] = false;
     delete this.ballMap[id];
   }
 
