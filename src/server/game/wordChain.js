@@ -1,9 +1,9 @@
 const Game = require("./game");
 const socketEvent = require("../constants/socketEvents");
+const request = require('request')
 
 const key = process.env.DICTIONARY_KEY
-
-console.log(key)
+const addr = "https://stdict.korean.go.kr/api/search.do?key=" + key + "&req_type=json&target=1&q="
 
 class Player{
     constructor(socket, id){
@@ -17,12 +17,44 @@ class Player{
 class WordChain extends Game{
     constructor(room) {
         super(room);
-        this.players = {}
+        this.players = {};
+        this.playerSeq = [];
+        this.nowWord = '';
+    }
+
+    disconnect(id){
+        if(this.players[id]){
+            this.leftGame(id);
+        }
+        this.getRoomSocket().emit("leave_user", id);
     }
 
     joinGame(socket, id){
         let player = new Player(socket, id);
         this.players[id] = player;
+        this.playerSeq.push(id);
+    }
+
+    leftGame(id){
+        for(let i=0; i < this.playerSeq.length; i++){
+            if(this.playerSeq[i] === id){
+                this.playerSeq.splice(i,1);
+                break;
+            }
+        }
+        delete this.players[id];
+    }
+
+    checkWord(word){
+        if(word.length < 2) return false;
+        if(word[0] !== this.nowWord[-1]) return false;
+        request.get(addr+encodeURI(word),(err, resoponse, body) =>{
+            if(err){
+                console.log(err);
+            }
+            if(body) return true;
+            return false;
+        })
     }
 
     initializeSocketEvents(id, socket){
@@ -31,3 +63,5 @@ class WordChain extends Game{
         this.joinGame(socket, id);
     }
 }
+
+module.exports = WordChain;
