@@ -2,10 +2,10 @@ import React, { useRef, useEffect, useState, memo } from "react";
 import "./LeftOrRightGame.scss";
 
 //이미지
-import BlueMonsterImg from "../../images/BlueMonster.png";
-import GreenMonsterImg from "../../images/GreenMonster.png";
-import ArrowLeftButtonImg from "../../images/ArrowLeftButton.png";
-import ArrowRightButtonImg from "../../images/ArrowRightButton.png";
+import BlueMonsterImg from "../../image/BlueMonster.png";
+import GreenMonsterImg from "../../image/GreenMonster.png";
+import ArrowLeftButtonImg from "../../image/ArrowLeftButton.png";
+import ArrowRightButtonImg from "../../image/ArrowRightButton.png";
 // 화살표 버튼 소스(다른 색도 있음) https://www.iconsdb.com/barbie-pink-icons/arrow-left-icon.html
 
 // 반응형

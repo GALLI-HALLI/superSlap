@@ -3,7 +3,7 @@ const Game = require("./game");
 class LeftOrRightGame extends Game {
   constructor(room) {
     super(room);
-    this.playerScores = {};
+    this.playerScores = new Map();
     this.receiveDataNum = 0;
   }
 
@@ -17,18 +17,18 @@ class LeftOrRightGame extends Game {
   }
 
   ranking() {
-      let loserId =  [];
-      let loserScore = 999999999;
-      Array.from(this.playerScores).forEach(([ key, value ]) => {
-        if(loserScore>value){
-            loserId = [];
-            loserId.push(key);
-            loserScore = value;
-        }else if(loserScore>value){
-            loserId.push(key);
-        }
-      });
-      this.comebackRoom({ loserId });
+    let loserId = [];
+    let loserScore = 999999999;
+    Array.from(this.playerScores).forEach(([key, value]) => {
+      if (loserScore > value) {
+        loserId = [];
+        loserId.push(key);
+        loserScore = value;
+      } else if (loserScore > value) {
+        loserId.push(key);
+      }
+    });
+    this.comebackRoom({ loserId });
   }
 
   initializeSocketEvents(id, socket) {
@@ -37,11 +37,11 @@ class LeftOrRightGame extends Game {
 
     //게임 끝 정보 받아서 넣어주기
     socket.on("lrEnd", (data) => {
-        this.playerScores[id] = data.score;
-        this.receiveDataNum ++;
-        if(this.receiveDataNum===this.playerScores[id].length){
-            this.ranking();
-        }
+      this.playerScores[id] = data.score;
+      this.receiveDataNum++;
+      if (this.receiveDataNum === this.playerScores[id].length) {
+        this.ranking();
+      }
     });
   }
 }

@@ -1,10 +1,12 @@
 const { GameList, GameStatus } = require("../constants/game");
 const socketEvents = require("../constants/socketEvents");
 const BombGame = require("../game/bombGame");
+const LRGame = require("../game/leftOrRightGame");
 const { sendMetaData } = require("./utils");
 
 const GameMap = {
   [GameList.Bomb]: BombGame,
+  [GameList.LRGame]: LRGame,
 };
 
 class Room {
