@@ -32,7 +32,10 @@ class GameData {
   };
 
   timer = {
-    width: 0,
+    width: 30,
+    maxWidth: 360 - 40 * 2,
+    maxTime: 15, //15초
+    time: 0,
   };
 
   score = {
@@ -151,7 +154,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   const [instance] = useState(() => new GameData());
 
   // const [monster] = useState(()=> new Monster(true));
-
+  let wrongMonster: any = null;
   const monsterList: any = [];
   const monsterLRList: any = [];
 
@@ -202,12 +205,16 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
         score -= 2;
 
         // 실패 효과 출력
+        wrongMonster = ball;
+        setTimeout(() => {
+          wrongMonster = null;
+        }, 400);
       } else {
         score += 1;
-      }
 
-      ball.goLeft = true;
-      monsterLRList.push(ball);
+        ball.goLeft = true;
+        monsterLRList.push(ball);
+      }
 
       // 새 공 추가
       const monster = makeNewMonster();
@@ -227,13 +234,17 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       if (ball.isBlue) {
         score += 1;
 
-        // 실패 효과 출력
+        ball.goLeft = false;
+        monsterLRList.push(ball);
       } else {
         score -= 2;
-      }
 
-      ball.goLeft = false;
-      monsterLRList.push(ball);
+        // 실패 효과 출력
+        wrongMonster = ball;
+        setTimeout(() => {
+          wrongMonster = null;
+        }, 400);
+      }
 
       // 새 공 추가
       const monster = makeNewMonster();
@@ -265,6 +276,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       }
     }, 5);
 
+    if (monsterLRList.lengt === 0) return;
     // 가로 이동
     let cnt2 = 0;
 
@@ -448,27 +460,33 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   }
 
   function drawTimer(ctx: any) {
+    let time = instance.timer.time;
     //header
     let radius: radius = {
-      tl: 18,
-      tr: 18,
-      br: 18,
-      bl: 18,
+      tl: 17,
+      tr: 17,
+      br: 17,
+      bl: 17,
     };
     ctx.save();
     ctx.fillStyle = "DarkRed";
     roundRect(ctx, 40, 30, 360 - 40 - 40, 30, radius, true, false);
-
     ctx.restore();
 
     ctx.save();
     ctx.fillStyle = "white";
-
-    roundRect(ctx, 40, 30, 360 - 40 - 40, 30, radius, true, false);
+    // 흰색 바
+    roundRect(ctx, 40, 30, instance.timer.width, 30, radius, true, false);
 
     ctx.beginPath();
     ctx.arc(40 + 15, 30 + 15, 15, 0, 2 * Math.PI);
     ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = "#ff4d4d";
+    ctx.font = "bold 16px Trebuchet MS";
+    ctx.fillText(`${time.toFixed(2)}`, 180 - 15, 30 + 20);
     ctx.restore();
   }
 
@@ -485,10 +503,58 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
       monsterList.push(monster);
     }
-  }, []);
+  }, [instance]);
+
+  function drawWrong(ctx: any) {
+    if (wrongMonster === null) return;
+    let img;
+
+    if (wrongMonster.isBlue) {
+      img = blueMonster;
+    } else {
+      img = greenMonster;
+    }
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "red";
+
+    ctx.drawImage(
+      img,
+      wrongMonster.x,
+      wrongMonster.y,
+      wrongMonster.width,
+      wrongMonster.height
+    );
+
+    ctx.beginPath();
+    ctx.arc(
+      wrongMonster.x + 75 / 2,
+      wrongMonster.y + 75 / 2,
+      75 / 2,
+      0,
+      2 * Math.PI
+    );
+    ctx.fill();
+    ctx.restore();
+  }
 
   useEffect(() => {
     render();
+    
+    //타이머
+    const timer = setInterval(function () {
+      instance.timer.time += 0.01;
+      instance.timer.width +=
+        (instance.timer.maxWidth - 30) / (instance.timer.maxTime * 100);
+      if (instance.timer.time > instance.timer.maxTime) {
+        instance.timer.time = instance.timer.maxTime;
+        instance.timer.width = instance.timer.maxWidth;
+        clearInterval(timer);
+      }
+    }, 10);
+  }, [instance]);
+    
+    //일정 시간 후 게임 결과 송신
     setTimeout(function () {
       console.log("gameEnded");
       socket.emit("lrEnd", score);
@@ -507,6 +573,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     drawScore(ctx);
 
     drawMonster(ctx);
+    drawWrong(ctx);
 
     drawMonsterLeftRight(ctx);
 
