@@ -10,6 +10,7 @@ class Player{
         this.socket = socket;
         this.id = id;
         this.turn = false;
+
         this.wrongCount = 0;
     }
 }
@@ -19,7 +20,7 @@ class WordChain extends Game{
         super(room);
         this.players = {};
         this.playerSeq = [];
-        this.nowWord = '';
+        this.wordList = [];
     }
 
     disconnect(id){
@@ -45,9 +46,9 @@ class WordChain extends Game{
         delete this.players[id];
     }
 
-    checkWord(word){
+    checkWord_chain(word){
         if(word.length < 2) return false;
-        if(word[0] !== this.nowWord[-1]) return false;
+        if(word[0] !== this.wordList[-1][-1]) return false;
         request.get(addr+encodeURI(word),(err, resoponse, body) =>{
             if(err){
                 console.log(err);
@@ -61,6 +62,8 @@ class WordChain extends Game{
         console.log(socket + ' is entered');
 
         this.joinGame(socket, id);
+
+
     }
 }
 
