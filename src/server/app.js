@@ -26,7 +26,9 @@ app.use(express.urlencoded({ extend: true }));
 
 const gameSocket = io.of("/api/room");
 const userConnect = require("./room/group.js");
+
 gameSocket.on("connection", (socket) => {
+  console.log(socket.id);
   userConnect(socket, gameSocket);
 });
 
