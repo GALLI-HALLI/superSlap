@@ -540,7 +540,8 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   useEffect(() => {
     render();
-
+    
+    //타이머
     const timer = setInterval(function () {
       instance.timer.time += 0.01;
       instance.timer.width +=
@@ -552,6 +553,13 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       }
     }, 10);
   }, [instance]);
+    
+    //일정 시간 후 게임 결과 송신
+    setTimeout(function () {
+      console.log("gameEnded");
+      socket.emit("lrEnd", score);
+    }, 15000);
+  }, []);
 
   const render = () => {
     if (canvasRef.current === null) return;
