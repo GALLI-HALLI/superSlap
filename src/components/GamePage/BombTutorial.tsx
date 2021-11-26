@@ -1,5 +1,5 @@
 import styles from "./BombTutorial.module.scss";
-import tutorialImage from "../../image/tutorialSample.jpg";
+import tutorialImage from "../../image/tutorialBombGame1.png";
 
 const BombTutorial = () => {
   return (
@@ -8,7 +8,7 @@ const BombTutorial = () => {
         <div className={styles.section}>
           <div className={styles.header}>폭탄 돌리기 튜토리얼!</div>
           <div className={styles.main}>
-            <img src={tutorialImage} alt="bombGameTutorial" />
+            <img src={tutorialImage} alt="bombGameTutorial" width="360px" />
           </div>
           {/* 타이머 추가 예정! */}
         </div>

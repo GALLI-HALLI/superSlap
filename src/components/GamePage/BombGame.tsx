@@ -102,6 +102,43 @@ class playerBall {
 /* ================== 타입 및 클래스 선언 끝================== */
 
 /* ================== 게임 정보 관련 시작 ================== */
+
+class BombGameData {
+  gameCanvas: TGameCanvas = {
+    width: 360,
+    height: 500,
+  };
+
+  initialData: TGameIntialData = {
+    ballRad: 20,
+    ballMoveSpeed: 2, // 1 보다 큰 수로 속도 배율
+    bombMoveSpeed: 3, // 폭탄은 유저보다 빠르게
+    maxPlayTime: 30,
+    bombFreezeTime: 1000, // 1초 = 1000
+  };
+
+  ongoingData: TGameOngoingData = {
+    gameTime: 0,
+    gameEnded: false,
+    myBombChangeFreeze: false,
+    otherBombChangeFreeze: false,
+  };
+
+  bombFlick: TBombFlick = {
+    x: 0,
+    a: 1,
+    frameCnt: 0,
+    period: 350,
+  };
+
+  balls: TPlayerBall[] = [];
+  ballMap: Record<string, playerBall> = {};
+  myId: string = "";
+
+  gameEnded = false;
+  gameStart = false;
+}
+
 //Note: 현재 픽셀 위치 설정은 canvas 360x500을 기준으로 맞춰져있습니다.
 const gameCanvas: TGameCanvas = {
   width: 360,
@@ -390,6 +427,8 @@ function initializeBombGame() {
 
   gameEnded = false;
   gameStart = false;
+
+  console.log(ongoingData);
 }
 
 /* ================== 게임 설정 초기화 ================== */
@@ -399,6 +438,9 @@ type TBombGameProps = {
 };
 
 const BombGame = ({ socket }: TBombGameProps) => {
+  // const [instance] = useState(() => new BombGameData());
+  // console.log(instance.gameCanvas.width);
+
   // 첫 랜더링 때 바뀌는 전역변수들 초기화
   useEffect(() => {
     console.log("게임 설정 초기화");
