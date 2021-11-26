@@ -6,7 +6,7 @@ const { sendMetaData } = require("./utils");
 
 const GameMap = {
   [GameList.Bomb]: BombGame,
-  [GameList.LRGame]: LRGame,
+  [GameList.LeftRight]: LRGame,
 };
 
 class Room {
