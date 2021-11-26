@@ -37,7 +37,7 @@ class LeftOrRightGame extends Game {
 
     //게임 끝 정보 받아서 넣어주기
     socket.on("lrEnd", (data) => {
-      this.playerScores[id] = data.score;
+      this.playerScores[id] = data;
       this.receiveDataNum++;
       if (this.receiveDataNum === this.playerScores[id].length) {
         this.ranking();

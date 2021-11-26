@@ -11,6 +11,10 @@ import ArrowRightButtonImg from "../../image/ArrowRightButton.png";
 // 반응형
 import { useMediaQuery } from "react-responsive";
 
+// 서버
+import { Socket } from "socket.io-client";
+// import { SocketServerEvent } from "../../constants/socket";
+
 type TGameCanvas = {
   height: number;
   width: number;
@@ -127,11 +131,20 @@ function roundRect(
   }
 }
 
+// const setupSocketEvents = (socket: Socket) => {
+
+//   return { };
+// };
+
 function ClearCanvas(ctx: any, canvas: any) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function LeftOrRightGame() {
+type TBombGameProps = {
+  socket: Socket;
+};
+
+function LeftOrRightGame({ socket }: TBombGameProps) {
   //canvas 사용을 위해 필요한 선언 1
   const canvasRef: any = useRef(null);
 
@@ -155,6 +168,8 @@ function LeftOrRightGame() {
   ArrowLeftButton.src = ArrowLeftButtonImg;
   const ArrowRightButton = new Image();
   ArrowRightButton.src = ArrowRightButtonImg;
+
+  // socket.emit("lrEnd", "hello, server");
 
   // onclick + touch handler in canvas tag
   const handleCanvasClick = (event: any) => {
