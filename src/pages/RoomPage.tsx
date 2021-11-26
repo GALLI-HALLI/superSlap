@@ -15,6 +15,7 @@ import { SocketServerEvent } from "../constants/socket";
 import BombGame from "../components/GamePage/BombGame";
 import GameList from "../components/RoomPage/GameList";
 import Loser from "../components/RoomPage/Loser";
+import LeftOrRightGame from "../components/GamePage/LeftOrRightGame";
 
 const GameMap = {
   [GameType.None]: () => (
@@ -24,6 +25,7 @@ const GameMap = {
     </div>
   ),
   [GameType.Bomb]: BombGame,
+  [GameType.LeftRight]: LeftOrRightGame,
 };
 
 const RoomPage = () => {
