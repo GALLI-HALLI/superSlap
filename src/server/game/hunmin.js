@@ -107,7 +107,10 @@ class Hunmin extends Game{
                 do{
                     this.turn++
                 }while(!this.playerSeq[this.turn%this.len]);
-                this.getRoomSocket.emit('pass',this.turn);
+                this.getRoomSocket.emit('pass',{
+                    turn: this.turn%this.len,
+                    word: data,
+                });
                 let now = this.turn;
                 setTimeout(()=>{
                     if(now !== this.turn) return;
