@@ -489,7 +489,11 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   useEffect(() => {
     render();
-  });
+    setTimeout(function () {
+      console.log("gameEnded");
+      socket.emit("lrEnd", score);
+    }, 15000);
+  }, []);
 
   const render = () => {
     if (canvasRef.current === null) return;
