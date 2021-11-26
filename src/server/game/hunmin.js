@@ -21,9 +21,9 @@ class Hunmin extends Game{
         this.turn = 0;
         this.nowWord = ''
         this.wordList = [];
-        this.turnTimer = 0;
         this.finish = false;
     }
+    
     start(){
         let suggest = consonants[parseInt(Math.random()*14)] + consonants[parseInt(Math.random()*14)];
         this.nowWord = suggest;
@@ -42,7 +42,7 @@ class Hunmin extends Game{
             let loser = this.playerSeq[this.turn%this.len][0];
             this.getRoomSocket().emit(socketEvent.gameEnd, loser);
             this.comebackRoom();
-        }, 2000);
+        }, 10000);
     }
 
     disconnect(id){
@@ -114,6 +114,7 @@ class Hunmin extends Game{
                 let now = this.turn;
                 setTimeout(()=>{
                     if(now !== this.turn) return;
+                    this.finish = true;
                     let loser = this.playerSeq[this.turn%this.len][0];
                     this.getRoomSocket().emit(socketEvent.gameEnd, loser);
                     this.comebackRoom();
