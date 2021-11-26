@@ -12,7 +12,6 @@ const userSchema = new Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
     },
     password: {
       type: String,
@@ -26,7 +25,7 @@ const userSchema = new Schema(
   },
   {
     timestamps: true, //언제 생성, 업데이트 됐는지
-  }
+  },
 );
 
 module.exports = mongoose.model("GameUser", userSchema);

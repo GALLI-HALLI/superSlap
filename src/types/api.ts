@@ -1,5 +1,4 @@
 import { GameType, GameStatus } from "../constants/game";
-import { AsyncActionStatus } from "../constants/redux";
 
 export type TProfile = {
   id: string;
@@ -38,4 +37,5 @@ export type TMetadata = {
   type: GameType;
   gameStatus: GameStatus;
   startTime: string;
+  loser?: TPlayer;
 };

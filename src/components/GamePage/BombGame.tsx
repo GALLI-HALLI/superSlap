@@ -366,7 +366,7 @@ function roundRect(
   height: number,
   radius: number | radius,
   fill: boolean,
-  stroke: boolean | undefined
+  stroke: boolean | undefined,
 ) {
   if (typeof stroke === "undefined") {
     stroke = true;
@@ -391,7 +391,7 @@ function roundRect(
     x + width,
     y + height,
     x + width - radius.br,
-    y + height
+    y + height,
   );
   ctx.lineTo(x + radius.bl, y + height);
   ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
@@ -453,7 +453,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
   // 소켓 초기화
   const { bombChange, sendData } = useMemo(
     () => setupSocketEvents(socket),
-    [socket]
+    [socket],
   );
 
   // 튜토리얼 출력
@@ -467,7 +467,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
   setTimeout(function () {
     gameStart = true;
     closeModal();
-  }, 10000); // 10초뒤 출력
+  }, 1000); // 10초뒤 출력
 
   // 게임 요소 시작
   useEffect(() => {
@@ -534,7 +534,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
         18, //height
         9, //radius
         true,
-        true
+        true,
       );
       ctx.restore();
 
@@ -553,7 +553,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           ball.x - initialData.ballRad - 15,
           ball.y - initialData.ballRad - 14,
           57,
-          57
+          57,
         );
 
         //폭탄이 점멸하게
@@ -578,7 +578,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
             ball.x - initialData.ballRad - 25,
             ball.y - initialData.ballRad - 25,
             80,
-            80
+            80,
           );
           ctx.restore();
         }
@@ -592,7 +592,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
         ctx.fillText(
           "나야 나!",
           ball.x - initialData.ballRad - 7,
-          ball.y - initialData.ballRad - 4
+          ball.y - initialData.ballRad - 4,
         );
         ctx.closePath();
       } else {
@@ -601,7 +601,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
         ctx.fillText(
           `player ${i}`,
           ball.x - initialData.ballRad - 7,
-          ball.y - initialData.ballRad - 4
+          ball.y - initialData.ballRad - 4,
         );
         ctx.closePath();
       }
@@ -657,7 +657,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           const collision: boolean = isBallCollision(
             curPlayerClone,
             otherPlayerClone,
-            initialData.ballRad
+            initialData.ballRad,
           );
 
           // 충돌했을때
@@ -680,7 +680,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
               curPlayer,
               otherPlayerClone,
               xySpeed,
-              initialData.ballRad
+              initialData.ballRad,
             );
             curPlayerClone.x += adjustedBallPosition3[0];
             curPlayerClone.y += adjustedBallPosition3[1];
@@ -692,7 +692,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
       let adjustedBallPosition2: number[] = isWallCollision(
         curPlayerClone,
         gameCanvas,
-        initialData.ballRad
+        initialData.ballRad,
       );
 
       curPlayerClone.x = adjustedBallPosition2[0];
