@@ -1,4 +1,4 @@
-const Hunmin = require("../../components/GamePage/Hunmin");
+const Hunmin = require("../game/hunmin");
 const { GameList, GameStatus } = require("../constants/game");
 const socketEvents = require("../constants/socketEvents");
 const BombGame = require("../game/bombGame");

@@ -81,7 +81,7 @@ const RoomPage = () => {
 
   if (metadata.gameStatus === GameStatus.Started) {
     const GameComponent = GameMap[metadata.type];
-    return <GameComponent socket={socket} />;
+    return <GameComponent socket={socket} players={metadata.players} />;
   }
 
   return (
