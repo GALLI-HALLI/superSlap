@@ -2,13 +2,14 @@ import { GameType } from "../../constants/game";
 import styles from "./GameList.module.scss";
 
 const GameLists = Object.values(GameType).filter(
-  (value) => value !== GameType.None
+  (value) => value !== GameType.None,
 );
 
 const GameName: Record<GameType, string> = {
   [GameType.None]: "없음",
   [GameType.Bomb]: "폭탄",
   [GameType.LeftRight]: "좌우좌우",
+  [GameType.Hunmin]: "훈민정음",
 };
 
 type TGameListProps = {

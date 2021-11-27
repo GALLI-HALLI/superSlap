@@ -3,6 +3,7 @@ const GameList = {
   Bomb: "bomb",
   Pencil: "pencil",
   LeftRight: "LeftRight",
+  hunmin: "hunmin",
 };
 
 const GameStatus = {

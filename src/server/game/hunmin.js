@@ -18,7 +18,7 @@ class Hunmin extends Game{
         super(room);
         this.playerSeq = [];
         this.len = 0;
-        this.turn = 0;
+        this.turn = -1;
         this.nowWord = ''
         this.wordList = [];
         this.finish = false;
@@ -37,12 +37,15 @@ class Hunmin extends Game{
         }
         this.getRoomSocket().emit('suggestInitial', suggest);
 
+        this.nextTurn()
+        this.getRoomSocket().emit('nextTurn',this.turn);
+
         setTimeout(()=>{
             if(this.finish) return;
             let loser = this.playerSeq[this.turn%this.len][0];
             this.getRoomSocket().emit(socketEvent.gameEnd, loser);
-            this.comebackRoom();
-        }, 10000);
+            this.comebackRoom(loser);
+        }, 100000);
     }
 
     disconnect(id){
@@ -61,6 +64,8 @@ class Hunmin extends Game{
             if(this.playerSeq[i][0] === id){
                 // this.playerSeq.splice(i,1);
                 this.playerSeq[i] = false;
+                this.nextTurn()
+                this.getRoomSocket().emit('nextTurn',this.turn);
                 break;
             }
         }
@@ -84,15 +89,35 @@ class Hunmin extends Game{
     async checkWord(word){
         if(word.length !== 2) return [false, wrongReason.length];
         if(this.wordList.includes(word)) return [false, wrongReason.already];
-        let initial = this.getInitialConstant(word[0]) + this.getInitialConstant(word[1]) 
+        let initial = this.getInitialConstant(word[0]) + this.getInitialConstant(word[1])
         if(initial !== this.nowWord) return [false, wrongReason.initial];
         request.get(addr+encodeURI(word),(err, resoponse, body) =>{
             if(err){
                 console.log(err);
             }
-            if(body) return [true, ''];
-            return [false, wrongReason.word];
+            if(body){
+                return [true, ''];
+            }else{
+                return [false, wrongReason.word];
+            }
         })
+        return [true, ''];
+    }
+
+    nextTurn(){
+        let cnt = 0;
+        do{
+            this.turn++;
+            cnt++;
+        }while(!this.playerSeq[this.turn%this.len] && cnt <= this.len);
+        let now = this.turn;
+        setTimeout(()=>{
+            if(now !== this.turn) return;
+            this.finish = true;
+            let loser = this.playerSeq[this.turn%this.len][0];
+            this.getRoomSocket().emit(socketEvent.gameEnd, loser);
+            this.comebackRoom(loser);
+        },50000)        
     }
 
     initializeSocketEvents(id, socket){
@@ -104,23 +129,13 @@ class Hunmin extends Game{
             let result = await this.checkWord(data)
             if(result[0]){
                 this.wordList.push(data)
-                do{
-                    this.turn++
-                }while(!this.playerSeq[this.turn%this.len]);
-                this.getRoomSocket.emit('pass',{
+                this.nextTurn(data)
+                this.getRoomSocket().emit('pass',{
                     turn: this.turn%this.len,
                     word: data,
                 });
-                let now = this.turn;
-                setTimeout(()=>{
-                    if(now !== this.turn) return;
-                    this.finish = true;
-                    let loser = this.playerSeq[this.turn%this.len][0];
-                    this.getRoomSocket().emit(socketEvent.gameEnd, loser);
-                    this.comebackRoom();
-                },5000)
             }else{
-                this.getRoomSocket.emit('fail', result[1])
+                this.getRoomSocket().emit('fail', result[1])
             }
         })
     }

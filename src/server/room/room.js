@@ -1,3 +1,4 @@
+const Hunmin = require("../game/hunmin");
 const { GameList, GameStatus } = require("../constants/game");
 const socketEvents = require("../constants/socketEvents");
 const BombGame = require("../game/bombGame");
@@ -7,6 +8,7 @@ const { sendMetaData } = require("./utils");
 const GameMap = {
   [GameList.Bomb]: BombGame,
   [GameList.LeftRight]: LRGame,
+  [GameList.hunmin]: Hunmin,
 };
 
 class Room {
@@ -61,7 +63,6 @@ class Room {
     });
     this.gameInstance.start();
   }
-
 
   comebackRoom = ({ loserId }) => {
     this.loserId = loserId;
