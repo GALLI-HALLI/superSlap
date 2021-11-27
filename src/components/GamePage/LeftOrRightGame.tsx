@@ -26,6 +26,14 @@ class GameData {
     height: 500 + 140,
   };
 
+  state = {
+    ended: false,
+  };
+
+  ifEnd = {
+    height: -(500 + 140),
+  };
+
   ballDistance = {
     x: 10, //임시
     y: 32, //공 위아래 간격
@@ -39,7 +47,7 @@ class GameData {
   };
 
   score = {
-    location: 200,
+    location: 160,
   };
 
   button = {
@@ -153,7 +161,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   const [instance] = useState(() => new GameData());
 
-  // const [monster] = useState(()=> new Monster(true));
   let wrongMonster: any = null;
   const monsterList: any = [];
   const monsterLRList: any = [];
@@ -176,6 +183,8 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   // onclick + touch handler in canvas tag
   const handleCanvasClick = (event: any) => {
+    if (instance.state.ended === true) return;
+
     const canvas2 = canvasRef.current;
     const rect = canvas2.getBoundingClientRect();
     let x;
@@ -457,6 +466,11 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       // 양수 10이상
       ctx.fillText(`${score}`, 180 - 60, instance.score.location);
     }
+
+    ctx.save();
+    ctx.font = "bold 30px Trebuchet MS";
+    ctx.fillText("your score", 180 - 70, instance.score.location + 30);
+    ctx.restore();
   }
 
   function drawTimer(ctx: any) {
@@ -489,21 +503,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     ctx.fillText(`${time.toFixed(2)}`, 180 - 15, 30 + 20);
     ctx.restore();
   }
-
-  // initialize game
-  useEffect(() => {
-    // load monster balls
-    // 처음엔 공 9개만 출력해야 문제 안생김!
-    for (let i = 1; i < 10; i++) {
-      const monster = makeNewMonster();
-
-      //위부터 아래까지 일렬로 늘어지게
-      let sth = instance.ballDistance.y;
-      monster.y += sth * i;
-
-      monsterList.push(monster);
-    }
-  }, [instance]);
 
   function drawWrong(ctx: any) {
     if (wrongMonster === null) return;
@@ -538,6 +537,125 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     ctx.restore();
   }
 
+  function Confetti(this: any) {
+    //construct confetti
+    const colours = ["#fde132", "#009bde", "#ff6b00"];
+
+    this.x = Math.round(Math.random() * instance.gameCanvas.width);
+    this.y =
+      Math.round(Math.random() * instance.gameCanvas.height) -
+      instance.gameCanvas.height / 2;
+    this.rotation = Math.random() * 360;
+
+    const size = Math.random() * (instance.gameCanvas.width / 60);
+    this.size = size < 15 ? 15 : size;
+
+    this.color = colours[Math.floor(colours.length * Math.random())];
+
+    this.speed = this.size / 7;
+
+    this.opacity = Math.random();
+
+    this.shiftDirection = Math.random() > 0.5 ? 1 : -1;
+  }
+
+  Confetti.prototype.border = function () {
+    if (this.y >= instance.gameCanvas.height) {
+      this.y = instance.gameCanvas.height;
+    }
+  };
+
+  Confetti.prototype.update = function () {
+    this.y += this.speed;
+
+    if (this.y <= instance.gameCanvas.height) {
+      this.x += this.shiftDirection / 3;
+      this.rotation += (this.shiftDirection * this.speed) / 100;
+    }
+
+    if (this.y > instance.gameCanvas.height) this.border();
+  };
+
+  Confetti.prototype.draw = function (ctx: any) {
+    ctx.beginPath();
+    ctx.arc(
+      this.x,
+      this.y,
+      this.size,
+      this.rotation,
+      this.rotation + Math.PI / 2
+    );
+    ctx.lineTo(this.x, this.y);
+    ctx.closePath();
+    ctx.globalAlpha = this.opacity;
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  };
+
+  const confNum = Math.floor(instance.gameCanvas.width / 4);
+  const confs = new Array(confNum)
+    .fill(undefined)
+    .map((_) => new (Confetti as any)());
+
+  function drawGameFinsh(ctx: any) {
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = "black";
+    ctx.fillRect(
+      0,
+      0,
+      instance.gameCanvas.width,
+      instance.gameCanvas.height + instance.ifEnd.height
+    );
+
+    ctx.restore();
+
+    ctx.save();
+    confs.forEach((conf) => {
+      conf.update();
+      conf.draw(ctx);
+    });
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = "white";
+    ctx.font = "bold 100px Trebuchet MS";
+    ctx.fillText(
+      "FINSH",
+      45 + instance.ifEnd.height,
+      instance.gameCanvas.height / 2
+    );
+    ctx.restore();
+  }
+
+  function ifGameFinsh() {
+    instance.state.ended = true;
+
+    const gameEndtimer = setInterval(function () {
+      instance.ifEnd.height += instance.gameCanvas.height / 100;
+      if (instance.ifEnd.height > 0) {
+        instance.ifEnd.height = 0;
+
+        clearInterval(gameEndtimer);
+      }
+    }, 10);
+  }
+
+  // initialize game
+  useEffect(() => {
+    // load monster balls
+    // 처음엔 공 9개만 출력해야 문제 안생김!
+    for (let i = 1; i < 10; i++) {
+      const monster = makeNewMonster();
+
+      //위부터 아래까지 일렬로 늘어지게
+      let sth = instance.ballDistance.y;
+      monster.y += sth * i;
+
+      monsterList.push(monster);
+    }
+  });
+
   useEffect(() => {
     render();
 
@@ -549,16 +667,19 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       if (instance.timer.time > instance.timer.maxTime) {
         instance.timer.time = instance.timer.maxTime;
         instance.timer.width = instance.timer.maxWidth;
+
+        // 게임 종료
+        ifGameFinsh();
         clearInterval(timer);
       }
     }, 10);
 
     //일정 시간 후 게임 결과 송신
     setTimeout(function () {
-      console.log("gameEnded");
+      console.log("game terminate");
       socket.emit("lrEnd", score);
-    }, 15000);
-  }, [instance]);
+    }, instance.timer.maxTime * 1000 + 3000);
+  });
 
   const render = () => {
     if (canvasRef.current === null) return;
@@ -580,6 +701,10 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     drawWhichLR(ctx, "right");
 
     drawButton(ctx);
+
+    if (instance.state.ended) {
+      drawGameFinsh(ctx);
+    }
 
     requestAnimationFrame(render);
   };
