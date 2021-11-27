@@ -179,7 +179,19 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   const ArrowRightButton = new Image();
   ArrowRightButton.src = ArrowRightButtonImg;
 
-  // socket.emit("lrEnd", "hello, server");
+  //키보드 좌우 클릭 감지
+
+  useEffect(() => {
+    window.addEventListener("keydown", (event) => {
+      if (instance.state.ended === true) return;
+
+      if (event.key === "ArrowLeft") {
+        leftOrRightEventHandle("left");
+      } else if (event.key === "ArrowRight") {
+        leftOrRightEventHandle("right");
+      }
+    });
+  });
 
   // onclick + touch handler in canvas tag
   const handleCanvasClick = (event: any) => {
@@ -198,8 +210,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       y = event.clientY - rect.top;
     }
 
-    // console.log(x, y);
-
     // left button for Green
     if (
       x >= instance.button.left.x &&
@@ -207,29 +217,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       y >= instance.button.left.y &&
       instance.button.left.y + instance.button.height >= y
     ) {
-      const ball = monsterList.pop();
-
-      // 성적 체크;
-      if (ball.isBlue) {
-        score -= 2;
-
-        // 실패 효과 출력
-        wrongMonster = ball;
-        setTimeout(() => {
-          wrongMonster = null;
-        }, 400);
-      } else {
-        score += 1;
-
-        ball.goLeft = true;
-        monsterLRList.push(ball);
-      }
-
-      // 새 공 추가
-      const monster = makeNewMonster();
-      monsterList.unshift(monster);
-
-      moveMonster();
+      leftOrRightEventHandle("left");
     } else if (
       // right button for Blue
       x >= instance.button.right.x &&
@@ -237,31 +225,49 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       y >= instance.button.right.y &&
       instance.button.right.y + instance.button.height >= y
     ) {
-      const ball = monsterList.pop();
-
-      // 성적 체크;
-      if (ball.isBlue) {
-        score += 1;
-
-        ball.goLeft = false;
-        monsterLRList.push(ball);
-      } else {
-        score -= 2;
-
-        // 실패 효과 출력
-        wrongMonster = ball;
-        setTimeout(() => {
-          wrongMonster = null;
-        }, 400);
-      }
-
-      // 새 공 추가
-      const monster = makeNewMonster();
-      monsterList.unshift(monster);
-
-      moveMonster();
+      leftOrRightEventHandle("right");
     }
   };
+
+  function leftOrRightEventHandle(whichPressed: string) {
+    const ball = monsterList.pop();
+    let success = true;
+
+    if (
+      (ball.isBlue && whichPressed === "right") ||
+      (!ball.isBlue && whichPressed === "left")
+    ) {
+      success = true;
+    } else {
+      success = false;
+    }
+
+    // 성적 체크;
+    if (!success) {
+      score -= 2;
+
+      // 실패 효과 출력
+      wrongMonster = ball;
+      setTimeout(() => {
+        wrongMonster = null;
+      }, 400);
+    } else {
+      score += 1;
+
+      if (whichPressed === "left") {
+        ball.goLeft = true;
+      } else {
+        ball.goLeft = false;
+      }
+      monsterLRList.push(ball);
+    }
+
+    // 새 공 추가
+    const monster = makeNewMonster();
+    monsterList.unshift(monster);
+
+    moveMonster();
+  }
 
   function makeNewMonster() {
     const random_boolean = Math.random() < 0.5;
@@ -270,7 +276,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   // on button click, start the animation
   function moveMonster() {
-    console.log("move");
     //세로 이동
     let initialY = 0;
     initialY += monsterList[1].y;
