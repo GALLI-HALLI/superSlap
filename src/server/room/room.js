@@ -1,10 +1,12 @@
 const { GameList, GameStatus } = require("../constants/game");
 const socketEvents = require("../constants/socketEvents");
 const BombGame = require("../game/bombGame");
+const LRGame = require("../game/leftOrRightGame");
 const { sendMetaData } = require("./utils");
 
 const GameMap = {
   [GameList.Bomb]: BombGame,
+  [GameList.LeftRight]: LRGame,
 };
 
 class Room {
@@ -17,11 +19,12 @@ class Room {
     this.startTime = null; // 게임 시작시간
     this.gameInstance = null; // 게임 처리 인스턴스
     this.gameSocket = gameSocket; // 게임 소켓
+    this.loserId = null;
   }
 
   destroy() {
-    this.comebackRoom();
     this.getRoomSocket().emit(socketEvents.roomDestroyed);
+    this.getRoomSocket().socketsLeave(this.code);
   }
 
   getRoomSocket() {
@@ -53,13 +56,15 @@ class Room {
     sendMetaData(this.gameSocket, this, this.code);
     // 오브젝트의 값들을 이터레이터로 만들어준다. 그것을 어레이로 만들어준다.
     // 방에 있는 플레이어들을 하나씩 돌면서 플레이어들의 소켓 인스턴스에 게임에서 설계한 소켓 로직들을 붙여준다.
-    Array.from(this.players).forEach(([ key, value ]) => {
+    Array.from(this.players).forEach(([key, value]) => {
       this.gameInstance.initializeSocketEvents(key, value.socket);
     });
     this.gameInstance.start();
   }
 
-  comebackRoom = () => {
+
+  comebackRoom = ({ loserId }) => {
+    this.loserId = loserId;
     this.gameStatus = GameStatus.Ended;
     sendMetaData(this.gameSocket, this, this.code);
   };

@@ -57,22 +57,25 @@ class BombGame extends Game {
     //게임종료 신호
     setTimeout(() => {
       this.gameStart = false;
-      let loser;
-      if(!this.balls || this.balls.length === 0) return;
+      let loserId;
+      if (!this.balls || this.balls.length === 0) return;
+
       for (let i = 0; i < this.balls.length; i++) {
         if (this.balls[i].bomb === true) {
-          loser = this.balls[i].id;
+          loserId = this.balls[i].id;
           break;
         }
       }
-      this.getRoomSocket().emit(socketEvent.gameEnd, loser);
-      this.comebackRoom();
-    }, 20000 + parseInt(Math.random()*11)*1000); //게임시작 20~30초 후 종료
+      this.getRoomSocket().emit(socketEvent.gameEnd, { loser: loserId });
+      setTimeout(() => {
+        this.comebackRoom({ loserId });
+      }, 5000);
+    }, 8000); //게임시작 30초 후 종료
   }
 
   // 유저가 나갔을때
   disconnect(id) {
-    if(this.ballMap[id]){
+    if (this.ballMap[id]) {
       this.leftGame(id);
     }
     this.getRoomSocket().emit("leave_user", id); //떠날 때 id 값 송신
@@ -80,17 +83,17 @@ class BombGame extends Game {
 
   joinGame(socket, id) {
     let ball = new PlayerBall(socket, id);
-    let startPosition = Math.floor(8 * Math.random())
-    while(this.ballSeq[startPosition]){
-      if(startPosition === 7){
-        startPosition = 0
-      }else{
-        startPosition++
+    let startPosition = Math.floor(8 * Math.random());
+    while (this.ballSeq[startPosition]) {
+      if (startPosition === 7) {
+        startPosition = 0;
+      } else {
+        startPosition++;
       }
     }
     ball.seq = startPosition;
     this.ballSeq[startPosition] = true;
-    
+
     let seq = ball.seq;
     ball.x = 140 + 80 * (seq % 2);
     ball.y = 100 + 100 * parseInt(seq / 2);
@@ -107,7 +110,7 @@ class BombGame extends Game {
     let noBomb = false;
     for (let i = 0; i < this.balls.length; i++) {
       if (this.balls[i].id === id) {
-        if(this.balls[i].bomb){
+        if (this.balls[i].bomb) {
           noBomb = true;
         }
         this.balls.splice(i, 1);
@@ -115,7 +118,7 @@ class BombGame extends Game {
       }
     }
 
-    if(noBomb && this.balls.length > 0){
+    if (noBomb && this.balls.length > 0) {
       this.balls[Math.floor(this.balls.length * Math.random())].bomb = true;
     }
     this.ballSeq[this.ballMap[id].seq] = false;

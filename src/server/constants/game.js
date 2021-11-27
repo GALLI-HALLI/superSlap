@@ -2,6 +2,7 @@ const GameList = {
   None: "none",
   Bomb: "bomb",
   Pencil: "pencil",
+  LeftRight: "LeftRight",
 };
 
 const GameStatus = {

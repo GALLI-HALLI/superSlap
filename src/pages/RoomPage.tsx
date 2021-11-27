@@ -14,6 +14,8 @@ import { GameStatus, GameType } from "../constants/game";
 import { SocketServerEvent } from "../constants/socket";
 import BombGame from "../components/GamePage/BombGame";
 import GameList from "../components/RoomPage/GameList";
+import Loser from "../components/RoomPage/Loser";
+import LeftOrRightGame from "../components/GamePage/LeftOrRightGame";
 
 const GameMap = {
   [GameType.None]: () => (
@@ -23,11 +25,13 @@ const GameMap = {
     </div>
   ),
   [GameType.Bomb]: BombGame,
+  [GameType.LeftRight]: LeftOrRightGame,
 };
 
 const RoomPage = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const [socket] = useState(() => io("/api/room"));
+  console.log(socket.id);
   const history = useHistory();
   const metadata = useSelector((state) => state.room.metadata);
 
@@ -67,8 +71,13 @@ const RoomPage = () => {
     return <div>로딩중 입니다.</div>;
   }
 
+  if (metadata.gameStatus === GameStatus.Ended) {
+    if (metadata.loser) {
+      return <Loser meta={metadata} />;
+    }
+  }
+
   if (metadata.gameStatus === GameStatus.Started) {
-    console.log("what?");
     const GameComponent = GameMap[metadata.type];
     return <GameComponent socket={socket} />;
   }

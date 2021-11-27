@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useMemo, useRef } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Joystick } from "react-joystick-component";
 import { Socket } from "socket.io-client";
 import { SocketServerEvent } from "../../constants/socket";
@@ -17,6 +17,9 @@ import backgroundImage from "../../image/gameBackground.jpg";
 import explosionImage from "../../image/explosion.png";
 import electricImage from "../../image/electric.png";
 
+//튜토리얼
+import BombTutorial from "./BombTutorial";
+
 // type
 import {
   TPlayerBall,
@@ -30,6 +33,7 @@ import {
   TImages,
   TBombFlick,
 } from "../../types/bombGameTypes";
+import { gameEnd } from "../../server/constants/socketEvents";
 
 /* ================== 조이스틱 관련 시작 ================== */
 
@@ -98,6 +102,43 @@ class playerBall {
 /* ================== 타입 및 클래스 선언 끝================== */
 
 /* ================== 게임 정보 관련 시작 ================== */
+
+class BombGameData {
+  gameCanvas: TGameCanvas = {
+    width: 360,
+    height: 500,
+  };
+
+  initialData: TGameIntialData = {
+    ballRad: 20,
+    ballMoveSpeed: 2, // 1 보다 큰 수로 속도 배율
+    bombMoveSpeed: 3, // 폭탄은 유저보다 빠르게
+    maxPlayTime: 30,
+    bombFreezeTime: 1000, // 1초 = 1000
+  };
+
+  ongoingData: TGameOngoingData = {
+    gameTime: 0,
+    gameEnded: false,
+    myBombChangeFreeze: false,
+    otherBombChangeFreeze: false,
+  };
+
+  bombFlick: TBombFlick = {
+    x: 0,
+    a: 1,
+    frameCnt: 0,
+    period: 350,
+  };
+
+  balls: TPlayerBall[] = [];
+  ballMap: Record<string, playerBall> = {};
+  myId: string = "";
+
+  gameEnded = false;
+  gameStart = false;
+}
+
 //Note: 현재 픽셀 위치 설정은 canvas 360x500을 기준으로 맞춰져있습니다.
 const gameCanvas: TGameCanvas = {
   width: 360,
@@ -109,6 +150,7 @@ const initialData: TGameIntialData = {
   ballMoveSpeed: 2, // 1 보다 큰 수로 속도 배율
   bombMoveSpeed: 3, // 폭탄은 유저보다 빠르게
   maxPlayTime: 30,
+  bombFreezeTime: 1000, // 1초 = 1000
 };
 
 const ongoingData: TGameOngoingData = {
@@ -129,11 +171,12 @@ const bombFlick: TBombFlick = {
   period: 350,
 };
 
-const balls: TPlayerBall[] = [];
-const ballMap: Record<string, playerBall> = {};
+let balls: TPlayerBall[] = [];
+let ballMap: Record<string, playerBall> = {};
 let myId: string;
 
 let gameEnded = false;
+let gameStart = false;
 
 function joinUser(data: TPlayerBall) {
   console.log("join user");
@@ -209,13 +252,13 @@ function updateBomb(sid: string, sbomb: boolean, rid: string, rbomb: boolean) {
     ongoingData.myBombChangeFreeze = true;
     setTimeout(function () {
       ongoingData.myBombChangeFreeze = false;
-    }, 5000);
+    }, initialData.bombFreezeTime);
   }
 
   ongoingData.otherBombChangeFreeze = true;
   setTimeout(function () {
     ongoingData.otherBombChangeFreeze = false;
-  }, 5000);
+  }, initialData.bombFreezeTime);
   //클라이언트 사이드에서 생긴 변경사항을 서버에 다시 보내서 정확한 데이터를 돌려 받게함
   // sendData(sball);
   // sendData(rball);
@@ -307,34 +350,140 @@ function bombFlickering(bombflick: TBombFlick) {
   return Math.sin(bombFlick.x - 1.57) / 4 + 0.25;
 }
 
+type radius = {
+  [index: string]: number;
+  tl: number;
+  tr: number;
+  br: number;
+  bl: number;
+};
+
+function roundRect(
+  ctx: any,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number | radius,
+  fill: boolean,
+  stroke: boolean | undefined,
+) {
+  if (typeof stroke === "undefined") {
+    stroke = true;
+  }
+  if (typeof radius === "undefined") {
+    radius = 5;
+  }
+  if (typeof radius === "number") {
+    radius = { tl: radius, tr: radius, br: radius, bl: radius };
+  } else {
+    var defaultRadius: radius = { tl: 0, tr: 0, br: 0, bl: 0 };
+    for (var side in defaultRadius) {
+      radius[side] = radius[side] || defaultRadius[side];
+    }
+  }
+  ctx.beginPath();
+  ctx.moveTo(x + radius.tl, y);
+  ctx.lineTo(x + width - radius.tr, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+  ctx.lineTo(x + width, y + height - radius.br);
+  ctx.quadraticCurveTo(
+    x + width,
+    y + height,
+    x + width - radius.br,
+    y + height,
+  );
+  ctx.lineTo(x + radius.bl, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+  ctx.lineTo(x, y + radius.tl);
+  ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+  ctx.closePath();
+  if (fill) {
+    ctx.fill();
+  }
+  if (stroke) {
+    ctx.stroke();
+  }
+}
+
 /* ================== 캔버스 출력 관련 끝================== */
+
+/* ================== 게임 설정 초기화 ================== */
+
+function initializeBombGame() {
+  ongoingData.gameTime = 0;
+  ongoingData.gameEnded = false;
+  ongoingData.myBombChangeFreeze = false;
+  ongoingData.otherBombChangeFreeze = false;
+
+  bombFlick.x = 0;
+  bombFlick.a = 1;
+  bombFlick.frameCnt = 0;
+  bombFlick.period = 350;
+
+  balls = [];
+  ballMap = {};
+  myId = "";
+
+  gameEnded = false;
+  gameStart = false;
+
+  console.log(ongoingData);
+}
+
+/* ================== 게임 설정 초기화 ================== */
 
 type TBombGameProps = {
   socket: Socket;
 };
 
 const BombGame = ({ socket }: TBombGameProps) => {
+  // const [instance] = useState(() => new BombGameData());
+  // console.log(instance.gameCanvas.width);
+
+  // 첫 랜더링 때 바뀌는 전역변수들 초기화
+  useEffect(() => {
+    console.log("게임 설정 초기화");
+    initializeBombGame();
+  }, []);
+
   //canvas 사용을 위해 필요한 선언 1
   const canvasRef: any = useRef(null);
 
+  // 소켓 초기화
   const { bombChange, sendData } = useMemo(
     () => setupSocketEvents(socket),
-    [socket]
+    [socket],
   );
 
-  //타이머 용
-  useEffect(() => {
-    timerData.progressBarHeight = 0;
-    ongoingData.gameTime = 0;
-    let timer = setInterval(function () {
-      ongoingData.gameTime += 0.1;
-      timerData.progressBarHeight += 1.666666667;
-      if (ongoingData.gameTime >= initialData.maxPlayTime) {
-        clearInterval(timer);
-      }
-    }, 100);
-  }, []);
+  // 튜토리얼 출력
+  const [showModal, setShowModal] = useState(true);
 
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  // 10초 뒤에 튜토리얼 창 끄게 해줌
+  setTimeout(function () {
+    gameStart = true;
+    closeModal();
+  }, 1000); // 10초뒤 출력
+
+  // 게임 요소 시작
+  useEffect(() => {
+    if (gameStart) {
+      console.log("캔버스 랜더링 시작");
+      render();
+      let event = setInterval(function () {
+        handleGameEvents();
+        if (gameEnded) {
+          clearInterval(event);
+        }
+      }, 20);
+    }
+  }, [showModal]);
+
+  // console.log(`게임 시작했나요? :${gameStart}`);
   let frameCnt = 0;
 
   /* 사용되는변수
@@ -374,6 +523,22 @@ const BombGame = ({ socket }: TBombGameProps) => {
     for (let i = 0; i < balls.length; i++) {
       let ball = balls[i];
 
+      //이름 박스 출력
+      ctx.save();
+      ctx.fillStyle = "white";
+      roundRect(
+        ctx,
+        ball.x - initialData.ballRad - 7, //x
+        ball.y - initialData.ballRad - 4 - 17, //y
+        initialData.ballRad * 2 + 18, //width
+        18, //height
+        9, //radius
+        true,
+        true,
+      );
+      ctx.restore();
+
+      // 공 출력
       ctx.fillStyle = ball.color;
       ctx.beginPath();
       ctx.arc(ball.x, ball.y, initialData.ballRad, 0, 2 * Math.PI);
@@ -388,7 +553,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           ball.x - initialData.ballRad - 15,
           ball.y - initialData.ballRad - 14,
           57,
-          57
+          57,
         );
 
         //폭탄이 점멸하게
@@ -413,7 +578,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
             ball.x - initialData.ballRad - 25,
             ball.y - initialData.ballRad - 25,
             80,
-            80
+            80,
           );
           ctx.restore();
         }
@@ -427,7 +592,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
         ctx.fillText(
           "나야 나!",
           ball.x - initialData.ballRad - 7,
-          ball.y - initialData.ballRad - 4
+          ball.y - initialData.ballRad - 4,
         );
         ctx.closePath();
       } else {
@@ -436,18 +601,11 @@ const BombGame = ({ socket }: TBombGameProps) => {
         ctx.fillText(
           `player ${i}`,
           ball.x - initialData.ballRad - 7,
-          ball.y - initialData.ballRad - 4
+          ball.y - initialData.ballRad - 4,
         );
         ctx.closePath();
       }
     }
-    ctx.restore();
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.fillStyle = "red";
-    ctx.fillRect(355, 500, 5, -timerData.progressBarHeight);
-    ctx.stroke();
     ctx.restore();
 
     if (gameEnded) {
@@ -467,7 +625,10 @@ const BombGame = ({ socket }: TBombGameProps) => {
     4. canvas height, width 
     5. 타이머 요소
   */
-  const handleGameEvents = () => {
+  function handleGameEvents() {
+    if (gameEnded || !gameStart) {
+      return;
+    }
     /*==== 데이터 조작 후 서버 전송 ====*/
     const curPlayer = ballMap[myId];
     // 내가 직접 공 위치 클라 꺼는 바꾸면 안됌
@@ -496,7 +657,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           const collision: boolean = isBallCollision(
             curPlayerClone,
             otherPlayerClone,
-            initialData.ballRad
+            initialData.ballRad,
           );
 
           // 충돌했을때
@@ -519,7 +680,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
               curPlayer,
               otherPlayerClone,
               xySpeed,
-              initialData.ballRad
+              initialData.ballRad,
             );
             curPlayerClone.x += adjustedBallPosition3[0];
             curPlayerClone.y += adjustedBallPosition3[1];
@@ -531,7 +692,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
       let adjustedBallPosition2: number[] = isWallCollision(
         curPlayerClone,
         gameCanvas,
-        initialData.ballRad
+        initialData.ballRad,
       );
 
       curPlayerClone.x = adjustedBallPosition2[0];
@@ -553,32 +714,30 @@ const BombGame = ({ socket }: TBombGameProps) => {
     }
 
     /*==== 데이터 조작 후 서버 전송 ====*/
-  };
-
-  useEffect(() => {
-    render();
-    setInterval(handleGameEvents, 20);
-  });
+  }
 
   return (
     <div className="hotBombPotato">
+      <div>{showModal && <BombTutorial />}</div>
       <div>
-        <canvas
-          id="canvas"
-          ref={canvasRef}
-          height={gameCanvas.height}
-          width={gameCanvas.width}
-        />
-      </div>
-      <div className="joystick">
-        <Joystick
-          size={100}
-          baseColor="lightgray"
-          stickColor="gray"
-          move={handleMove}
-          stop={handleStop}
-          throttle={120}
-        ></Joystick>
+        <div>
+          <canvas
+            id="canvas"
+            ref={canvasRef}
+            height={gameCanvas.height}
+            width={gameCanvas.width}
+          />
+        </div>
+        <div className="joystick">
+          <Joystick
+            size={100}
+            baseColor="lightgray"
+            stickColor="gray"
+            move={handleMove}
+            stop={handleStop}
+            throttle={120}
+          ></Joystick>
+        </div>
       </div>
     </div>
   );
