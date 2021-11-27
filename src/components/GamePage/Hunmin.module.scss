@@ -1,0 +1,71 @@
+.gameContainer {
+  display: flex;
+  flex-direction: column;
+  .suggestionContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .suggestion {
+      height: 50px;
+      font-size: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: white;
+      width: 150px;
+      border-radius: 0 0 10px 10px;
+    }
+  }
+  .playContainer {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    overflow: auto;
+    .players {
+      background-color: rgba(0, 0, 0, 0.5);
+      height: 300px;
+      width: 60%;
+      ul {
+        padding-left: 0px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: chartreuse;
+        li {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: white;
+          list-style: none;
+          height: 25%;
+          margin: 5px 5px 5px 5px;
+        }
+      }
+    }
+    .chat {
+      background-color: rgba(255, 255, 255, 0.5);
+      margin-left: 10px;
+      margin-right: 10px;
+      width: 100%;
+    }
+  }
+  .inputContainer {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    input {
+      padding-left: 10px;
+      height: 35px;
+      width: 80%;
+      margin-left: 5;
+      margin-right: 10px;
+      border: none;
+      border-radius: 10px;
+    }
+    button {
+      margin-right: 5px;
+    }
+  }
+}

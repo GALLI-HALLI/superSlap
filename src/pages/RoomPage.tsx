@@ -16,6 +16,7 @@ import BombGame from "../components/GamePage/BombGame";
 import GameList from "../components/RoomPage/GameList";
 import Loser from "../components/RoomPage/Loser";
 import LeftOrRightGame from "../components/GamePage/LeftOrRightGame";
+import Hunmin from "../components/GamePage/Hunmin";
 
 const GameMap = {
   [GameType.None]: () => (
@@ -26,6 +27,7 @@ const GameMap = {
   ),
   [GameType.Bomb]: BombGame,
   [GameType.LeftRight]: LeftOrRightGame,
+  [GameType.Hunmin]: Hunmin,
 };
 
 const RoomPage = () => {

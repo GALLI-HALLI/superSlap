@@ -10,6 +10,7 @@ import AuthRedirect from "./pages/AuthRedirect";
 import initializeStore from "./store/initializeStore";
 import RoomPage from "./pages/RoomPage";
 import Loser from "./components/RoomPage/Loser";
+import Hunmin from "./components/GamePage/Hunmin";
 
 const store = initializeStore();
 
@@ -24,7 +25,7 @@ function App() {
           <Route path="/lobby" component={LobbyPage} />
           <Route path="/auth-redirect" component={AuthRedirect} />
           <Route path="/room/:roomId" component={RoomPage} />
-          <Route path="/loser" component={Loser} />
+          <Route path="/hunmin" component={Hunmin} />
         </Switch>
       </Layout>
     </Provider>
