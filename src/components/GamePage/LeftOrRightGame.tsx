@@ -602,7 +602,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     .fill(undefined)
     .map((_) => new (Confetti as any)());
 
-  function drawGameFinsh(ctx: any) {
+  function drawGameFinish(ctx: any) {
     ctx.save();
     ctx.globalAlpha = 0.4;
     ctx.fillStyle = "black";
@@ -626,14 +626,14 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     ctx.fillStyle = "white";
     ctx.font = "bold 100px Trebuchet MS";
     ctx.fillText(
-      "FINSH",
-      45 + instance.ifEnd.height,
+      "FINISH",
+      35 + instance.ifEnd.height,
       instance.gameCanvas.height / 2
     );
     ctx.restore();
   }
 
-  function ifGameFinsh() {
+  function ifGameFinish() {
     instance.state.ended = true;
 
     const gameEndtimer = setInterval(function () {
@@ -674,7 +674,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
         instance.timer.width = instance.timer.maxWidth;
 
         // 게임 종료
-        ifGameFinsh();
+        ifGameFinish();
         clearInterval(timer);
       }
     }, 10);
@@ -708,7 +708,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     drawButton(ctx);
 
     if (instance.state.ended) {
-      drawGameFinsh(ctx);
+      drawGameFinish(ctx);
     }
 
     requestAnimationFrame(render);
