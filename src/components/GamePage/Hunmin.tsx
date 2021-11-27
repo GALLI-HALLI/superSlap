@@ -12,6 +12,7 @@ type TSocket = {
 const Hunmin = ({ socket, players }: TSocket) => {
   const [inputValue, setInputValue] = useState("");
   const [suggest, setSuggest] = useState("");
+  const [checkMsg, setCheckMsg] = useState("");
   const changeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -21,23 +22,30 @@ const Hunmin = ({ socket, players }: TSocket) => {
     socket.emit("word", inputValue);
   };
 
+  socket.on("join_user", (data) => {
+    console.log(data);
+  });
+
   useEffect(() => {
     socket.on("fail", (msg) => {
       console.log(msg);
+      setCheckMsg(msg);
+      setInputValue("");
     });
     socket.on("pass", (data) => {
       console.log(data);
+      setInputValue("");
     });
     socket.on("suggestInitial", (data) => {
       setSuggest(data);
-      console.log(suggest);
+      setInputValue("");
     });
   });
 
   return (
     <div className={styles.gameContainer}>
       <div className={styles.suggestionContainer}>
-        <div className={styles.suggestion}>{suggest}</div>
+        Ma7kZEU <div className={styles.suggestion}>{suggest}</div>
       </div>
       <div className={styles.playContainer}>
         <div className={styles.players}>
@@ -71,6 +79,7 @@ const Hunmin = ({ socket, players }: TSocket) => {
           onChange={changeValue}
         />
         <Button onClick={postWord}>제출</Button>
+        <label>{checkMsg}</label>
       </div>
     </div>
   );
