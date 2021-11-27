@@ -62,6 +62,7 @@ class Room {
     this.gameInstance.start();
   }
 
+
   comebackRoom = ({ loserId }) => {
     this.loserId = loserId;
     this.gameStatus = GameStatus.Ended;
