@@ -172,12 +172,14 @@ class Hunmin extends Game {
         this.getRoomSocket().emit("hunminData", {
           success: true,
           turn: this.turn % this.len,
-          msg: data,
+          word: data,
+          msg: "성공이지롱~~~",
         });
       } else {
         this.getRoomSocket().emit("hunminData", {
           success: false,
           turn: this.turn % this.len,
+          word: data,
           msg: result[1],
         });
       }
