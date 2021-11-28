@@ -17,19 +17,21 @@ class LeftOrRightGame extends Game {
   }
 
   ranking() {
-    let loserId = [];
+    //주석 패배자 리스트로 보낼 때
+    // let loserId = [];
+    let loserId;
     let loserScore = 999999999;
     Array.from(this.playerScores).forEach(([key, value]) => {
       if (loserScore > value) {
-        loserId = [];
-        loserId.push(key);
+        loserId = key;
+        // loserId = [];
+        // loserId.push(key);
         loserScore = value;
-      } else if (loserScore > value) {
-        loserId.push(key);
       }
+      // else if (loserScore === value) {
+      //   loserId.push(key);
+      // }
     });
-    // console.log(loserId[0]);
-    // let loser = loserId[0];
     this.comebackRoom({ loserId });
   }
 
