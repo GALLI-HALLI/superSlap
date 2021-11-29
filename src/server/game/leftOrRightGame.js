@@ -17,20 +17,15 @@ class LeftOrRightGame extends Game {
   }
 
   ranking() {
-    //주석 패배자 리스트로 보낼 때
-    // let loserId = [];
     let loserId;
     let loserScore = 999999999;
     Array.from(this.playerScores).forEach(([key, value]) => {
       if (loserScore > value) {
         loserId = key;
-        // loserId = [];
-        // loserId.push(key);
         loserScore = value;
+      } else if (loserScore === value) {
+        if (Math.random() >= 0.5) loserId = key;
       }
-      // else if (loserScore === value) {
-      //   loserId.push(key);
-      // }
     });
     this.comebackRoom({ loserId });
   }
@@ -44,6 +39,7 @@ class LeftOrRightGame extends Game {
       this.playerScores.set(id, data);
       this.receiveDataNum++;
       if (this.receiveDataNum === this.playerScores.size) {
+        console.log("hh");
         this.ranking();
       }
     });
