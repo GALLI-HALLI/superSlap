@@ -1,0 +1,11 @@
+.gameContainer {
+  display: flex;
+  flex-direction: column;
+  .playContainer {
+    margin-top: 10px;
+    background-color: blue;
+    .suggestAndTime {
+      display: flex;
+    }
+  }
+}

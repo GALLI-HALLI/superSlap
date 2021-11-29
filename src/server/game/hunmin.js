@@ -29,6 +29,11 @@ const wrongReason = {
   word: "표준대국어사전에 없는 단어입니다",
 };
 
+const SECOND = 1000;
+
+const GAME_TIME_LIMIT = SECOND * 100;
+const TURN_TIME_LIMIT = SECOND * 5;
+
 class Hunmin extends Game {
   constructor(room) {
     super(room);
@@ -55,17 +60,25 @@ class Hunmin extends Game {
         seq: i,
       });
     }
-    this.getRoomSocket().emit("suggestInitial", suggest);
+
+    this.getRoomSocket().emit("setInitial", {
+      suggest,
+      gameTimeLimit: TURN_TIME_LIMIT,
+      turnTimeLimit: GAME_TIME_LIMIT,
+    });
 
     this.nextTurn();
-    this.getRoomSocket().emit("nextTurn", this.turn);
+    this.getRoomSocket().emit(
+      "nextTurn",
+      this.playerSeq[this.turn / this.playerSeq.length].id,
+    );
 
     setTimeout(() => {
       if (this.finish) return;
       let loser = this.playerSeq[this.turn % this.len][0];
       this.getRoomSocket().emit(socketEvent.gameEnd, loser);
       this.comebackRoom(loser);
-    }, 100000);
+    }, GAME_TIME_LIMIT);
   }
 
   disconnect(id) {
@@ -85,7 +98,10 @@ class Hunmin extends Game {
         // this.playerSeq.splice(i,1);
         this.playerSeq[i] = false;
         this.nextTurn();
-        this.getRoomSocket().emit("nextTurn", this.turn);
+        this.getRoomSocket().emit(
+          "nextTurn",
+          this.playerSeq[this.turn / this.playerSeq.length].id,
+        );
         break;
       }
     }
@@ -130,17 +146,18 @@ class Hunmin extends Game {
     let initial =
       this.getInitialConstant(word[0]) + this.getInitialConstant(word[1]);
     if (initial !== this.nowWord) return [false, wrongReason.initial];
-    request.get(addr + encodeURI(word), (err, resoponse, body) => {
-      if (err) {
-        console.log(err);
-      }
-      if (body) {
-        return [true, ""];
-      } else {
-        return [false, wrongReason.word];
-      }
+    return new Promise((resolve, reject) => {
+      request.get(addr + encodeURI(word), (err, response, body) => {
+        console.log(err, response, body);
+        if (err) {
+          console.log(err);
+        }
+        if (body) {
+          resolve([true, ""]);
+        }
+        resolve([false, wrongReason.word]);
+      });
     });
-    return [true, ""];
   }
 
   nextTurn() {
@@ -156,7 +173,7 @@ class Hunmin extends Game {
       let loser = this.playerSeq[this.turn % this.len][0];
       this.getRoomSocket().emit(socketEvent.gameEnd, loser);
       this.comebackRoom(loser);
-    }, 50000);
+    }, TURN_TIME_LIMIT);
   }
 
   initializeSocketEvents(id, socket) {
@@ -166,6 +183,7 @@ class Hunmin extends Game {
 
     socket.on("word", async (data) => {
       let result = await this.checkWord(data);
+      console.log(result);
       if (result[0]) {
         this.wordList.push(data);
         this.nextTurn(data);
