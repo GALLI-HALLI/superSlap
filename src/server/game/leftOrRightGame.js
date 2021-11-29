@@ -39,7 +39,6 @@ class LeftOrRightGame extends Game {
       this.playerScores.set(id, data);
       this.receiveDataNum++;
       if (this.receiveDataNum === this.playerScores.size) {
-        console.log("hh");
         this.ranking();
       }
     });
