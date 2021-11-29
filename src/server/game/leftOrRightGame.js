@@ -31,7 +31,7 @@ class LeftOrRightGame extends Game {
     this.comebackRoom({ loserId });
   }
 
-  initializeSocketEvents(id, socket) {
+  initializeSocketEvents(id, socket, nickname) {
     console.log(`${id} is entered ${Date()}`);
     this.playerScores.set(id, 0);
 
