@@ -1,54 +1,46 @@
 .gameContainer {
   display: flex;
   flex-direction: column;
-  .suggestionContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    .suggestion {
-      height: 50px;
-      font-size: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: white;
-      width: 150px;
-      border-radius: 0 0 10px 10px;
-    }
-  }
   .playContainer {
     margin-top: 10px;
-    display: flex;
-    justify-content: space-between;
-    overflow: auto;
-    .players {
-      background-color: rgba(0, 0, 0, 0.5);
-      height: 300px;
-      width: 60%;
-      ul {
-        padding-left: 0px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background-color: chartreuse;
-        li {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: white;
-          list-style: none;
-          height: 25%;
-          margin: 5px 5px 5px 5px;
-        }
+    margin-left: 5px;
+    margin-right: 5px;
+    border-radius: 10px;
+    height: 250px;
+    background-color: white;
+    .suggestAndTime {
+      display: flex;
+      .gameTime {
+        margin: 10px auto 10px 10px;
+      }
+      .suggest {
+        margin: 10px 10px 10px auto;
       }
     }
-    .chat {
-      background-color: rgba(255, 255, 255, 0.5);
-      margin-left: 10px;
-      margin-right: 10px;
-      width: 100%;
+    .gameRecord {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-top: 20px;
+      .userWord {
+        margin-left: 15px;
+        font-size: 40px;
+      }
+      .nickname {
+        margin-left: 15px;
+      }
+      .passMsg {
+        margin-left: 15px;
+      }
     }
+  }
+  .progressBar {
+    margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
+    background-color: red;
+    height: 15px;
+    border-radius: 10px;
   }
   .inputContainer {
     margin-top: 10px;
@@ -64,8 +56,22 @@
       border: none;
       border-radius: 10px;
     }
-    button {
-      margin-right: 5px;
+  }
+
+  .playerA {
+    display: flex;
+    margin-top: 5px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    div {
+      display: flex;
+      border-radius: 10px;
+      justify-content: center;
+      align-items: center;
+      margin: 5px auto;
+      background-color: white;
+      width: 80px;
+      height: 50px;
     }
   }
 }
