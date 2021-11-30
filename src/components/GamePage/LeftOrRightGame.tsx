@@ -188,19 +188,21 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   ArrowRightButton.src = ArrowRightButtonImg;
 
   //키보드 좌우 클릭 감지
-  useEffect(() => {
-    setTimeout(function () {
-      window.addEventListener("keydown", (event) => {
-        if (instance.state.ended === true) return;
+  useEffect(() => {});
 
-        if (event.key === "ArrowLeft") {
-          leftOrRightEventHandle("left");
-        } else if (event.key === "ArrowRight") {
-          leftOrRightEventHandle("right");
-        }
-      });
-    }, 3700 + 6000);
-  }, []);
+  window.addEventListener("keydown", (event) => {
+    if (
+      instance.state.ended === true ||
+      instance.gameStartAnimation.value <= 10000
+    )
+      return;
+
+    if (event.key === "ArrowLeft") {
+      leftOrRightEventHandle("left");
+    } else if (event.key === "ArrowRight") {
+      leftOrRightEventHandle("right");
+    }
+  });
 
   // 튜토리얼 출력
   const [showModal, setShowModal] = useState(true);
@@ -255,9 +257,10 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   function leftOrRightEventHandle(whichPressed: string) {
     if (monsterList.length === 0) return;
+
+    console.log("call");
     const ball = monsterList.pop();
     let success = true;
-
     if (
       (ball.isBlue && whichPressed === "right") ||
       (!ball.isBlue && whichPressed === "left")
@@ -270,7 +273,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     // 성적 체크;
     if (!success) {
       score -= 2;
-
       // 실패 효과 출력
       wrongMonster = ball;
       setTimeout(() => {
@@ -286,7 +288,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       }
       monsterLRList.push(ball);
     }
-
     // 새 공 추가
     const monster = makeNewMonster();
     monsterList.unshift(monster);
@@ -717,7 +718,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   useEffect(() => {
     render();
-  });
+  }); // 재랜더링 방지하면 키보드 조작 터치 조작 둘중하나 안되게 됌. 왜??? 시발 왜?
 
   const render = () => {
     if (canvasRef.current === null) return;
