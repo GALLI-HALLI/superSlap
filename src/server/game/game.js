@@ -24,6 +24,11 @@ class Game {
   }
 
   /**
+   * 게임 데이터 정리
+   */
+  end() {}
+
+  /**
    * 사용자 한명이 나갔을 경우
    * @param {Id} id 로그인 id 정보
    */
@@ -36,6 +41,7 @@ class Game {
    * 게임이 끝났을때 상속받은 클래스에서 반드시 호출해야합니다.
    */
   comebackRoom({ loserId }) {
+    this.end();
     this.room.comebackRoom({ loserId });
   }
 

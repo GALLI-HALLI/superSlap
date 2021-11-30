@@ -85,7 +85,16 @@ const Hunmin = ({ socket }: TSocket) => {
       setGameTimeRemain(data.gameTimeLimit);
       setTurnTimeRemain(data.turnTimeLimit);
     });
+
+    return () => {
+      socket.off("setInitial");
+      socket.off("word");
+      socket.off("nextTurn");
+      socket.off("join_user");
+      socket.off("hunminData");
+    };
   }, [socket]);
+
   useEffect(() => {
     setInterval(() => {
       setTurnTimeRemain((prev) => prev - 10);

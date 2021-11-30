@@ -15,6 +15,13 @@ import { useMediaQuery } from "react-responsive";
 import { Socket } from "socket.io-client";
 // import { SocketServerEvent } from "../../constants/socket";
 
+//게임 시작 애니메이션
+//총 3.7초 3700
+import {
+  drawGameStart,
+  gameStartAnimation,
+} from "../../utils/gameStartAnimation";
+
 type TGameCanvas = {
   height: number;
   width: number;
@@ -24,6 +31,10 @@ class GameData {
   gameCanvas: TGameCanvas = {
     width: 360,
     height: 500 + 140,
+  };
+
+  gameStartAnimation = {
+    value: 0,
   };
 
   state = {
@@ -42,7 +53,8 @@ class GameData {
   timer = {
     width: 30,
     maxWidth: 360 - 40 * 2,
-    maxTime: 15, //15초
+    maxPlayTime: 15, //15초
+    cntDownTime: 3700,
     time: 0,
   };
 
@@ -142,11 +154,6 @@ function roundRect(
   }
 }
 
-// const setupSocketEvents = (socket: Socket) => {
-
-//   return { };
-// };
-
 function ClearCanvas(ctx: any, canvas: any) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -180,22 +187,28 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   //키보드 좌우 클릭 감지
 
   useEffect(() => {
-    window.addEventListener("keydown", (event) => {
-      if (instance.state.ended === true) return;
+    setTimeout(function () {
+      window.addEventListener("keydown", (event) => {
+        if (instance.state.ended === true) return;
 
-      if (event.key === "ArrowLeft") {
-        leftOrRightEventHandle("left");
-      } else if (event.key === "ArrowRight") {
-        leftOrRightEventHandle("right");
-      }
-    });
+        if (event.key === "ArrowLeft") {
+          leftOrRightEventHandle("left");
+        } else if (event.key === "ArrowRight") {
+          leftOrRightEventHandle("right");
+        }
+      });
+    }, 3700);
   });
 
   // const isTabletOrMobile = useMediaQuery({ query: "(max-width: 767px)" });
 
   // onclick + touch handler in canvas tag
   const handleCanvasClick = (event: any) => {
-    if (instance.state.ended === true) return;
+    if (
+      instance.state.ended === true ||
+      instance.gameStartAnimation.value <= 10000
+    )
+      return;
 
     const canvas2 = canvasRef.current;
     const rect = canvas2.getBoundingClientRect();
@@ -649,40 +662,46 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   useEffect(() => {
     // load monster balls
     // 처음엔 공 9개만 출력해야 문제 안생김!
-    for (let i = 1; i < 10; i++) {
-      const monster = makeNewMonster();
+    setTimeout(function () {
+      for (let i = 1; i < 10; i++) {
+        const monster = makeNewMonster();
 
-      //위부터 아래까지 일렬로 늘어지게
-      let sth = instance.ballDistance.y;
-      monster.y += sth * i;
+        //위부터 아래까지 일렬로 늘어지게
+        let sth = instance.ballDistance.y;
+        monster.y += sth * i;
 
-      monsterList.push(monster);
-    }
+        monsterList.push(monster);
+      }
+    }, 3700);
   });
 
   useEffect(() => {
+    gameStartAnimation(instance, instance.gameCanvas.width);
+
     render();
 
     //타이머
-    const timer = setInterval(function () {
-      instance.timer.time += 0.01;
-      instance.timer.width +=
-        (instance.timer.maxWidth - 30) / (instance.timer.maxTime * 100);
-      if (instance.timer.time > instance.timer.maxTime) {
-        instance.timer.time = instance.timer.maxTime;
-        instance.timer.width = instance.timer.maxWidth;
+    setTimeout(function () {
+      const timer = setInterval(function () {
+        instance.timer.time += 0.01;
+        instance.timer.width +=
+          (instance.timer.maxWidth - 30) / (instance.timer.maxPlayTime * 100);
+        if (instance.timer.time > instance.timer.maxPlayTime) {
+          instance.timer.time = instance.timer.maxPlayTime;
+          instance.timer.width = instance.timer.maxWidth;
 
-        // 게임 종료
-        ifGameFinish();
-        clearInterval(timer);
-      }
-    }, 10);
+          // 게임 종료
+          ifGameFinish();
+          clearInterval(timer);
+        }
+      }, 10);
+    }, 3700); //
 
     //일정 시간 후 게임 결과 송신
     setTimeout(function () {
       console.log("game terminate");
       socket.emit("lrEnd", score);
-    }, instance.timer.maxTime * 1000 + 3000);
+    }, instance.timer.maxPlayTime * 1000 + 3000 + 3700);
   });
 
   const render = () => {
@@ -709,6 +728,14 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     if (instance.state.ended) {
       drawGameFinish(ctx);
     }
+
+    console.log(instance.gameStartAnimation.value);
+    drawGameStart(
+      ctx,
+      instance.gameCanvas.width,
+      instance.gameCanvas.height,
+      instance.gameStartAnimation.value
+    );
 
     requestAnimationFrame(render);
   };
