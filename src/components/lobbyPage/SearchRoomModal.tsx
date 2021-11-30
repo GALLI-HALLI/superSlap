@@ -5,7 +5,7 @@ import { useSelector } from "../../hooks/typeReduxHook";
 import { useDispatch } from "react-redux";
 import { joinUser } from "../../store/room/room.action";
 import { useHistory } from "react-router";
-import { AsyncActionStatus } from "../../constants/redux";
+import useRequestSuccess from "../../hooks/useRequestSuccess";
 
 type TSearchRoom = {
   close: () => void;
@@ -17,15 +17,20 @@ const SearchRoomModal = ({ close }: TSearchRoom) => {
   const dispatch = useDispatch();
   const history = useHistory();
 
+  const isJoinCheckRequestSuccess = useRequestSuccess(joinCheck.joinStatus);
+
+  console.log(joinCheck);
+  console.log(isJoinCheckRequestSuccess);
+
   useEffect(() => {
-    if (joinCheck.joinStatus === AsyncActionStatus.Success) {
+    if (isJoinCheckRequestSuccess) {
       if (!joinCheck.message?.succuess) {
         alert(joinCheck.message?.msg);
       } else if (joinCheck.message?.succuess) {
         history.push(`/room/${roomId}`);
       }
     }
-  }, [joinCheck, history, roomId]);
+  }, [joinCheck, history]);
 
   const hanedleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRoomId(e.target.value);

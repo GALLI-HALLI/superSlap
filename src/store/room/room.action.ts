@@ -18,7 +18,6 @@ export const setResetRoom = createAction("SET_RESET_ROOM");
 
 export const getRoomId = () => async (dispatch: Dispatch) => {
   dispatch(getRoomIdLoading());
-
   try {
     const roomCode = await getRoomID();
     console.log(roomCode);
@@ -29,10 +28,9 @@ export const getRoomId = () => async (dispatch: Dispatch) => {
 };
 
 export const joinUser = (code: TRoomId) => async (dispatch: Dispatch) => {
-  dispatch(getRoomIdLoading());
+  dispatch(getJoinLoading());
   try {
     const data = await searchRoom(code);
-    console.log(data, "방 입장가능 메시지");
     dispatch(getJoinSuccess({ data }));
   } catch {
     dispatch(getJoinFailure());

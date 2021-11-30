@@ -32,8 +32,7 @@ const GameMap = {
 
 const RoomPage = () => {
   const { roomId } = useParams<{ roomId: string }>();
-  const [socket] = useState(() => io("/api/room"));
-  console.log(socket.id);
+  const [socket] = useState(() => io("/api/room", { autoConnect: false }));
   const history = useHistory();
   const metadata = useSelector((state) => state.room.metadata);
 
@@ -44,17 +43,24 @@ const RoomPage = () => {
   };
 
   useEffect(() => {
+    socket.on("metadata", (data: TMetadata) => {
+      dispatch(setMetaData({ data }));
+    });
+    socket.on(SocketServerEvent.GameAlreadyStarted, () => {
+      socket.disconnect();
+      history.push("/lobby");
+    });
+    socket.on(SocketServerEvent.roomDestroyed, () => {
+      socket.disconnect();
+      history.push("/lobby");
+    });
+  }, [dispatch, socket, history]);
+
+  useEffect(() => {
     let token = localStorage.getItem("token");
     if (token) {
+      socket.connect();
       socket.emit("enter", roomId, token);
-      socket.on("metadata", (data: TMetadata) => {
-        dispatch(setMetaData({ data }));
-      });
-      socket.on(SocketServerEvent.GameAlreadyStarted, () => {
-        alert("이미 진행중이라고~~~");
-        socket.disconnect();
-        history.push("/lobby");
-      });
     }
     return () => {
       dispatch(setResetRoom());
@@ -81,7 +87,7 @@ const RoomPage = () => {
 
   if (metadata.gameStatus === GameStatus.Started) {
     const GameComponent = GameMap[metadata.type];
-    return <GameComponent socket={socket} players={metadata.players} />;
+    return <GameComponent socket={socket} />;
   }
 
   return (

@@ -33,7 +33,7 @@ const wrongReason = {
 const SECOND = 1000;
 
 const GAME_TIME_LIMIT = SECOND * 100;
-const TURN_TIME_LIMIT = SECOND * 5;
+const TURN_TIME_LIMIT = SECOND * 10;
 //*
 
 class Hunmin extends Game {
@@ -59,6 +59,7 @@ class Hunmin extends Game {
     for (let i = 0; i < this.len; i++) {
       this.getRoomSocket().emit("join_user", {
         id: this.playerSeq[i][0],
+        nickname: this.playerSeq[i][2],
         seq: i,
       });
     }
@@ -66,8 +67,8 @@ class Hunmin extends Game {
     //*변경
     this.getRoomSocket().emit("setInitial", {
       suggest,
-      gameTimeLimit: TURN_TIME_LIMIT,
-      turnTimeLimit: GAME_TIME_LIMIT,
+      gameTimeLimit: GAME_TIME_LIMIT,
+      turnTimeLimit: TURN_TIME_LIMIT,
     });
     //*
 
@@ -75,9 +76,9 @@ class Hunmin extends Game {
 
     setTimeout(() => {
       if (this.finish) return;
-      let loser = this.playerSeq[this.turn % this.len][0];
-      this.getRoomSocket().emit(socketEvent.gameEnd, loser);
-      this.comebackRoom(loser);
+      let loserId = this.playerSeq[this.turn % this.len][0];
+      this.getRoomSocket().emit(socketEvent.gameEnd);
+      this.comebackRoom({ loserId });
     }, GAME_TIME_LIMIT);
   }
 
@@ -167,21 +168,22 @@ class Hunmin extends Game {
     } while (!this.playerSeq[this.turn % this.len] && cnt <= this.len);
     let now = this.turn;
     this.getRoomSocket().emit(
-        "nextTurn",
-        this.playerSeq[this.turn % this.len][0] //순서를 아이디로 보내주세요
-      );
+      "nextTurn",
+      this.playerSeq[this.turn % this.len][0], //순서를 아이디로 보내주세요
+    );
     setTimeout(() => {
       if (now !== this.turn) return;
       this.finish = true;
-      let loser = this.playerSeq[this.turn % this.len][0];
-      this.getRoomSocket().emit(socketEvent.gameEnd, loser);
-      this.comebackRoom(loser);
+      let loserId = this.playerSeq[this.turn % this.len][0];
+      console.log(loserId, "서버", 123897162349081623948);
+      this.getRoomSocket().emit(socketEvent.gameEnd);
+      this.comebackRoom({ loserId });
     }, TURN_TIME_LIMIT);
   }
 
   initializeSocketEvents(id, socket, nickname) {
     console.log(socket + " is entered");
-    
+
     this.joinGame(id, nickname);
 
     socket.on("word", async (data) => {
@@ -206,7 +208,6 @@ class Hunmin extends Game {
           msg: result[1],
         });
       }
-      //*
     });
   }
 }

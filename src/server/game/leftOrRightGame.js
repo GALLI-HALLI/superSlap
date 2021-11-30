@@ -17,15 +17,14 @@ class LeftOrRightGame extends Game {
   }
 
   ranking() {
-    let loserId = [];
+    let loserId;
     let loserScore = 999999999;
     Array.from(this.playerScores).forEach(([key, value]) => {
       if (loserScore > value) {
-        loserId = [];
-        loserId.push(key);
+        loserId = key;
         loserScore = value;
-      } else if (loserScore > value) {
-        loserId.push(key);
+      } else if (loserScore === value) {
+        if (Math.random() >= 0.5) loserId = key;
       }
     });
     this.comebackRoom({ loserId });
@@ -37,10 +36,9 @@ class LeftOrRightGame extends Game {
 
     //게임 끝 정보 받아서 넣어주기
     socket.on("lrEnd", (data) => {
-      console.log(data);
-      this.playerScores[id] = data;
+      this.playerScores.set(id, data);
       this.receiveDataNum++;
-      if (this.receiveDataNum === this.playerScores[id].length) {
+      if (this.receiveDataNum === this.playerScores.size) {
         this.ranking();
       }
     });
