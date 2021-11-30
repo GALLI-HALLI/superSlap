@@ -15,6 +15,8 @@ import { useMediaQuery } from "react-responsive";
 import { Socket } from "socket.io-client";
 // import { SocketServerEvent } from "../../constants/socket";
 
+import tutorialImage from "../../image/tutorialLeftRight.png";
+
 //게임 시작 애니메이션
 //총 3.7초 3700
 import {
@@ -39,6 +41,7 @@ class GameData {
 
   state = {
     ended: false,
+    started: false,
   };
 
   ifEnd = {
@@ -183,6 +186,8 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   ArrowLeftButton.src = ArrowLeftButtonImg;
   const ArrowRightButton = new Image();
   ArrowRightButton.src = ArrowRightButtonImg;
+  const tutorial = new Image();
+  tutorial.src = tutorialImage;
 
   //키보드 좌우 클릭 감지
 
@@ -197,8 +202,10 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
           leftOrRightEventHandle("right");
         }
       });
-    }, 3700);
+    }, 3700 + 4000);
   });
+
+  useEffect(() => {});
 
   // const isTabletOrMobile = useMediaQuery({ query: "(max-width: 767px)" });
 
@@ -672,13 +679,14 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
         monsterList.push(monster);
       }
-    }, 3700);
+    }, 3700 + 4000);
   });
 
   useEffect(() => {
-    gameStartAnimation(instance, instance.gameCanvas.width);
-
-    render();
+    setTimeout(function () {
+      instance.state.started = true;
+      gameStartAnimation(instance, instance.gameCanvas.width);
+    }, 4000);
 
     //타이머
     setTimeout(function () {
@@ -695,13 +703,17 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
           clearInterval(timer);
         }
       }, 10);
-    }, 3700); //
+    }, 3700 + 4000); //
 
     //일정 시간 후 게임 결과 송신
     setTimeout(function () {
       console.log("game terminate");
       socket.emit("lrEnd", score);
-    }, instance.timer.maxPlayTime * 1000 + 3000 + 3700);
+    }, instance.timer.maxPlayTime * 1000 + 3000 + 3700 + 4000);
+  });
+
+  useEffect(() => {
+    render();
   });
 
   const render = () => {
@@ -729,13 +741,22 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       drawGameFinish(ctx);
     }
 
-    console.log(instance.gameStartAnimation.value);
     drawGameStart(
       ctx,
       instance.gameCanvas.width,
       instance.gameCanvas.height,
       instance.gameStartAnimation.value
     );
+
+    if (!instance.state.started) {
+      ctx.drawImage(
+        tutorial,
+        -10,
+        -20,
+        instance.gameCanvas.width + 20,
+        instance.gameCanvas.height + 40
+      );
+    }
 
     requestAnimationFrame(render);
   };
