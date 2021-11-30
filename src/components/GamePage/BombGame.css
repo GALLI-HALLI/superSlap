@@ -7,6 +7,13 @@
   /* width: 360px; */
 }
 
+.bombgame {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 #canvas {
   background-color: #38b5db;
   border-radius: 20px;

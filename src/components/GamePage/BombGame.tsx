@@ -183,7 +183,7 @@ const bombFlick: TBombFlick = {
   x: 0,
   a: 1,
   frameCnt: 0,
-  period: 350,
+  period: 500, //커질수록 천천히 깜빡임
 };
 
 let balls: TPlayerBall[] = [];
@@ -441,7 +441,7 @@ function initializeBombGame() {
   bombFlick.x = 0;
   bombFlick.a = 1;
   bombFlick.frameCnt = 0;
-  bombFlick.period = 350;
+  bombFlick.period = 500;
 
   balls = [];
   ballMap = {};
@@ -485,26 +485,29 @@ const BombGame = ({ socket }: TBombGameProps) => {
   };
 
   // 6초 뒤에 튜토리얼 창 끄게 해줌
-  setTimeout(function () {
-    closeModal();
-    gameStartAnimation(instance, instance.gameCanvas.width);
-    setTimeout(function () {
-      gameStart = true;
-    }, 3700);
-  }, 6000);
 
   // 게임 요소 시작
   useEffect(() => {
-    console.log("캔버스 랜더링 시작");
-    render();
-    let event = setInterval(function () {
-      handleGameEvents();
-      if (gameEnded) {
-        ifGameFinish();
-        clearInterval(event);
-      }
-    }, 40);
-  }, [showModal]);
+    setTimeout(function () {
+      closeModal();
+      gameStartAnimation(instance, instance.gameCanvas.width);
+      setTimeout(function () {
+        gameStart = true;
+      }, 3700);
+    }, 6000);
+
+    setTimeout(function () {
+      console.log("캔버스 랜더링 시작");
+      render();
+      let event = setInterval(function () {
+        handleGameEvents();
+        if (gameEnded) {
+          ifGameFinish();
+          clearInterval(event);
+        }
+      }, 40);
+    }, 6000);
+  }, []);
 
   function Confetti(this: any) {
     //construct confetti
@@ -862,7 +865,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
   return (
     <div className="hotBombPotato">
       <div>{showModal && <GameTutorial game="bomb" />}</div>
-      <div>
+      <div className="bombgame">
         <div>
           <canvas
             id="canvas"
