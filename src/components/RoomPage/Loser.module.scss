@@ -25,4 +25,15 @@
     display: flex;
     margin: 20px 10px 10px auto;
   }
+  .rank {
+    margin-top: 10px;
+    ul {
+      margin-top: 10px;
+      list-style: none;
+      padding-left: 0px;
+      li {
+        list-style: none;
+      }
+    }
+  }
 }

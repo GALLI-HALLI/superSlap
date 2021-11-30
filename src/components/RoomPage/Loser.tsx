@@ -1,4 +1,5 @@
 import { useDispatch } from "react-redux";
+import { matchPath } from "react-router";
 import { GameType, GameStatus } from "../../constants/game";
 import { setMetaData } from "../../store/room/room.action";
 import { TMetadata } from "../../types/api";
@@ -16,6 +17,7 @@ const Loser = ({ meta }: { meta: TMetadata }) => {
     gameStatus: GameStatus.Idle,
     startTime: "",
     loser: undefined,
+    rank: undefined,
   };
 
   const backButton = () => {
@@ -28,6 +30,19 @@ const Loser = ({ meta }: { meta: TMetadata }) => {
       <div className={styles.loserName}>
         <label>아이디: {meta.loser?.id}</label>
         <label>닉네임: {meta.loser?.nickname}</label>
+      </div>
+      <div className={styles.rank}>
+        <ul>
+          {meta.rank && <li>아이디 : 점수 </li>}
+          {meta.rank &&
+            meta.rank.map(({ nickname, score }) => {
+              return (
+                <li>
+                  {nickname} : {score}
+                </li>
+              );
+            })}
+        </ul>
       </div>
       <div className={styles.backBtn}>
         <Button onClick={backButton}>나가기</Button>
