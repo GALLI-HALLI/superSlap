@@ -41,6 +41,7 @@ class Game {
    * 게임이 끝났을때 상속받은 클래스에서 반드시 호출해야합니다.
    */
   comebackRoom({ loserId, rank }) {
+    this.end();
     this.room.comebackRoom({ loserId, rank });
   }
 
