@@ -16,7 +16,7 @@ class LeftOrRightGame extends Game {
     this.playerScores.delete(id);
   }
 
-  async ranking() {
+  ranking() {
     let loserId;
     let loserScore = 999999999;
     Array.from(this.playerScores).forEach(([key, value]) => {
