@@ -79,7 +79,7 @@ class Hunmin extends Game {
       if (this.finish) return;
       let loserId = this.playerSeq[this.turn % this.len][0];
       this.getRoomSocket().emit(socketEvent.gameEnd);
-      this.comebackRoom({ loserId });
+      this.comebackRoom({ loserId }, null);
     }, GAME_TIME_LIMIT);
   }
 
@@ -180,7 +180,7 @@ class Hunmin extends Game {
     let now = this.turn;
     this.getRoomSocket().emit(
       "nextTurn",
-      this.playerSeq[this.turn % this.len][0], //순서를 아이디로 보내주세요
+      this.playerSeq[this.turn % this.len][0] //순서를 아이디로 보내주세요
     );
     setTimeout(() => {
       if (now !== this.turn) return;
@@ -188,7 +188,7 @@ class Hunmin extends Game {
       let loserId = this.playerSeq[this.turn % this.len][0];
       console.log(loserId, "서버", 123897162349081623948);
       this.getRoomSocket().emit(socketEvent.gameEnd);
-      this.comebackRoom({ loserId });
+      this.comebackRoom({ loserId }, null);
     }, TURN_TIME_LIMIT);
   }
 
