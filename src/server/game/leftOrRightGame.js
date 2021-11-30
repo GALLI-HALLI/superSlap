@@ -16,7 +16,7 @@ class LeftOrRightGame extends Game {
     this.playerScores.delete(id);
   }
 
-  ranking() {
+  async ranking() {
     let loserId;
     let loserScore = 999999999;
     Array.from(this.playerScores).forEach(([key, value]) => {
@@ -30,10 +30,9 @@ class LeftOrRightGame extends Game {
 
     let rank = [...this.playerScores.values()];
     rank = rank.sort((a, b) => {
-      console.log(a.score, b.score);
       return a.score - b.score;
     });
-    this.comebackRoom({ loserId });
+    this.comebackRoom({ loserId, rank });
   }
 
   initializeSocketEvents(id, socket, nickname) {
