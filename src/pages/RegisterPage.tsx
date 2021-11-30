@@ -13,7 +13,7 @@ import { useHistory } from "react-router";
 const existingIds = ["kqjatjr@gmail.com"];
 
 const checkDuplicate = (value: string) =>
-  Promise.resolve(!existingIds.includes(value) && value.length > 4);
+  Promise.resolve(!existingIds.includes(value) && value.length > 5);
 
 const RegisterPage = () => {
   const [id, setId] = useState("");
@@ -68,7 +68,7 @@ const RegisterPage = () => {
               valid: "사용가능한 닉네임 입니다.",
               invalid: "사용 불가능한 닉네임 입니다.",
             }}
-            validator={(value: string) => value.length >= 2}
+            validator={(value: string) => value.length >= 1}
             onChange={({ value }) => {
               setName(value);
             }}
@@ -82,7 +82,7 @@ const RegisterPage = () => {
               valid: "사용가능한 비밀번호 입니다.",
               invalid: "사용 불가능한 비밀번호 입니다.",
             }}
-            validator={(value: string) => value.length >= 8}
+            validator={(value: string) => value.length >= 6}
             onChange={({ value }) => {
               setPassword(value);
             }}

@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
+import { SocketServerEvent } from "../../constants/socket";
 import useProfile from "../../hooks/useProfile";
 import Button from "../common/Button";
 import styles from "./Hunmin.module.scss";
@@ -21,6 +22,7 @@ const PLAYER_MAX = 8;
 const Hunmin = ({ socket }: TSocket) => {
   const [currentPlayerId, setCurrentPlayerId] = useState<string>("");
   const [players, setPlayers] = useState<THunminPlayer[]>([]);
+  const [gameEnd, setGameEnd] = useState(false);
   const { data } = useProfile({ blockAccess: true });
   const [gameTimeRemain, setGameTimeRemain] = useState(0);
   const [turnTimeRemain, setTurnTimeRemain] = useState(0);
@@ -86,6 +88,10 @@ const Hunmin = ({ socket }: TSocket) => {
       setTurnTimeRemain(data.turnTimeLimit);
     });
 
+    socket.on(SocketServerEvent.GameEnd, () => {
+      setGameEnd(true);
+    });
+
     return () => {
       socket.off("setInitial");
       socket.off("word");
@@ -113,6 +119,13 @@ const Hunmin = ({ socket }: TSocket) => {
 
   return (
     <div className={styles.gameContainer}>
+      {gameEnd && (
+        <div className={styles.modal}>
+          <div className={styles.section}>
+            <div className={styles.main}>GAME END</div>
+          </div>
+        </div>
+      )}
       <div
         className={styles.playContainer}
         style={{ backgroundColor: checkWord.success ? "white" : "red" }}
