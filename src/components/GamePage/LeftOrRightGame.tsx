@@ -22,9 +22,6 @@ import {
   gameStartAnimation,
 } from "../../utils/gameStartAnimation";
 
-//튜토리얼
-import GameTutorial from "./GameTutorial";
-
 type TGameCanvas = {
   height: number;
   width: number;
@@ -188,33 +185,22 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   ArrowRightButton.src = ArrowRightButtonImg;
 
   //키보드 좌우 클릭 감지
-  useEffect(() => {});
 
-  window.addEventListener("keydown", (event) => {
-    if (
-      instance.state.ended === true ||
-      instance.gameStartAnimation.value <= 10000
-    )
-      return;
+  useEffect(() => {
+    setTimeout(function () {
+      window.addEventListener("keydown", (event) => {
+        if (instance.state.ended === true) return;
 
-    if (event.key === "ArrowLeft") {
-      leftOrRightEventHandle("left");
-    } else if (event.key === "ArrowRight") {
-      leftOrRightEventHandle("right");
-    }
+        if (event.key === "ArrowLeft") {
+          leftOrRightEventHandle("left");
+        } else if (event.key === "ArrowRight") {
+          leftOrRightEventHandle("right");
+        }
+      });
+    }, 3700);
   });
 
-  // 튜토리얼 출력
-  const [showModal, setShowModal] = useState(true);
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
-  // 10초 뒤에 튜토리얼 창 끄게 해줌
-  setTimeout(function () {
-    closeModal();
-  }, 6000); // 6초뒤 출력
+  // const isTabletOrMobile = useMediaQuery({ query: "(max-width: 767px)" });
 
   // onclick + touch handler in canvas tag
   const handleCanvasClick = (event: any) => {
@@ -256,11 +242,9 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   };
 
   function leftOrRightEventHandle(whichPressed: string) {
-    if (monsterList.length === 0) return;
-
-    console.log("call");
     const ball = monsterList.pop();
     let success = true;
+
     if (
       (ball.isBlue && whichPressed === "right") ||
       (!ball.isBlue && whichPressed === "left")
@@ -273,6 +257,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     // 성적 체크;
     if (!success) {
       score -= 2;
+
       // 실패 효과 출력
       wrongMonster = ball;
       setTimeout(() => {
@@ -288,6 +273,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       }
       monsterLRList.push(ball);
     }
+
     // 새 공 추가
     const monster = makeNewMonster();
     monsterList.unshift(monster);
@@ -676,21 +662,23 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   useEffect(() => {
     // load monster balls
     // 처음엔 공 9개만 출력해야 문제 안생김!
-    for (let i = 1; i < 10; i++) {
-      const monster = makeNewMonster();
+    setTimeout(function () {
+      for (let i = 1; i < 10; i++) {
+        const monster = makeNewMonster();
 
-      //위부터 아래까지 일렬로 늘어지게
-      let sth = instance.ballDistance.y;
-      monster.y += sth * i;
+        //위부터 아래까지 일렬로 늘어지게
+        let sth = instance.ballDistance.y;
+        monster.y += sth * i;
 
-      monsterList.push(monster);
-    }
+        monsterList.push(monster);
+      }
+    }, 3700);
   });
 
   useEffect(() => {
-    setTimeout(function () {
-      gameStartAnimation(instance, instance.gameCanvas.width);
-    }, 6000);
+    gameStartAnimation(instance, instance.gameCanvas.width);
+
+    render();
 
     //타이머
     setTimeout(function () {
@@ -707,18 +695,14 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
           clearInterval(timer);
         }
       }, 10);
-    }, 3700 + 6000); //
+    }, 3700); //
 
     //일정 시간 후 게임 결과 송신
     setTimeout(function () {
       console.log("game terminate");
       socket.emit("lrEnd", score);
-    }, instance.timer.maxPlayTime * 1000 + 3000 + 3700 + 6000);
-  }, []);
-
-  useEffect(() => {
-    render();
-  }); // 재랜더링 방지하면 키보드 조작 터치 조작 둘중하나 안되게 됌. 왜??? 시발 왜?
+    }, instance.timer.maxPlayTime * 1000 + 3000 + 3700);
+  });
 
   const render = () => {
     if (canvasRef.current === null) return;
@@ -740,11 +724,12 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     drawWhichLR(ctx, "right");
 
     drawButton(ctx);
-    // console.log(instance.gameStartAnimation.value);
+
     if (instance.state.ended) {
       drawGameFinish(ctx);
     }
 
+    console.log(instance.gameStartAnimation.value);
     drawGameStart(
       ctx,
       instance.gameCanvas.width,
@@ -757,7 +742,8 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   return (
     <div className="LeftOrRightGame">
-      <div>{showModal && <GameTutorial game="leftright" />}</div>
+      <div></div>
+      <div></div>
       <div>
         <canvas
           id="canvas"
