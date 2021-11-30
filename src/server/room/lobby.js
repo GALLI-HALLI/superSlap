@@ -1,5 +1,6 @@
 const RoomManager = require("./roomManager.js");
-const { nanoid } = require("nanoid");
+const { customAlphabet } = require("nanoid");
+const nanoid = customAlphabet("1234567890abcdefghijklmnopqrstuvwxyz", 5);
 
 const checkAuth = require("../middleware/checkAuth");
 
@@ -12,7 +13,7 @@ const createLobbyRoute = (gameSocket) => {
     const id = req.user;
     let code = "";
     do {
-      code = nanoid(7);
+      code = nanoid();
     } while (roomManager.hasRoom(code));
     roomManager.createRoom(code, id, gameSocket);
     res.json({ code }); //code 받아서 그 라우터로 이동(ex localhost:3000/room/code번호)
