@@ -30,7 +30,7 @@ class LeftOrRightGame extends Game {
 
     let rank = [...this.playerScores.values()];
     rank = rank.sort((a, b) => {
-      return a.score - b.score;
+      return b.score - a.score;
     });
     this.comebackRoom({ loserId, rank });
   }
