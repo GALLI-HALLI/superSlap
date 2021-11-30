@@ -865,7 +865,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
   return (
     <div className="hotBombPotato">
       <div>{showModal && <GameTutorial game="bomb" />}</div>
-      <div>
+      <div className="bombgame">
         <div>
           <canvas
             id="canvas"
