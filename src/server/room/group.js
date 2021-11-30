@@ -4,6 +4,7 @@ const lobby = require("./lobby");
 const socketEvents = require("../constants/socketEvents");
 const { sendMetaData } = require("./utils");
 const roomManager = lobby.roomManager;
+const { GameStatus } = require("../constants/game");
 
 module.exports = (socket, gameSocket) => {
   let room;
@@ -26,7 +27,9 @@ module.exports = (socket, gameSocket) => {
       room.addPlayer(id, name, socket);
       socket.join(code);
 
-      sendMetaData(gameSocket, room, code);
+      room.gameStatus = GameStatus.Idle;
+
+      sendMetaData(gameSocket, room, code, null);
     }
   });
 
@@ -36,7 +39,7 @@ module.exports = (socket, gameSocket) => {
 
     if (room) {
       room.removePlayer(id);
-      sendMetaData(gameSocket, room, room.code);
+      sendMetaData(gameSocket, room, room.code, null);
       if (id === room.id) {
         roomManager.destroyRoom(room.code);
       }

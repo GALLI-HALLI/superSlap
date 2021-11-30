@@ -68,7 +68,7 @@ class BombGame extends Game {
       }
       this.getRoomSocket().emit(socketEvent.gameEnd, { loser: loserId });
       setTimeout(() => {
-        this.comebackRoom({ loserId });
+        this.comebackRoom({ loserId }, null);
       }, 5000);
     }, 8000); //게임시작 30초 후 종료
   }
@@ -125,7 +125,7 @@ class BombGame extends Game {
     delete this.ballMap[id];
   }
 
-  initializeSocketEvents(id, socket) {
+  initializeSocketEvents(id, socket, nickname) {
     console.log(`${id} is entered ${Date()}`);
 
     //게임에 필요한 ball생성 작업

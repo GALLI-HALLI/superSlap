@@ -20,23 +20,29 @@ class LeftOrRightGame extends Game {
     let loserId;
     let loserScore = 999999999;
     Array.from(this.playerScores).forEach(([key, value]) => {
-      if (loserScore > value) {
+      if (loserScore > value.score) {
         loserId = key;
-        loserScore = value;
-      } else if (loserScore === value) {
+        loserScore = value.score;
+      } else if (loserScore === value.score) {
         if (Math.random() >= 0.5) loserId = key;
       }
+    });
+
+    let rank = [...this.playerScores.values()];
+    rank = rank.sort((a, b) => {
+      console.log(a.score, b.score);
+      return a.score - b.score;
     });
     this.comebackRoom({ loserId });
   }
 
-  initializeSocketEvents(id, socket) {
+  initializeSocketEvents(id, socket, nickname) {
     console.log(`${id} is entered ${Date()}`);
-    this.playerScores.set(id, 0);
+    this.playerScores.set(id, null);
 
     //게임 끝 정보 받아서 넣어주기
     socket.on("lrEnd", (data) => {
-      this.playerScores.set(id, data);
+      this.playerScores.set(id, { score: data, nickname });
       this.receiveDataNum++;
       if (this.receiveDataNum === this.playerScores.size) {
         this.ranking();

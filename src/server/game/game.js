@@ -40,9 +40,8 @@ class Game {
    * 게임 내부에서 게임을 끝냈다고 외부로 이벤트를 보내주기 위함
    * 게임이 끝났을때 상속받은 클래스에서 반드시 호출해야합니다.
    */
-  comebackRoom({ loserId }) {
-    this.end();
-    this.room.comebackRoom({ loserId });
+  comebackRoom({ loserId, rank }) {
+    this.room.comebackRoom({ loserId, rank });
   }
 
   /**
