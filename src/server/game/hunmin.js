@@ -77,6 +77,7 @@ class Hunmin extends Game {
 
     setTimeout(() => {
       if (this.finish) return;
+      this.finish = true;
       this.gameEnd()
     }, GAME_TIME_LIMIT);
   }
@@ -202,6 +203,7 @@ class Hunmin extends Game {
     socket.on("word", async (data) => {
       let result = await this.checkWord(data);
       console.log(result);
+      if(this.finish) return;
       if (result[0]) {
         this.wordList.push(data);
         this.nextTurn();
