@@ -22,6 +22,9 @@ import {
   gameStartAnimation,
 } from "../../utils/gameStartAnimation";
 
+//튜토리얼
+import GameTutorial from "./GameTutorial";
+
 type TGameCanvas = {
   height: number;
   width: number;
@@ -185,7 +188,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   ArrowRightButton.src = ArrowRightButtonImg;
 
   //키보드 좌우 클릭 감지
-
   useEffect(() => {
     setTimeout(function () {
       window.addEventListener("keydown", (event) => {
@@ -198,9 +200,19 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
         }
       });
     }, 3700);
-  });
+  }, []);
 
-  // const isTabletOrMobile = useMediaQuery({ query: "(max-width: 767px)" });
+  // 튜토리얼 출력
+  const [showModal, setShowModal] = useState(true);
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  // 10초 뒤에 튜토리얼 창 끄게 해줌
+  setTimeout(function () {
+    closeModal();
+  }, 6000); // 6초뒤 출력
 
   // onclick + touch handler in canvas tag
   const handleCanvasClick = (event: any) => {
@@ -662,21 +674,21 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   useEffect(() => {
     // load monster balls
     // 처음엔 공 9개만 출력해야 문제 안생김!
-    setTimeout(function () {
-      for (let i = 1; i < 10; i++) {
-        const monster = makeNewMonster();
+    for (let i = 1; i < 10; i++) {
+      const monster = makeNewMonster();
 
-        //위부터 아래까지 일렬로 늘어지게
-        let sth = instance.ballDistance.y;
-        monster.y += sth * i;
+      //위부터 아래까지 일렬로 늘어지게
+      let sth = instance.ballDistance.y;
+      monster.y += sth * i;
 
-        monsterList.push(monster);
-      }
-    }, 3700);
-  });
+      monsterList.push(monster);
+    }
+  }, []);
 
   useEffect(() => {
-    gameStartAnimation(instance, instance.gameCanvas.width);
+    setTimeout(function () {
+      gameStartAnimation(instance, instance.gameCanvas.width);
+    }, 6000);
 
     render();
 
@@ -695,14 +707,14 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
           clearInterval(timer);
         }
       }, 10);
-    }, 3700); //
+    }, 3700 + 6000); //
 
     //일정 시간 후 게임 결과 송신
     setTimeout(function () {
       console.log("game terminate");
       socket.emit("lrEnd", score);
-    }, instance.timer.maxPlayTime * 1000 + 3000 + 3700);
-  });
+    }, instance.timer.maxPlayTime * 1000 + 3000 + 3700 + 6000);
+  }, []);
 
   const render = () => {
     if (canvasRef.current === null) return;
@@ -729,7 +741,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       drawGameFinish(ctx);
     }
 
-    console.log(instance.gameStartAnimation.value);
     drawGameStart(
       ctx,
       instance.gameCanvas.width,
@@ -742,8 +753,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   return (
     <div className="LeftOrRightGame">
-      <div></div>
-      <div></div>
+      <div>{showModal && <GameTutorial game="leftright" />}</div>
       <div>
         <canvas
           id="canvas"

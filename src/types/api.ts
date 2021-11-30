@@ -30,6 +30,11 @@ export type TPlayer = {
   nickname: string;
 };
 
+export type TRank = {
+  nickname: string;
+  score: number;
+};
+
 export type TMetadata = {
   id: string;
   code: string;
@@ -38,4 +43,5 @@ export type TMetadata = {
   gameStatus: GameStatus;
   startTime: string;
   loser?: TPlayer;
+  rank?: TRank[];
 };

@@ -185,7 +185,7 @@ class Hunmin extends Game {
     let now = this.turn;
     this.getRoomSocket().emit(
       "nextTurn",
-      this.playerSeq[this.turn % this.len][0], //순서를 아이디로 보내주세요
+      this.playerSeq[this.turn % this.len][0] //순서를 아이디로 보내주세요
     );
     setTimeout(() => {
       if (now !== this.turn) return;
