@@ -32,7 +32,7 @@ const GameTutorial = (props: TGameTutorial) => {
         <div className={styles.section}>
           <div className={styles.header}>폭탄 돌리기 튜토리얼!</div>
           <div className={styles.main}>
-            <img src={tutorialImage} alt="bombGameTutorial" width="360px" />
+            <img src={tutorialImage} alt="bombGameTutorial" width="330px" />
           </div>
           {/* 타이머 추가 예정! */}
         </div>
