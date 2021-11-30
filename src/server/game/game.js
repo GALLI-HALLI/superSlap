@@ -12,7 +12,7 @@ class Game {
    * @param {Socket} socket 사용자 한명에 대한 소켓 정보
    * @param {Id} id 로그인 id 정보
    */
-  initializeSocketEvents(id, socket) {
+  initializeSocketEvents(id, socket, nickname) {
     throw new Error("Not implemented");
   }
 

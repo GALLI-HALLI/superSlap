@@ -1,6 +1,5 @@
 const sendMetaData = (gameSocket, room, code) => {
   const loser = room.players.get(room.loserId);
-
   gameSocket.in(code).emit("metadata", {
     id: room.id,
     code: room.code,

@@ -29,10 +29,12 @@ const wrongReason = {
   word: "표준대국어사전에 없는 단어입니다",
 };
 
+//*추가
 const SECOND = 1000;
 
 const GAME_TIME_LIMIT = SECOND * 100;
-const TURN_TIME_LIMIT = SECOND * 5;
+const TURN_TIME_LIMIT = SECOND * 10;
+//*
 
 class Hunmin extends Game {
   constructor(room) {
@@ -57,27 +59,26 @@ class Hunmin extends Game {
     for (let i = 0; i < this.len; i++) {
       this.getRoomSocket().emit("join_user", {
         id: this.playerSeq[i][0],
+        nickname: this.playerSeq[i][2],
         seq: i,
       });
     }
 
+    //*변경
     this.getRoomSocket().emit("setInitial", {
       suggest,
-      gameTimeLimit: TURN_TIME_LIMIT,
-      turnTimeLimit: GAME_TIME_LIMIT,
+      gameTimeLimit: GAME_TIME_LIMIT,
+      turnTimeLimit: TURN_TIME_LIMIT,
     });
+    //*
 
     this.nextTurn();
-    this.getRoomSocket().emit(
-      "nextTurn",
-      this.playerSeq[this.turn / this.playerSeq.length].id,
-    );
 
     setTimeout(() => {
       if (this.finish) return;
-      let loser = this.playerSeq[this.turn % this.len][0];
-      this.getRoomSocket().emit(socketEvent.gameEnd, loser);
-      this.comebackRoom(loser);
+      let loserId = this.playerSeq[this.turn % this.len][0];
+      this.getRoomSocket().emit(socketEvent.gameEnd);
+      this.comebackRoom({ loserId });
     }, GAME_TIME_LIMIT);
   }
 
@@ -88,8 +89,8 @@ class Hunmin extends Game {
     this.getRoomSocket().emit("leave_user", id);
   }
 
-  joinGame(id) {
-    this.playerSeq.push([id, Math.random()]);
+  joinGame(id, nickname) {
+    this.playerSeq.push([id, Math.random(), nickname]);
   }
 
   leftGame(id) {
@@ -98,10 +99,6 @@ class Hunmin extends Game {
         // this.playerSeq.splice(i,1);
         this.playerSeq[i] = false;
         this.nextTurn();
-        this.getRoomSocket().emit(
-          "nextTurn",
-          this.playerSeq[this.turn / this.playerSeq.length].id,
-        );
         break;
       }
     }
@@ -141,11 +138,13 @@ class Hunmin extends Game {
   }
 
   async checkWord(word) {
-    if (word.length !== 2) return [false, wrongReason.length];
-    if (this.wordList.includes(word)) return [false, wrongReason.already];
+    if (word.length !== 2) return [false, wrongReason.length]; //두글자 아닐때
+    if (this.wordList.includes(word)) return [false, wrongReason.already]; //이미 나온 단어일 때
     let initial =
       this.getInitialConstant(word[0]) + this.getInitialConstant(word[1]);
-    if (initial !== this.nowWord) return [false, wrongReason.initial];
+    if (initial !== this.nowWord) return [false, wrongReason.initial]; //초성이 맞지 않을 때
+
+    //*수정
     return new Promise((resolve, reject) => {
       request.get(addr + encodeURI(word), (err, response, body) => {
         console.log(err, response, body);
@@ -153,11 +152,12 @@ class Hunmin extends Game {
           console.log(err);
         }
         if (body) {
-          resolve([true, ""]);
+          resolve([true, JSON.parse(body).channel.item[0].sense.definition]);
         }
         resolve([false, wrongReason.word]);
       });
     });
+    //*
   }
 
   nextTurn() {
@@ -167,32 +167,46 @@ class Hunmin extends Game {
       cnt++;
     } while (!this.playerSeq[this.turn % this.len] && cnt <= this.len);
     let now = this.turn;
+    this.getRoomSocket().emit(
+      "nextTurn",
+      this.playerSeq[this.turn % this.len][0], //순서를 아이디로 보내주세요
+    );
     setTimeout(() => {
       if (now !== this.turn) return;
       this.finish = true;
-      let loser = this.playerSeq[this.turn % this.len][0];
-      this.getRoomSocket().emit(socketEvent.gameEnd, loser);
-      this.comebackRoom(loser);
+      let loserId = this.playerSeq[this.turn % this.len][0];
+      console.log(loserId, "서버", 123897162349081623948);
+      this.getRoomSocket().emit(socketEvent.gameEnd);
+      this.comebackRoom({ loserId });
     }, TURN_TIME_LIMIT);
   }
 
-  initializeSocketEvents(id, socket) {
+  initializeSocketEvents(id, socket, nickname) {
     console.log(socket + " is entered");
 
-    this.joinGame(id);
+    this.joinGame(id, nickname);
 
     socket.on("word", async (data) => {
       let result = await this.checkWord(data);
       console.log(result);
       if (result[0]) {
         this.wordList.push(data);
-        this.nextTurn(data);
-        this.getRoomSocket().emit("pass", {
-          turn: this.turn % this.len,
+        this.nextTurn();
+        this.getRoomSocket().emit("hunminData", {
+          success: true,
+          nickname: this.playerSeq[this.turn % this.len][2],
           word: data,
+          mean: result[1],
+          msg: "성공이지롱~~~",
         });
       } else {
-        this.getRoomSocket().emit("fail", result[1]);
+        this.getRoomSocket().emit("hunminData", {
+          success: false,
+          nickname: this.playerSeq[this.turn % this.len][2],
+          word: data,
+          mean: "",
+          msg: result[1],
+        });
       }
     });
   }
