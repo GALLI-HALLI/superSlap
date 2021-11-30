@@ -20,6 +20,13 @@ import electricImage from "../../image/electric.png";
 //튜토리얼
 import GameTutorial from "./GameTutorial";
 
+//게임 시작 애니메이션
+//총 3.7초 3700
+import {
+  drawGameStart,
+  gameStartAnimation,
+} from "../../utils/gameStartAnimation";
+
 // type
 import {
   TPlayerBall,
@@ -140,6 +147,10 @@ class BombGameData {
 
   ifEnd = {
     height: -(500 + 140),
+  };
+
+  gameStartAnimation = {
+    value: 0,
   };
 }
 
@@ -473,25 +484,26 @@ const BombGame = ({ socket }: TBombGameProps) => {
     setShowModal(false);
   };
 
-  // 10초 뒤에 튜토리얼 창 끄게 해줌
+  // 6초 뒤에 튜토리얼 창 끄게 해줌
   setTimeout(function () {
-    gameStart = true;
     closeModal();
-  }, 1000); // 10초뒤 출력
+    gameStartAnimation(instance, instance.gameCanvas.width);
+    setTimeout(function () {
+      gameStart = true;
+    }, 3700);
+  }, 6000);
 
   // 게임 요소 시작
   useEffect(() => {
-    if (gameStart) {
-      console.log("캔버스 랜더링 시작");
-      render();
-      let event = setInterval(function () {
-        handleGameEvents();
-        if (gameEnded) {
-          ifGameFinish();
-          clearInterval(event);
-        }
-      }, 40);
-    }
+    console.log("캔버스 랜더링 시작");
+    render();
+    let event = setInterval(function () {
+      handleGameEvents();
+      if (gameEnded) {
+        ifGameFinish();
+        clearInterval(event);
+      }
+    }, 40);
   }, [showModal]);
 
   function Confetti(this: any) {
@@ -736,7 +748,12 @@ const BombGame = ({ socket }: TBombGameProps) => {
       // ctx.drawImage(explosion, 0, 70, 360, 360);
       drawGameFinish(ctx);
     }
-
+    drawGameStart(
+      ctx,
+      instance.gameCanvas.width,
+      instance.gameCanvas.height,
+      instance.gameStartAnimation.value
+    );
     ctx.restore();
     /*==== 캔버스 요소 조작 끝 ====*/
 
