@@ -12,6 +12,9 @@ let ballColor = [
   "hotpink",
 ]; //8 color setting
 
+const SECOND = 1000
+const GAME_TIME_LIMIT = SECOND * 30;
+
 class PlayerBall {
   constructor(socket, id) {
     this.socket = socket;
@@ -70,7 +73,7 @@ class BombGame extends Game {
       setTimeout(() => {
         this.comebackRoom({ loserId }, null);
       }, 5000);
-    }, 8000); //게임시작 30초 후 종료
+    }, GAME_TIME_LIMIT);
   }
 
   // 유저가 나갔을때
