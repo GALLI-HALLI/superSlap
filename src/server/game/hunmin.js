@@ -77,9 +77,8 @@ class Hunmin extends Game {
 
     setTimeout(() => {
       if (this.finish) return;
-      let loserId = this.playerSeq[this.turn % this.len][0];
-      this.getRoomSocket().emit(socketEvent.gameEnd);
-      this.comebackRoom({ loserId }, null);
+      this.finish = true;
+      this.gameEnd()
     }, GAME_TIME_LIMIT);
   }
 
@@ -91,6 +90,14 @@ class Hunmin extends Game {
     this.playerSeq = [];
     this.nowWord = "";
     this.wordList = [];
+  }
+
+  gameEnd(){
+    let loserId = this.playerSeq[this.turn % this.len][0];
+    this.getRoomSocket().emit(socketEvent.gameEnd);
+    setTimeout(()=>{
+      this.comebackRoom({ loserId });
+    },3*SECOND)
   }
 
   disconnect(id) {
@@ -158,7 +165,6 @@ class Hunmin extends Game {
     //*수정
     return new Promise((resolve, reject) => {
       request.get(addr + encodeURI(word), (err, response, body) => {
-        console.log(err, response, body);
         if (err) {
           console.log(err);
         }
@@ -185,10 +191,7 @@ class Hunmin extends Game {
     setTimeout(() => {
       if (now !== this.turn) return;
       this.finish = true;
-      let loserId = this.playerSeq[this.turn % this.len][0];
-      console.log(loserId, "서버", 123897162349081623948);
-      this.getRoomSocket().emit(socketEvent.gameEnd);
-      this.comebackRoom({ loserId }, null);
+      this.gameEnd();
     }, TURN_TIME_LIMIT);
   }
 
@@ -200,6 +203,7 @@ class Hunmin extends Game {
     socket.on("word", async (data) => {
       let result = await this.checkWord(data);
       console.log(result);
+      if(this.finish) return;
       if (result[0]) {
         this.wordList.push(data);
         this.nextTurn();
