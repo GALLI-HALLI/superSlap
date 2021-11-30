@@ -23,7 +23,7 @@ export function drawGameStart(
   ctx.font = "bold 100px Trebuchet MS";
   ctx.fillText(
     "3",
-    35 + canvasWidth / 2 - gameStartAnimation / 4, //360
+    -20 + canvasWidth / 2 - canvasWidth * 1 + gameStartAnimation, //360
     canvasHeight / 2
   );
   ctx.restore();
@@ -34,8 +34,8 @@ export function drawGameStart(
   ctx.fillStyle = "white";
   ctx.font = "bold 100px Trebuchet MS";
   ctx.fillText(
-    "3",
-    35 + canvasWidth / 2 - gameStartAnimation / 3,
+    "2",
+    -20 + canvasWidth / 2 - canvasWidth * 2 + gameStartAnimation,
     canvasHeight / 2
   );
   ctx.restore();
@@ -46,8 +46,8 @@ export function drawGameStart(
   ctx.fillStyle = "white";
   ctx.font = "bold 100px Trebuchet MS";
   ctx.fillText(
-    "3",
-    35 + canvasWidth / 2 - gameStartAnimation / 2,
+    "1",
+    -20 + canvasWidth / 2 - canvasWidth * 3 + gameStartAnimation,
     canvasHeight / 2
   );
   ctx.restore();
@@ -56,33 +56,37 @@ export function drawGameStart(
 
   ctx.save();
   ctx.fillStyle = "white";
-  ctx.font = "bold 100px Trebuchet MS";
+  ctx.font = "bold 80px Trebuchet MS";
   ctx.fillText(
-    "3",
-    35 + canvasWidth / 2 - gameStartAnimation,
+    "GAME",
+    -120 + canvasWidth / 2 - canvasWidth * 4 + gameStartAnimation,
     canvasHeight / 2
+  );
+  ctx.fillStyle = "white";
+  ctx.font = "bold 80px Trebuchet MS";
+  ctx.fillText(
+    "START!",
+    -120 + canvasWidth / 2 - canvasWidth * 4 + gameStartAnimation,
+    80 + canvasHeight / 2
   );
   ctx.restore();
 }
 
-export function gameStartAnimation(
-  gameStartAnimation: number,
-  canvasWidth: number
-) {
+export function gameStartAnimation(instance: any, canvasWidth: number) {
   // 3초
   let threeSecond = setInterval(function () {
-    gameStartAnimation += canvasWidth / 28;
-    if (gameStartAnimation >= canvasWidth) {
-      gameStartAnimation = canvasWidth;
+    instance.gameStartAnimation.value += canvasWidth / 28;
+    if (instance.gameStartAnimation.value >= canvasWidth) {
+      instance.gameStartAnimation.value = canvasWidth;
       clearInterval(threeSecond);
     }
-  }, 25); // 1000 = 1초이니 700 = 0.7초, 총 28프레임 으로 360을 나눠서 글자들 이동 및 출력
+  }, 25); // 1000 = 1초이니 700 = 0.7초, 총 700/ 25 = 28프레임 으로 360을 나눠서 글자들 이동 및 출력
   // 2초
   setTimeout(function () {
     let twoSecond = setInterval(function () {
-      gameStartAnimation += canvasWidth / 28;
-      if (gameStartAnimation >= canvasWidth * 2) {
-        gameStartAnimation = canvasWidth * 2;
+      instance.gameStartAnimation.value += canvasWidth / 28;
+      if (instance.gameStartAnimation.value >= canvasWidth * 2) {
+        instance.gameStartAnimation.value = canvasWidth * 2;
         clearInterval(twoSecond);
       }
     }, 25);
@@ -90,9 +94,9 @@ export function gameStartAnimation(
   // 1초
   setTimeout(function () {
     let oneSecond = setInterval(function () {
-      gameStartAnimation += canvasWidth / 28;
-      if (gameStartAnimation >= canvasWidth * 3) {
-        gameStartAnimation = canvasWidth * 3;
+      instance.gameStartAnimation.value += canvasWidth / 28;
+      if (instance.gameStartAnimation.value >= canvasWidth * 3) {
+        instance.gameStartAnimation.value = canvasWidth * 3;
         clearInterval(oneSecond);
       }
     }, 25);
@@ -101,13 +105,13 @@ export function gameStartAnimation(
   // 게임 시작
   setTimeout(function () {
     let gameStart = setInterval(function () {
-      gameStartAnimation += canvasWidth / 14;
-      if (gameStartAnimation >= canvasWidth * 4) {
-        gameStartAnimation = canvasWidth * 4;
+      instance.gameStartAnimation.value += canvasWidth / 14; // 350 동안 진행
+      if (instance.gameStartAnimation.value >= canvasWidth * 4) {
+        instance.gameStartAnimation.value = canvasWidth * 4;
 
         setTimeout(function () {
-          gameStartAnimation += 1000;
-        }, 700);
+          instance.gameStartAnimation.value += 10000;
+        }, 350);
         clearInterval(gameStart);
       }
     }, 25);
