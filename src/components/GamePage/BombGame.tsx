@@ -147,8 +147,8 @@ const gameCanvas: TGameCanvas = {
 
 const initialData: TGameIntialData = {
   ballRad: 20,
-  ballMoveSpeed: 2, // 1 보다 큰 수로 속도 배율
-  bombMoveSpeed: 3, // 폭탄은 유저보다 빠르게
+  ballMoveSpeed: 4, // 1 보다 큰 수로 속도 배율
+  bombMoveSpeed: 6, // 폭탄은 유저보다 빠르게
   maxPlayTime: 30,
   bombFreezeTime: 1000, // 1초 = 1000
 };
@@ -366,7 +366,7 @@ function roundRect(
   height: number,
   radius: number | radius,
   fill: boolean,
-  stroke: boolean | undefined,
+  stroke: boolean | undefined
 ) {
   if (typeof stroke === "undefined") {
     stroke = true;
@@ -391,7 +391,7 @@ function roundRect(
     x + width,
     y + height,
     x + width - radius.br,
-    y + height,
+    y + height
   );
   ctx.lineTo(x + radius.bl, y + height);
   ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
@@ -453,7 +453,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
   // 소켓 초기화
   const { bombChange, sendData } = useMemo(
     () => setupSocketEvents(socket),
-    [socket],
+    [socket]
   );
 
   // 튜토리얼 출력
@@ -479,7 +479,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
         if (gameEnded) {
           clearInterval(event);
         }
-      }, 20);
+      }, 50);
     }
   }, [showModal]);
 
@@ -528,13 +528,13 @@ const BombGame = ({ socket }: TBombGameProps) => {
       ctx.fillStyle = "white";
       roundRect(
         ctx,
-        ball.x - initialData.ballRad - 7, //x
-        ball.y - initialData.ballRad - 4 - 17, //y
-        initialData.ballRad * 2 + 18, //width
-        18, //height
-        9, //radius
+        ball.x - initialData.ballRad - 10, //x
+        ball.y - initialData.ballRad - 3 - 17, //y
+        initialData.ballRad * 2 + 20, //width
+        20, //height
+        10, //radius
         true,
-        true,
+        true
       );
       ctx.restore();
 
@@ -553,7 +553,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           ball.x - initialData.ballRad - 15,
           ball.y - initialData.ballRad - 14,
           57,
-          57,
+          57
         );
 
         //폭탄이 점멸하게
@@ -578,7 +578,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
             ball.x - initialData.ballRad - 25,
             ball.y - initialData.ballRad - 25,
             80,
-            80,
+            80
           );
           ctx.restore();
         }
@@ -586,25 +586,29 @@ const BombGame = ({ socket }: TBombGameProps) => {
       }
 
       // 플레이어 이름 출력
+      ctx.save();
+      ctx.fillStyle = "black";
+      // 내 공일 경우
       if (ball.id === myId) {
         ctx.beginPath();
-        ctx.font = "15px Arial";
+        ctx.font = "bold 15px Arial";
         ctx.fillText(
           "나야 나!",
           ball.x - initialData.ballRad - 7,
-          ball.y - initialData.ballRad - 4,
+          ball.y - initialData.ballRad - 4
         );
         ctx.closePath();
       } else {
         ctx.beginPath();
-        ctx.font = "15px Arial";
+        ctx.font = "bold 15px Arial";
         ctx.fillText(
           `player ${i}`,
           ball.x - initialData.ballRad - 7,
-          ball.y - initialData.ballRad - 4,
+          ball.y - initialData.ballRad - 4
         );
         ctx.closePath();
       }
+      ctx.restore();
     }
     ctx.restore();
 
@@ -657,7 +661,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           const collision: boolean = isBallCollision(
             curPlayerClone,
             otherPlayerClone,
-            initialData.ballRad,
+            initialData.ballRad
           );
 
           // 충돌했을때
@@ -680,7 +684,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
               curPlayer,
               otherPlayerClone,
               xySpeed,
-              initialData.ballRad,
+              initialData.ballRad
             );
             curPlayerClone.x += adjustedBallPosition3[0];
             curPlayerClone.y += adjustedBallPosition3[1];
@@ -692,7 +696,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
       let adjustedBallPosition2: number[] = isWallCollision(
         curPlayerClone,
         gameCanvas,
-        initialData.ballRad,
+        initialData.ballRad
       );
 
       curPlayerClone.x = adjustedBallPosition2[0];
