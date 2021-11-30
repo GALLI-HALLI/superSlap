@@ -267,28 +267,34 @@ function updateBomb(sid: string, sbomb: boolean, rid: string, rbomb: boolean) {
 /* ================== 게임 정보 관련 끝 ================== */
 
 /* ================== 서버 관련 시작 ================== */
-const setupSocketEvents = (socket: Socket) => {
+const setupSocketEvents = (socket: Socket, end: boolean) => {
   socket.on("user_id", function (data) {
+    if (!end) return;
     myId = data;
   });
 
   socket.on("join_user", function (data: TPlayerBall) {
+    if (!end) return;
     joinUser(data);
   });
 
   socket.on("leave_user", function (data) {
+    if (!end) return;
     leaveUser(data);
   });
 
   socket.on("update_state", function (data: TPlayerBall) {
+    if (!end) return;
     updateState(data);
   });
 
   socket.on("update_bomb", function (data) {
+    if (!end) return;
     updateBomb(data.sid, data.sbomb, data.rid, data.rbomb);
   });
 
   socket.on(SocketServerEvent.GameEnd, function (data) {
+    if (!end) return;
     gameFinished(data.loser, data.color);
   });
 
@@ -317,6 +323,7 @@ const setupSocketEvents = (socket: Socket) => {
   function gameFinished(loser: string, color: string) {
     console.log("game ended");
     gameEnded = true;
+    end = false;
   }
 
   return { sendData, bombChange, gameFinished };
@@ -452,7 +459,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
   // 소켓 초기화
   const { bombChange, sendData } = useMemo(
-    () => setupSocketEvents(socket),
+    () => setupSocketEvents(socket, true),
     [socket]
   );
 
