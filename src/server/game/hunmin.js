@@ -33,13 +33,14 @@ const wrongReason = {
 const SECOND = 1000;
 
 const GAME_TIME_LIMIT = SECOND * 100;
-const TURN_TIME_LIMIT = SECOND * 10;
+const TURN_TIME_LIMIT = SECOND * 3;
 //*
 
 class Hunmin extends Game {
   constructor(room) {
     super(room);
     this.playerSeq = [];
+    this.playerSocket = [];
     this.len = 0;
     this.turn = -1;
     this.nowWord = "";
@@ -80,6 +81,16 @@ class Hunmin extends Game {
       this.getRoomSocket().emit(socketEvent.gameEnd);
       this.comebackRoom({ loserId });
     }, GAME_TIME_LIMIT);
+  }
+
+  end() {
+    this.playerSocket.forEach((socket) => {
+      socket.removeAllListeners("word");
+    });
+    this.playerSocket = [];
+    this.playerSeq = [];
+    this.nowWord = "";
+    this.wordList = [];
   }
 
   disconnect(id) {
@@ -209,6 +220,7 @@ class Hunmin extends Game {
         });
       }
     });
+    this.playerSocket.push(socket);
   }
 }
 
