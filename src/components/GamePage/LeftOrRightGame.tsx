@@ -199,7 +199,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
           leftOrRightEventHandle("right");
         }
       });
-    }, 3700);
+    }, 3700 + 6000);
   }, []);
 
   // 튜토리얼 출력
@@ -254,6 +254,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   };
 
   function leftOrRightEventHandle(whichPressed: string) {
+    if (monsterList.length === 0) return;
     const ball = monsterList.pop();
     let success = true;
 
@@ -683,14 +684,12 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
       monsterList.push(monster);
     }
-  }, []);
+  });
 
   useEffect(() => {
     setTimeout(function () {
       gameStartAnimation(instance, instance.gameCanvas.width);
     }, 6000);
-
-    render();
 
     //타이머
     setTimeout(function () {
@@ -716,6 +715,10 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     }, instance.timer.maxPlayTime * 1000 + 3000 + 3700 + 6000);
   }, []);
 
+  useEffect(() => {
+    render();
+  });
+
   const render = () => {
     if (canvasRef.current === null) return;
     //canvas 사용을 위해 필요한 선언 2
@@ -736,7 +739,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     drawWhichLR(ctx, "right");
 
     drawButton(ctx);
-
+    // console.log(instance.gameStartAnimation.value);
     if (instance.state.ended) {
       drawGameFinish(ctx);
     }
