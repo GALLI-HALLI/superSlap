@@ -486,7 +486,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
         if (gameEnded) {
           clearInterval(event);
         }
-      }, 50);
+      }, 40);
     }
   }, [showModal]);
 
