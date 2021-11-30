@@ -18,7 +18,7 @@ import explosionImage from "../../image/explosion.png";
 import electricImage from "../../image/electric.png";
 
 //튜토리얼
-import BombTutorial from "./BombTutorial";
+import GameTutorial from "./GameTutorial";
 
 // type
 import {
@@ -104,7 +104,7 @@ class playerBall {
 /* ================== 게임 정보 관련 시작 ================== */
 
 class BombGameData {
-  gameCanvas: TGameCanvas = {
+  gameCanvas = {
     width: 360,
     height: 500,
   };
@@ -137,6 +137,10 @@ class BombGameData {
 
   gameEnded = false;
   gameStart = false;
+
+  ifEnd = {
+    height: -(500 + 140),
+  };
 }
 
 //Note: 현재 픽셀 위치 설정은 canvas 360x500을 기준으로 맞춰져있습니다.
@@ -445,8 +449,7 @@ type TBombGameProps = {
 };
 
 const BombGame = ({ socket }: TBombGameProps) => {
-  // const [instance] = useState(() => new BombGameData());
-  // console.log(instance.gameCanvas.width);
+  const [instance] = useState(() => new BombGameData());
 
   // 첫 랜더링 때 바뀌는 전역변수들 초기화
   useEffect(() => {
@@ -484,13 +487,115 @@ const BombGame = ({ socket }: TBombGameProps) => {
       let event = setInterval(function () {
         handleGameEvents();
         if (gameEnded) {
+          ifGameFinish();
           clearInterval(event);
         }
       }, 40);
     }
   }, [showModal]);
 
-  // console.log(`게임 시작했나요? :${gameStart}`);
+  function Confetti(this: any) {
+    //construct confetti
+    const colours = ["#fde132", "#009bde", "#ff6b00"];
+
+    this.x = Math.round(Math.random() * instance.gameCanvas.width);
+    this.y =
+      Math.round(Math.random() * instance.gameCanvas.height) -
+      instance.gameCanvas.height / 2;
+    this.rotation = Math.random() * 360;
+
+    const size = Math.random() * (instance.gameCanvas.width / 60);
+    this.size = size < 15 ? 15 : size;
+
+    this.color = colours[Math.floor(colours.length * Math.random())];
+
+    this.speed = this.size / 7;
+
+    this.opacity = Math.random();
+
+    this.shiftDirection = Math.random() > 0.5 ? 1 : -1;
+  }
+
+  Confetti.prototype.border = function () {
+    if (this.y >= instance.gameCanvas.height) {
+      this.y = instance.gameCanvas.height;
+    }
+  };
+
+  Confetti.prototype.update = function () {
+    this.y += this.speed;
+
+    if (this.y <= instance.gameCanvas.height) {
+      this.x += this.shiftDirection / 3;
+      this.rotation += (this.shiftDirection * this.speed) / 100;
+    }
+
+    if (this.y > instance.gameCanvas.height) this.border();
+  };
+
+  Confetti.prototype.draw = function (ctx: any) {
+    ctx.beginPath();
+    ctx.arc(
+      this.x,
+      this.y,
+      this.size,
+      this.rotation,
+      this.rotation + Math.PI / 2
+    );
+    ctx.lineTo(this.x, this.y);
+    ctx.closePath();
+    ctx.globalAlpha = this.opacity;
+    ctx.fillStyle = this.color;
+    ctx.fill();
+  };
+
+  const confNum = Math.floor(instance.gameCanvas.width / 4);
+  const confs = new Array(confNum)
+    .fill(undefined)
+    .map((_) => new (Confetti as any)());
+
+  function drawGameFinish(ctx: any) {
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = "black";
+    ctx.fillRect(
+      0,
+      0,
+      instance.gameCanvas.width,
+      instance.gameCanvas.height + instance.ifEnd.height
+    );
+
+    ctx.restore();
+
+    ctx.save();
+    confs.forEach((conf) => {
+      conf.update();
+      conf.draw(ctx);
+    });
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = "white";
+    ctx.font = "bold 100px Trebuchet MS";
+    ctx.fillText(
+      "FINISH",
+      35 + instance.ifEnd.height,
+      instance.gameCanvas.height / 2
+    );
+    ctx.restore();
+  }
+
+  function ifGameFinish() {
+    const gameEndtimer = setInterval(function () {
+      instance.ifEnd.height += instance.gameCanvas.height / 100;
+      if (instance.ifEnd.height > 0) {
+        instance.ifEnd.height = 0;
+
+        clearInterval(gameEndtimer);
+      }
+    }, 10);
+  }
+
   let frameCnt = 0;
 
   /* 사용되는변수
@@ -510,10 +615,9 @@ const BombGame = ({ socket }: TBombGameProps) => {
     /*==== 캔버스 요소 조작 시작 ====*/
 
     ClearCanvas(ctx, canvas);
-
     ctx.save();
     if (gameEnded) {
-      if (frameCnt > 360) {
+      if (frameCnt > 200) {
         ctx.translate(0, 0);
       } else {
         const shake = shakeGenerator(10);
@@ -521,7 +625,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
         frameCnt += 1;
       }
     }
-    ctx.restore();
 
     ctx.drawImage(gameBackground, 0, 0, 360, 500);
 
@@ -562,6 +665,16 @@ const BombGame = ({ socket }: TBombGameProps) => {
           57,
           57
         );
+
+        if (gameEnded) {
+          ctx.drawImage(
+            explosion,
+            ball.x - initialData.ballRad - 50,
+            ball.y - initialData.ballRad - 50,
+            150,
+            150
+          );
+        }
 
         //폭탄이 점멸하게
         // f(x) = sin(x * a) * (1/2)
@@ -620,9 +733,11 @@ const BombGame = ({ socket }: TBombGameProps) => {
     ctx.restore();
 
     if (gameEnded) {
-      ctx.drawImage(explosion, 0, 70, 360, 360);
+      // ctx.drawImage(explosion, 0, 70, 360, 360);
+      drawGameFinish(ctx);
     }
 
+    ctx.restore();
     /*==== 캔버스 요소 조작 끝 ====*/
 
     //canvas에 애니메이션이 작동하게 하는 함수.
@@ -729,7 +844,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
   return (
     <div className="hotBombPotato">
-      <div>{showModal && <BombTutorial />}</div>
+      <div>{showModal && <GameTutorial game="bomb" />}</div>
       <div>
         <div>
           <canvas
