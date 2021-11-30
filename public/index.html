@@ -26,8 +26,13 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>SuperSlap</title>
+    <style>
+      body {
+        overscroll-behavior-y: none;
+      }
+    </style>
   </head>
-  <body>
+  <body onkeydown="return (event.keyCode == 154)">
     <div id="root"></div>
     <!--
       This HTML file is a template.

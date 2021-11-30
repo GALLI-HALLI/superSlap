@@ -167,8 +167,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   let score = 0;
 
-  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 767px)" });
-
   // 이미지 로딩
   const blueMonster = new Image();
   blueMonster.src = BlueMonsterImg;
@@ -193,6 +191,8 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     });
   });
 
+  // const isTabletOrMobile = useMediaQuery({ query: "(max-width: 767px)" });
+
   // onclick + touch handler in canvas tag
   const handleCanvasClick = (event: any) => {
     if (instance.state.ended === true) return;
@@ -202,28 +202,27 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     let x;
     let y;
 
-    if (isTabletOrMobile) {
-      x = event.clientX;
-      y = event.clientY;
-    } else {
-      x = event.clientX - rect.left; //canvas.offsetLeft or Right
-      y = event.clientY - rect.top;
-    }
+    // if (isTabletOrMobile) {
+    //   x = event.clientX;
+    //   y = event.clientY;
+    // } else {
+    x = event.clientX - rect.left; //canvas.offsetLeft or Right
+    y = event.clientY - rect.top;
 
     // left button for Green
     if (
-      x >= instance.button.left.x &&
-      instance.button.left.x + instance.button.width >= x &&
-      y >= instance.button.left.y &&
-      instance.button.left.y + instance.button.height >= y
+      x >= 0 &&
+      instance.button.left.x + instance.button.width + 20 >= x &&
+      y >= instance.button.left.y - 20 &&
+      instance.button.left.y + instance.button.height + 40 >= y
     ) {
       leftOrRightEventHandle("left");
     } else if (
       // right button for Blue
-      x >= instance.button.right.x &&
-      instance.button.right.x + instance.button.width >= x &&
-      y >= instance.button.right.y &&
-      instance.button.right.y + instance.button.height >= y
+      x >= instance.button.right.x - 20 &&
+      instance.button.right.x + instance.button.width + 40 >= x &&
+      y >= instance.button.right.y - 20 &&
+      instance.button.right.y + instance.button.height + 40 >= y
     ) {
       leftOrRightEventHandle("right");
     }
