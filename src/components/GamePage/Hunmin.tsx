@@ -51,7 +51,7 @@ const Hunmin = ({ socket }: TSocket) => {
   };
 
   const postWord = () => {
-    socket.emit("word", inputValue);
+    socket.emit("word", { word: inputValue, turn: currentPlayerId });
   };
 
   const onKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
