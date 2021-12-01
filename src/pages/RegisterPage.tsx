@@ -6,10 +6,11 @@ import Button from "../components/common/Button";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { registerUser } from "../store/user/user.action";
+import { registerUser, setResetRegister } from "../store/user/user.action";
 import { useSelector } from "../hooks/typeReduxHook";
 import { AsyncActionStatus } from "../constants/redux";
 import { useHistory } from "react-router";
+import { setResetRoom } from "../store/room/room.action";
 
 const existingIds = ["kqjatjr@gmail.com"];
 
@@ -27,6 +28,7 @@ const RegisterPage = () => {
   useEffect(() => {
     if (registerStatus === AsyncActionStatus.Success) {
       alert("회원가입 성공");
+      dispatch(setResetRegister());
       history.push("/");
     }
   }, [registerStatus, history]);
