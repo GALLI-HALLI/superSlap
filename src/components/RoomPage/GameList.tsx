@@ -41,5 +41,4 @@ const GameList = ({ onClickGame }: TGameListProps) => {
     </div>
   );
 };
-
 export default GameList;

@@ -19,9 +19,6 @@ const SearchRoomModal = ({ close }: TSearchRoom) => {
 
   const isJoinCheckRequestSuccess = useRequestSuccess(joinCheck.joinStatus);
 
-  console.log(joinCheck);
-  console.log(isJoinCheckRequestSuccess);
-
   useEffect(() => {
     if (isJoinCheckRequestSuccess) {
       if (!joinCheck.message?.succuess) {

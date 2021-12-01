@@ -10,9 +10,9 @@ import { AsyncActionStatus } from "../constants/redux";
 import { useDispatch } from "react-redux";
 import { userLogin } from "../store/user/user.action";
 
-const googleButtonStyle = {
-  width: "310px",
-};
+// const googleButtonStyle = {
+//   width: "310px",
+// };
 
 const MainPage = ({ children }: PropsWithChildren<{}>) => {
   const dispatch = useDispatch();
@@ -65,11 +65,11 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
             <Button>회원가입</Button>
           </Link>
         </div>
-        <div className={styles.social}>
+        {/* <div className={styles.social}>
           <a href="/api/auth/google">
             <GoogleButton type="light" style={googleButtonStyle}></GoogleButton>
           </a>
-        </div>
+        </div> */}
       </form>
       {children}
     </div>
