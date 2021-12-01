@@ -7,19 +7,33 @@
   background-color: white;
 
   .title {
-    border-radius: 20px 20px 0 0;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 360px;
     height: 40px;
+    font-size: 25px;
+    font-weight: bold;
+  }
+
+  .loserTitle {
+    @extend .title;
+    border-radius: 20px 20px 0 0;
     background-color: red;
+  }
+  .rankTitle {
+    @extend .title;
+    background: #974dcb;
+    margin-top: 20px;
   }
   .loserName {
     display: flex;
     flex-direction: column;
     width: auto;
     margin-top: 20px;
+    label {
+      font-size: 18px;
+    }
   }
   .backBtn {
     display: flex;
@@ -27,12 +41,18 @@
   }
   .rank {
     margin-top: 10px;
+    width: 240px;
     ul {
       margin-top: 10px;
       list-style: none;
       padding-left: 0px;
       li {
         list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #efefef;
+        font-size: 18px;
       }
     }
   }
