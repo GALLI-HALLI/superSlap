@@ -48,6 +48,6 @@ module.exports = (socket, gameSocket) => {
 
   // 게임시작시 게임시작했다고 정보를 바꿔준다.
   socket.on(socketEvents.gameStart, (type) => {
-    room.startGame(type);
+    if (room) room.startGame(type);
   });
 };
