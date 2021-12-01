@@ -56,6 +56,9 @@ const RoomPage = () => {
       socket.disconnect();
       history.push("/lobby");
     });
+    socket.on("noRoom", () => {
+      history.push("/lobby");
+    });
   }, [dispatch, socket, history]);
 
   useEffect(() => {
