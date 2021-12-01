@@ -757,11 +757,9 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   return (
     <div className="LeftOrRightGame">
-      <div></div>
-      <div></div>
       <div>
         <canvas
-          id="canvas"
+          id="canvasLR"
           ref={canvasRef}
           height={instance.gameCanvas.height}
           width={instance.gameCanvas.width}

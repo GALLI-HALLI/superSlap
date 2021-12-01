@@ -91,7 +91,7 @@ const RoomPage = () => {
   }
 
   if (metadata.gameStatus === GameStatus.Started) {
-    if (metadata.type === "pencil") return <PencilSpin />;
+    if (metadata.type === "pencil") return <PencilSpin meta={metadata} />;
     const GameComponent = GameMap[metadata.type];
     return <GameComponent socket={socket} />;
   }

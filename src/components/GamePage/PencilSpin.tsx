@@ -1,6 +1,11 @@
 import React, { memo, useEffect, useRef, useState } from "react";
 import "./PencilSpin.scss";
 import pencilImg from "../../image/pencil.png";
+import Button from "../common/Button";
+import { TMetadata } from "../../types/api";
+import { useDispatch } from "react-redux";
+import { setMetaData } from "../../store/room/room.action";
+import { GameType, GameStatus } from "../../constants/game";
 
 const getRandom = (min: number, max: number) =>
   Math.random() * (max - min) + min;
@@ -24,14 +29,14 @@ type TGameData = {
 class GameData {
   gameCanvas = {
     width: 360,
-    height: 360,
+    height: 500,
   };
 
   pencil = {
-    x: 60,
-    y: 60,
-    width: 240,
-    height: 240,
+    x: 30,
+    y: 80,
+    width: 300,
+    height: 300,
   };
 
   rotation = {
@@ -60,9 +65,9 @@ class Pencil {
 
   rotate(ctx: any, image: any) {
     //pencil rotation 출력
-    ctx.translate(180, 180);
+    ctx.translate(180, 180 + 50);
     ctx.rotate((this.degree * Math.PI) / 180);
-    ctx.translate(-180, -180);
+    ctx.translate(-180, -180 - 50);
   }
 }
 
@@ -112,7 +117,7 @@ function ClearCanvas(ctx: any, canvas: any) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function PencilSpin() {
+function PencilSpin({ meta }: { meta: TMetadata }) {
   //canvas 사용을 위해 필요한 선언 1
   const canvasRef: any = useRef(null);
 
@@ -142,14 +147,21 @@ function PencilSpin() {
     /*==== 캔버스 요소 조작 시작====*/
     ClearCanvas(ctx, canvas);
 
-    ctx.font = "30px Arial";
-    ctx.fillText("슈퍼 연필 돌리기!", 50, 30);
+    ctx.save();
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, instance.gameCanvas.width, 60);
+    ctx.restore();
 
+    ctx.fillStyle = "black";
+    ctx.font = "bold 30px Arial";
+    ctx.fillText("슈퍼 연필 돌리기!", 60, 50);
+
+    ctx.fillStyle = "white";
     ctx.save(); //원래 설정을 저장한다.
 
     // 연필이 한번 회전한 후 멈춰있을 경우
     if (instance.rotation.speed === 0) {
-      ctx.fillText("다시 플레이하려면 클릭!", 70, 430);
+      ctx.fillText("다시 플레이하려면 클릭!", 15, 430);
     }
 
     // 클릭을 통해 연필 돌리기 게임이 시작 요청을 받았거나
@@ -158,7 +170,7 @@ function PencilSpin() {
     }
     // 클릭 이벤트가 아직 발생하지 않은 경우
     else {
-      ctx.fillText("연필을 클릭하시면 돕니다!", 70, 430);
+      ctx.fillText("연필을 클릭하시면 돕니다!", 5, 430);
     }
 
     // Pencil draw
@@ -182,15 +194,35 @@ function PencilSpin() {
     render();
   });
 
+  const dispatch = useDispatch();
+
+  const data: TMetadata = {
+    id: meta.id,
+    code: meta.code,
+    players: meta.players,
+    type: GameType.None,
+    gameStatus: GameStatus.Idle,
+    startTime: "",
+    loser: undefined,
+    rank: undefined,
+  };
+
+  const backButton = () => {
+    dispatch(setMetaData({ data }));
+  };
+
   return (
     <div className="PencilSpin">
       <canvas
-        id="canvas"
+        id="canvasPR"
         ref={canvasRef}
         onClick={handleCanvasClick}
         height={instance.gameCanvas.height}
         width={instance.gameCanvas.width}
       />
+      <div className="backBtn">
+        <Button onClick={backButton}>나가기</Button>
+      </div>
     </div>
   );
 }

@@ -138,7 +138,7 @@ class BombGameData {
     x: 0,
     a: 1,
     frameCnt: 0,
-    period: 350,
+    period: 120,
   };
 
   balls: TPlayerBall[] = [];
@@ -166,7 +166,7 @@ const gameCanvas: TGameCanvas = {
 const initialData: TGameIntialData = {
   ballRad: 20,
   ballMoveSpeed: 4, // 1 보다 큰 수로 속도 배율
-  bombMoveSpeed: 6, // 폭탄은 유저보다 빠르게
+  bombMoveSpeed: 7, // 폭탄은 유저보다 빠르게
   maxPlayTime: 30,
   bombFreezeTime: 1000, // 1초 = 1000
 };
@@ -186,7 +186,7 @@ const bombFlick: TBombFlick = {
   x: 0,
   a: 1,
   frameCnt: 0,
-  period: 500, //커질수록 천천히 깜빡임
+  period: 180, //커질수록 천천히 깜빡임
 };
 
 let balls: TPlayerBall[] = [];
@@ -371,15 +371,16 @@ function shakeGenerator(amplitude: number) {
 }
 
 function bombFlickering(bombflick: TBombFlick) {
-  bombFlick.frameCnt += 1;
-  bombFlick.x += 0.003 * bombFlick.a;
-
-  if (bombFlick.frameCnt > bombFlick.period) {
-    bombFlick.a += 1;
-    bombFlick.frameCnt = 0;
+  bombflick.frameCnt += 1;
+  bombflick.x += 0.003 * bombflick.a;
+  console.log(bombflick.frameCnt);
+  console.log(bombflick.period);
+  if (bombflick.frameCnt > bombflick.period) {
+    bombflick.a += 1;
+    bombflick.frameCnt = 0;
   }
 
-  return Math.sin(bombFlick.x - 1.57) / 4 + 0.25;
+  return Math.sin(bombFlick.x - 1.57) / 2.7 + 0.37;
 }
 
 type radius = {
@@ -472,7 +473,7 @@ function initializeBombGame() {
   bombFlick.x = 0;
   bombFlick.a = 1;
   bombFlick.frameCnt = 0;
-  bombFlick.period = 500;
+  bombFlick.period = 120;
 
   balls = [];
   ballMap = {};
