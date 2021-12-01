@@ -167,6 +167,7 @@ class BombGame extends Game {
     socket.on("bomb_change", (data) => {
       let send = this.ballMap[data.send];
       let receive = this.ballMap[data.receive];
+      if (send === undefined || receive === undefined) return;
       send.bomb = false;
       receive.bomb = true;
       //폭탄 변경 ball 정보 전송
