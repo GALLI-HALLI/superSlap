@@ -10,6 +10,7 @@ import {
   loginFailure,
   loginSuccess,
   resetProfile,
+  setResetRegister,
 } from "../user/user.action";
 import { TProfile } from "../../types/api";
 import { AsyncActionStatus } from "../../constants/redux";
@@ -53,6 +54,10 @@ const user = createReducer(initialState, (builder) => {
   });
   builder.addCase(getProfileFailure, (state) => {
     state.profile.status = AsyncActionStatus.Failure;
+  });
+
+  builder.addCase(setResetRegister, (state) => {
+    state.register.status = AsyncActionStatus.Idle;
   });
 
   builder.addCase(registerLoading, (state) => {

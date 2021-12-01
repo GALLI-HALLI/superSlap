@@ -10,6 +10,8 @@ export const registerLoading = createAction("REGISTER_LOADING");
 export const registerSuccess = createAction("REGISTER_SUCCESS");
 export const registerFailure = createAction("REGISTER_FAILURE");
 
+export const setResetRegister = createAction("SET_RESET_REGISTER");
+
 export const loginLoading = createAction("LOGIN_LOADING");
 export const loginSuccess = createAction("LOGIN_SUCCESS");
 export const loginFailure = createAction("LOGIN_FAILURE");
