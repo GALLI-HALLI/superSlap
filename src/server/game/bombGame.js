@@ -12,13 +12,14 @@ let ballColor = [
   "hotpink",
 ]; //8 color setting
 
-const SECOND = 1000
+const SECOND = 1000;
 const GAME_TIME_LIMIT = SECOND * 30;
 
 class PlayerBall {
-  constructor(socket, id) {
+  constructor(socket, id, nickname) {
     this.socket = socket;
     this.id = id;
+    this.nickname = nickname;
     this.seq = 0;
     this.x = 0;
     this.y = 0;
@@ -42,16 +43,27 @@ class BombGame extends Game {
     this.gameStart = true;
     this.balls[Math.floor(this.balls.length * Math.random())].bomb = true; //폭탄 랜덤생성. 해당 코드 비활성화 시 joinGame()함수에서 첫 번째 플레이어에 폭탄 true 처리하는 코드 필요함
     //생성된 ball들의 기초 정보 전송
+    let balls = [];
     for (let i = 0; i < this.balls.length; i++) {
       let ball = this.balls[i];
-      this.getRoomSocket().emit("join_user", {
+      balls.push({
         id: ball.id,
+        nickname: ball.nickname,
         x: ball.x,
         y: ball.y,
         color: ball.color,
         bomb: ball.bomb,
       });
+      // this.getRoomSocket().emit("join_user", {
+      // id: ball.id,
+      // x: ball.x,
+      // y: ball.y,
+      // color: ball.color,
+      // bomb: ball.bomb,
+      // });
     }
+
+    this.getRoomSocket().emit("join_user", balls);
 
     this.balls.forEach((ball) => {
       ball.socket.emit("user_id", ball.id);
@@ -84,8 +96,8 @@ class BombGame extends Game {
     this.getRoomSocket().emit("leave_user", id); //떠날 때 id 값 송신
   }
 
-  joinGame(socket, id) {
-    let ball = new PlayerBall(socket, id);
+  joinGame(socket, id, nickname) {
+    let ball = new PlayerBall(socket, id, nickname);
     let startPosition = Math.floor(8 * Math.random());
     while (this.ballSeq[startPosition]) {
       if (startPosition === 7) {
@@ -132,7 +144,7 @@ class BombGame extends Game {
     console.log(`${id} is entered ${Date()}`);
 
     //게임에 필요한 ball생성 작업
-    this.joinGame(socket, id);
+    this.joinGame(socket, id, nickname);
 
     //업데이트된 위치 정보 받아서
     socket.on("send_location", (data) => {

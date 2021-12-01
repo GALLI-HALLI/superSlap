@@ -1,6 +1,7 @@
 //게임
 export type TPlayerBall = {
   id: string;
+  nickname: string;
   color: string;
   x: number;
   y: number;

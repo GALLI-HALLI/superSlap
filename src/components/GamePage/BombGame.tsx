@@ -92,6 +92,7 @@ const Images: TImages = {
 /* ================== 타입 및 클래스 선언 시작================== */
 class playerBall {
   id: string;
+  nickname: string;
   color: string;
   x: number;
   y: number;
@@ -99,6 +100,7 @@ class playerBall {
 
   constructor() {
     this.id = "";
+    this.nickname = "누구세요";
     this.color = "#FF00FF";
     this.x = 360 / 2;
     this.y = 500 / 2;
@@ -193,19 +195,22 @@ let myId: string;
 let gameEnded = false;
 let gameStart = false;
 
-function joinUser(data: TPlayerBall) {
+function joinUser(data: TPlayerBall[]) {
   console.log("join user");
-  let ball = new playerBall();
-  ball.id = data.id;
-  ball.color = data.color;
-  ball.x = data.x;
-  ball.y = data.y;
-  ball.bomb = data.bomb;
 
-  balls.push(ball);
-  ballMap[data.id] = ball;
+  for (let i = 0; i < data.length; i++) {
+    let ball = new playerBall();
+    ball.id = data[i].id;
+    ball.color = data[i].color;
+    ball.x = data[i].x;
+    ball.y = data[i].y;
+    ball.bomb = data[i].bomb;
 
-  return ball;
+    balls.push(ball);
+    ballMap[data[i].id] = ball;
+  }
+
+  return;
 }
 
 function leaveUser(id: string) {
@@ -288,8 +293,9 @@ const setupSocketEvents = (socket: Socket, end: boolean) => {
     myId = data;
   });
 
-  socket.on("join_user", function (data: TPlayerBall) {
+  socket.once("join_user", function (data: TPlayerBall[]) {
     if (!end) return;
+    console.log(data);
     joinUser(data);
   });
 
@@ -460,6 +466,7 @@ type TBombGameProps = {
 };
 
 const BombGame = ({ socket }: TBombGameProps) => {
+  console.log("hello");
   const [instance] = useState(() => new BombGameData());
 
   // 첫 랜더링 때 바뀌는 전역변수들 초기화
