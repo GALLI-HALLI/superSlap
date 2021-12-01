@@ -4,6 +4,7 @@ import LogoImg from "../components/MainPage/LogoImg";
 import styles from "./RegisterPage.module.scss";
 import Button from "../components/common/Button";
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { registerUser } from "../store/user/user.action";
 import { useSelector } from "../hooks/typeReduxHook";
@@ -89,6 +90,9 @@ const RegisterPage = () => {
           />
         </div>
         <div className={styles.regiBtnContainer}>
+          <Link to="/">
+            <Button className={styles.regiBtn}>뒤로가기</Button>
+          </Link>
           <Button type="submit" className={styles.regiBtn}>
             가입 하기
           </Button>
