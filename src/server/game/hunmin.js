@@ -53,7 +53,7 @@ class Hunmin extends Game {
       let suggest =
         consonants[parseInt(Math.random() * 14)] +
         consonants[parseInt(Math.random() * 14)];
-      this.nowWord = "ㅍㄱ";
+      this.nowWord = suggest;
       this.len = this.playerSeq.length;
       this.playerSeq.sort((a, b) => {
         return a[1] - b[1];
@@ -68,7 +68,7 @@ class Hunmin extends Game {
 
       //*변경
       this.getRoomSocket().emit("setInitial", {
-        suggest: "ㅍㄱ",
+        suggest,
         gameTimeLimit: GAME_TIME_LIMIT,
         turnTimeLimit: TURN_TIME_LIMIT,
       });
