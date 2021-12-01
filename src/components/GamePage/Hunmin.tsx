@@ -142,7 +142,7 @@ const Hunmin = ({ socket }: TSocket) => {
           <label className={styles.nickname}>{checkWord.nickname}</label>
           <label className={styles.userWord}>{checkWord.word}</label>
           <label className={styles.passMsg}>{checkWord.msg}</label>
-          <label className={styles.passMsg}>{checkWord.mean}</label>
+          <label className={styles.mean}>{checkWord.mean}</label>
         </div>
       </div>
       <div
