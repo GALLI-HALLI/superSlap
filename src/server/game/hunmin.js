@@ -33,7 +33,7 @@ const wrongReason = {
 const SECOND = 1000;
 
 const GAME_TIME_LIMIT = SECOND * 100;
-const TURN_TIME_LIMIT = SECOND * 3;
+const TURN_TIME_LIMIT = SECOND * 10;
 //*
 
 class Hunmin extends Game {
@@ -49,30 +49,31 @@ class Hunmin extends Game {
   }
 
   start() {
-    let suggest =
-      consonants[parseInt(Math.random() * 14)] +
-      consonants[parseInt(Math.random() * 14)];
-    this.nowWord = suggest;
-    this.len = this.playerSeq.length;
-    this.playerSeq.sort((a, b) => {
-      return a[1] - b[1];
-    });
-    for (let i = 0; i < this.len; i++) {
-      this.getRoomSocket().emit("join_user", {
-        id: this.playerSeq[i][0],
-        nickname: this.playerSeq[i][2],
-        seq: i,
-      });
-    }
-
-    //*변경
-    this.getRoomSocket().emit("setInitial", {
-      suggest,
-      gameTimeLimit: GAME_TIME_LIMIT,
-      turnTimeLimit: TURN_TIME_LIMIT,
-    });
-    //*
     setTimeout(() => {
+      let suggest =
+        consonants[parseInt(Math.random() * 14)] +
+        consonants[parseInt(Math.random() * 14)];
+      this.nowWord = suggest;
+      this.len = this.playerSeq.length;
+      this.playerSeq.sort((a, b) => {
+        return a[1] - b[1];
+      });
+      for (let i = 0; i < this.len; i++) {
+        this.getRoomSocket().emit("join_user", {
+          id: this.playerSeq[i][0],
+          nickname: this.playerSeq[i][2],
+          seq: i,
+        });
+      }
+
+      //*변경
+      this.getRoomSocket().emit("setInitial", {
+        suggest,
+        gameTimeLimit: GAME_TIME_LIMIT,
+        turnTimeLimit: TURN_TIME_LIMIT,
+      });
+      //*
+
       this.nextTurn();
 
       setTimeout(() => {
