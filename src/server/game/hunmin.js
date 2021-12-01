@@ -209,7 +209,6 @@ class Hunmin extends Game {
       if (result[0]) {
         if(this.playerSeq[this.turn%this.len][0] !== data.turn) return;
         this.wordList.push(data.word);
-        this.nextTurn();
         this.getRoomSocket().emit("hunminData", {
           success: true,
           nickname: this.playerSeq[this.turn % this.len][2],
