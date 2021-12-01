@@ -5,6 +5,22 @@ import pencilImg from "../../image/pencil.png";
 const getRandom = (min: number, max: number) =>
   Math.random() * (max - min) + min;
 
+type TGameDataNumber = {
+  [key: string]: number;
+};
+
+type TGameDataBoolean = {
+  [key: string]: boolean;
+};
+
+type TGameData = {
+  gameCanvas: TGameDataNumber;
+  pencil: TGameDataNumber;
+  rotation: TGameDataNumber;
+  initial: TGameDataNumber;
+  state: TGameDataBoolean;
+};
+
 class GameData {
   gameCanvas = {
     width: 360,
@@ -12,10 +28,10 @@ class GameData {
   };
 
   pencil = {
-    x: 100,
-    y: 100,
-    width: 300,
-    height: 300,
+    x: 60,
+    y: 60,
+    width: 240,
+    height: 240,
   };
 
   rotation = {
@@ -44,13 +60,13 @@ class Pencil {
 
   rotate(ctx: any, image: any) {
     //pencil rotation 출력
-    ctx.translate(250, 250);
+    ctx.translate(180, 180);
     ctx.rotate((this.degree * Math.PI) / 180);
-    ctx.translate(-250, -250);
+    ctx.translate(-180, -180);
   }
 }
 
-function PencilRotation(ctx: any, instance: any, image: any) {
+function PencilRotation(ctx: any, instance: TGameData, image: any) {
   let data = new Pencil(instance.rotation.degree);
   data.rotate(ctx, image);
 
@@ -64,7 +80,7 @@ function PencilRotation(ctx: any, instance: any, image: any) {
   */
 
   // pencil rotate
-  instance.rotation.degree += instance.speed;
+  instance.rotation.degree += instance.rotation.speed;
 
   // 연필 회전 방향 및 가속,감속 결정
   if (instance.rotation.speed > 0) {
@@ -83,8 +99,6 @@ function PencilRotation(ctx: any, instance: any, image: any) {
       instance.rotation.time += 1; // 회전 유지 시간
       console.log("Rotating");
     }
-    // console.log(instance.speed);
-    // console.log(maxTime);
   }
   // 연필 정지 시 게임 정보 초기화
   else {
@@ -102,7 +116,7 @@ function PencilSpin() {
   //canvas 사용을 위해 필요한 선언 1
   const canvasRef: any = useRef(null);
 
-  const [instance] = useState(() => new GameData());
+  const [instance] = useState<TGameData>(() => new GameData());
 
   // image
   const image = new Image();
@@ -120,50 +134,51 @@ function PencilSpin() {
     }
   };
 
+  const render = () => {
+    //canvas 사용을 위해 필요한 선언 2
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+
+    /*==== 캔버스 요소 조작 시작====*/
+    ClearCanvas(ctx, canvas);
+
+    ctx.font = "30px Arial";
+    ctx.fillText("슈퍼 연필 돌리기!", 50, 30);
+
+    ctx.save(); //원래 설정을 저장한다.
+
+    // 연필이 한번 회전한 후 멈춰있을 경우
+    if (instance.rotation.speed === 0) {
+      ctx.fillText("다시 플레이하려면 클릭!", 70, 430);
+    }
+
+    // 클릭을 통해 연필 돌리기 게임이 시작 요청을 받았거나
+    if (instance.state.gameStart) {
+      PencilRotation(ctx, instance, image);
+    }
+    // 클릭 이벤트가 아직 발생하지 않은 경우
+    else {
+      ctx.fillText("연필을 클릭하시면 돕니다!", 70, 430);
+    }
+
+    // Pencil draw
+    ctx.drawImage(
+      image,
+      instance.pencil.x,
+      instance.pencil.y,
+      instance.pencil.width,
+      instance.pencil.height
+    );
+
+    ctx.restore(); // 원래 설정을 복원한다.
+
+    /*==== 캔버스 요소 조작 끝====*/
+
+    //canvas에 애니메이션이 작동하게 하는 함수.
+    requestAnimationFrame(render);
+  };
+
   useEffect(() => {
-    const render = () => {
-      //canvas 사용을 위해 필요한 선언 2
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-
-      /*==== 캔버스 요소 조작 시작====*/
-      ClearCanvas(ctx, canvas);
-
-      ctx.font = "30px Arial";
-      ctx.fillText("슈퍼 연필 돌리기!", 120, 50);
-
-      ctx.save(); //원래 설정을 저장한다.
-
-      // 연필이 한번 회전한 후 멈춰있을 경우
-      if (instance.rotation.speed === 0) {
-        ctx.fillText("다시 플레이하려면 클릭!", 70, 430);
-      }
-
-      // 클릭을 통해 연필 돌리기 게임이 시작 요청을 받았거나
-      if (instance.state.gameStart) {
-        PencilRotation(ctx, instance, image);
-      }
-      // 클릭 이벤트가 아직 발생하지 않은 경우
-      else {
-        ctx.fillText("연필을 클릭하시면 돕니다!", 70, 430);
-      }
-
-      // Pencil draw
-      ctx.drawImage(
-        image,
-        instance.pencil.x,
-        instance.pencil.y,
-        instance.pencil.width,
-        instance.pencil.height
-      );
-
-      ctx.restore(); // 원래 설정을 복원한다.
-
-      /*==== 캔버스 요소 조작 끝====*/
-
-      //canvas에 애니메이션이 작동하게 하는 함수.
-      requestAnimationFrame(render);
-    };
     render();
   });
 
