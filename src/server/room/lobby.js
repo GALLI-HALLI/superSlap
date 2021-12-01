@@ -23,10 +23,10 @@ const createLobbyRoute = (gameSocket) => {
     const code = req.body.roomId;
     console.log(req.body);
     if (roomManager.hasRoom(code)) {
-      if (roomManager.rooms.get(code).players.length > 7) {
+      if (roomManager.rooms.get(code).players.size > 7) {
         return res.json({
           succuess: false,
-          msg: "인원이 8명이상입니다.",
+          msg: "방이 꽉찼습니다.",
         });
       }
       return res.json({
