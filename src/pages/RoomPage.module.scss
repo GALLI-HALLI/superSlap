@@ -1,22 +1,23 @@
 .container {
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
   .roomPageContainer {
     width: 400px;
-    .memberListContainer {
-      width: "360px";
-      height: "540px";
-    }
   }
   .buttonContainer {
-    margin-left: 30px;
+    width: 340px;
     margin-top: 10px;
+    margin-bottom: 0;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-
     .masterName {
       margin-left: auto;
+    }
+    .label {
+      display: block;
     }
   }
 }
