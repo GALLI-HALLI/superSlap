@@ -28,7 +28,7 @@ const GameList = ({ onClickGame }: TGameListProps) => {
             {GameLists.map((value, index) => {
               return (
                 <li>
-                  게임 {index}: {GameName[value]}
+                  {GameName[value]}
                   <button onClick={() => onClickGame(value)}>
                     {GameName[value]}
                   </button>

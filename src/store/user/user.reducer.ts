@@ -9,6 +9,7 @@ import {
   loginLoading,
   loginFailure,
   loginSuccess,
+  resetProfile,
 } from "../user/user.action";
 import { TProfile } from "../../types/api";
 import { AsyncActionStatus } from "../../constants/redux";
@@ -39,6 +40,9 @@ const initialState: TUserStore = {
 };
 
 const user = createReducer(initialState, (builder) => {
+  builder.addCase(resetProfile, (state) => {
+    state.profile = { status: AsyncActionStatus.Idle };
+  });
   builder.addCase(getProfileLoading, (state) => {
     state.profile.status = AsyncActionStatus.Loading;
   });

@@ -14,7 +14,7 @@ export const loginLoading = createAction("LOGIN_LOADING");
 export const loginSuccess = createAction("LOGIN_SUCCESS");
 export const loginFailure = createAction("LOGIN_FAILURE");
 
-// 서버에서 응답하는 데이터 의미있는 값이 아닐때가 있음..
+export const resetProfile = createAction("RESET_PROFILE");
 
 export const getProfileLoading = createAction("GET_PROFILE_LOADING");
 export const getProfileSuccess = createAction<{ profile: TProfile }>(
