@@ -65,11 +65,11 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
             <Button>회원가입</Button>
           </Link>
         </div>
-        <div className={styles.social}>
+        {/* <div className={styles.social}>
           <a href="/api/auth/google">
             <GoogleButton type="light" style={googleButtonStyle}></GoogleButton>
           </a>
-        </div>
+        </div> */}
       </form>
       {children}
     </div>
