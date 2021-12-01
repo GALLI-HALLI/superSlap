@@ -28,7 +28,7 @@ const LobbyPage = () => {
 
   useEffect(() => {
     if (isRoomRequestSucceed) {
-      history.replace(`/room/${roomData}`);
+      history.push(`/room/${roomData}`);
     }
   }, [roomData, history, isRoomRequestSucceed]);
 
@@ -46,7 +46,7 @@ const LobbyPage = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     dispatch(resetProfile());
-    history.push("/");
+    history.replace("/");
     alert("로그아웃 되었습니다.");
   };
 

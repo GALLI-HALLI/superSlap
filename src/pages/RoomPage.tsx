@@ -41,7 +41,7 @@ const RoomPage = () => {
   const dispatch = useDispatch();
 
   const backLobby = () => {
-    history.push("/lobby");
+    history.replace("/lobby");
   };
 
   useEffect(() => {
@@ -50,14 +50,14 @@ const RoomPage = () => {
     });
     socket.on(SocketServerEvent.GameAlreadyStarted, () => {
       socket.disconnect();
-      history.push("/lobby");
+      history.replace("/lobby");
     });
     socket.on(SocketServerEvent.roomDestroyed, () => {
       socket.disconnect();
-      history.push("/lobby");
+      history.replace("/lobby");
     });
     socket.on("noRoom", () => {
-      history.push("/lobby");
+      history.replace("/lobby");
     });
   }, [dispatch, socket, history]);
 
