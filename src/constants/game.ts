@@ -3,6 +3,7 @@ export enum GameType {
   Bomb = "bomb",
   LeftRight = "LeftRight",
   Hunmin = "hunmin",
+  Pencil = "pencil",
 }
 
 export enum GameStatus {

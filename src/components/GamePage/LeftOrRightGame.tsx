@@ -749,13 +749,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     );
 
     if (!instance.state.started) {
-      ctx.drawImage(
-        tutorial,
-        -10,
-        -20,
-        instance.gameCanvas.width + 20,
-        instance.gameCanvas.height + 40
-      );
+      ctx.drawImage(tutorial, 0, 75, instance.gameCanvas.width, 34 * 14.4);
     }
 
     requestAnimationFrame(render);
