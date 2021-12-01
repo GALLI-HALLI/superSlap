@@ -36,8 +36,9 @@ module.exports = (socket, gameSocket) => {
   // 연결이 해제되었을때 방장이 나갔는지 체크하고 나갔다면 방을 없앤다.
   socket.on(socketEvents.disconnect, (reason) => {
     console.log(socket.id + " has left because of " + reason + " " + Date());
-    if (room.gameStatus === GameStatus.Ended) room.gameStatus = GameStatus.Idle;
     if (room) {
+      if (room.gameStatus === GameStatus.Ended)
+        room.gameStatus = GameStatus.Idle;
       room.removePlayer(id);
       sendMetaData(gameSocket, room, room.code, null);
       if (id === room.id) {
