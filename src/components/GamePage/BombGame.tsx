@@ -41,6 +41,7 @@ import {
   TBombFlick,
 } from "../../types/bombGameTypes";
 import { gameEnd } from "../../server/constants/socketEvents";
+import { unstable_renderSubtreeIntoContainer } from "react-dom";
 
 /* ================== 조이스틱 관련 시작 ================== */
 
@@ -92,13 +93,15 @@ const Images: TImages = {
 /* ================== 타입 및 클래스 선언 시작================== */
 class playerBall {
   id: string;
+  nickname: string;
   color: string;
   x: number;
   y: number;
   bomb: boolean;
 
   constructor() {
-    this.id = "";
+    this.id = "initialId";
+    this.nickname = "누구세요";
     this.color = "#FF00FF";
     this.x = 360 / 2;
     this.y = 500 / 2;
@@ -193,19 +196,23 @@ let myId: string;
 let gameEnded = false;
 let gameStart = false;
 
-function joinUser(data: TPlayerBall) {
+function joinUser(data: TPlayerBall[]) {
   console.log("join user");
-  let ball = new playerBall();
-  ball.id = data.id;
-  ball.color = data.color;
-  ball.x = data.x;
-  ball.y = data.y;
-  ball.bomb = data.bomb;
 
-  balls.push(ball);
-  ballMap[data.id] = ball;
+  for (let i = 0; i < data.length; i++) {
+    let ball = new playerBall();
+    ball.id = data[i].id;
+    ball.nickname = data[i].nickname;
+    ball.color = data[i].color;
+    ball.x = data[i].x;
+    ball.y = data[i].y;
+    ball.bomb = data[i].bomb;
 
-  return ball;
+    balls.push(ball);
+    ballMap[data[i].id] = ball;
+  }
+
+  return;
 }
 
 function leaveUser(id: string) {
@@ -288,7 +295,7 @@ const setupSocketEvents = (socket: Socket, end: boolean) => {
     myId = data;
   });
 
-  socket.on("join_user", function (data: TPlayerBall) {
+  socket.once("join_user", function (data: TPlayerBall[]) {
     if (!end) return;
     joinUser(data);
   });
@@ -325,7 +332,10 @@ const setupSocketEvents = (socket: Socket, end: boolean) => {
   }
 
   function bombChange(ballId1: string, ballId2: string) {
+    if (ballId1 === undefined || ballId2 === undefined) return;
+
     console.log("bomb change");
+
     let data = {
       send: ballId1,
       receive: ballId2,
@@ -430,6 +440,27 @@ function roundRect(
 
 /* ================== 캔버스 출력 관련 끝================== */
 
+function textLengthOverCut(txt: string, len: number, lastTxt: string) {
+  const korean = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+
+  if (len === 0) {
+    // 기본값
+    len = 8;
+  }
+  if (lastTxt === "") {
+    // 기본값
+    lastTxt = "...";
+  }
+  if (korean.test(txt)) {
+    //한글 겁나 뚱뚱함;;
+    len = 5;
+  }
+  if (txt.length > len) {
+    txt = txt.substr(0, len) + lastTxt;
+  }
+  return txt;
+}
+
 /* ================== 게임 설정 초기화 ================== */
 
 function initializeBombGame() {
@@ -449,8 +480,6 @@ function initializeBombGame() {
 
   gameEnded = false;
   gameStart = false;
-
-  console.log(ongoingData);
 }
 
 /* ================== 게임 설정 초기화 ================== */
@@ -650,12 +679,16 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
       //이름 박스 출력
       ctx.save();
-      ctx.fillStyle = "white";
+      if (ball.id === myId) {
+        ctx.fillStyle = "limegreen";
+      } else {
+        ctx.fillStyle = "white";
+      }
       roundRect(
         ctx,
-        ball.x - initialData.ballRad - 10, //x
-        ball.y - initialData.ballRad - 3 - 17, //y
-        initialData.ballRad * 2 + 20, //width
+        ball.x - initialData.ballRad - 10 - 5, //x
+        ball.y - initialData.ballRad - 4 - 17 - 6, //y
+        initialData.ballRad * 2 + 20 + 10, //width
         20, //height
         10, //radius
         true,
@@ -722,24 +755,23 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
       // 플레이어 이름 출력
       ctx.save();
-      ctx.fillStyle = "black";
       // 내 공일 경우
       if (ball.id === myId) {
+        ctx.fillStyle = "black";
         ctx.beginPath();
         ctx.font = "bold 15px Arial";
-        ctx.fillText(
-          "나야 나!",
-          ball.x - initialData.ballRad - 7,
-          ball.y - initialData.ballRad - 4
-        );
+        ctx.fillText("나", ball.x - 7, ball.y - initialData.ballRad - 4 - 6);
         ctx.closePath();
       } else {
+        let tempNickname = textLengthOverCut(ball.nickname, 7, "...");
+
+        ctx.fillStyle = "black";
         ctx.beginPath();
-        ctx.font = "bold 15px Arial";
+        ctx.font = "bold 12px Arial";
         ctx.fillText(
-          `player ${i}`,
+          `${tempNickname}`,
           ball.x - initialData.ballRad - 7,
-          ball.y - initialData.ballRad - 4
+          ball.y - initialData.ballRad - 4 - 7 - 2
         );
         ctx.closePath();
       }
