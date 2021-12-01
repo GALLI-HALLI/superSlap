@@ -26,19 +26,24 @@ const Loser = ({ meta }: { meta: TMetadata }) => {
 
   return (
     <div className={styles.loserContainer}>
-      <div className={styles.title}>패배자</div>
+      <div className={styles.loserTitle}>패배자</div>
       <div className={styles.loserName}>
         <label>아이디: {meta.loser?.id}</label>
         <label>닉네임: {meta.loser?.nickname}</label>
       </div>
+      <div className={styles.rankTitle}>기록</div>
       <div className={styles.rank}>
         <ul>
-          {meta.rank && <li>아이디 : 점수 </li>}
+          {meta.rank && (
+            <li>
+              <span>아이디</span> <span>점수</span>{" "}
+            </li>
+          )}
           {meta.rank &&
             meta.rank.map(({ nickname, score }) => {
               return (
                 <li>
-                  {nickname} : {score}
+                  <span>{nickname}</span> <span>{score}</span>
                 </li>
               );
             })}
