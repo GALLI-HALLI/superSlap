@@ -76,7 +76,15 @@ const RoomPage = () => {
   };
 
   if (!metadata) {
-    return <div>로딩중 입니다.</div>;
+    return (
+      <>
+        <div>로딩중 입니다.</div>
+        <p>장시간 머물러 있는경우 버튼을 눌러주세요</p>
+        <div>
+          <Button onClick={backLobby}>로비로</Button>
+        </div>
+      </>
+    );
   }
 
   if (metadata.gameStatus === GameStatus.Ended) {
