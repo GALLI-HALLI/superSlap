@@ -11,9 +11,11 @@
     .suggestAndTime {
       display: flex;
       .gameTime {
+        font-size: 30px;
         margin: 10px auto 10px 10px;
       }
       .suggest {
+        font-size: 30px;
         margin: 10px 10px 10px auto;
       }
     }
@@ -21,16 +23,28 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      margin-top: 20px;
+      margin-top: 10px;
+      margin-right: 5px;
       .userWord {
-        margin-left: 15px;
+        margin-left: 5px;
         font-size: 40px;
       }
       .nickname {
-        margin-left: 15px;
+        margin-left: 5px;
       }
       .passMsg {
-        margin-left: 15px;
+        margin-left: 5px;
+      }
+      .mean {
+        margin-top: 5px;
+        height: 80px;
+        width: 340px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        margin-left: 5px;
       }
     }
   }
