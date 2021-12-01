@@ -203,16 +203,17 @@ class Hunmin extends Game {
     this.joinGame(id, nickname);
 
     socket.on("word", async (data) => {
-      let result = await this.checkWord(data);
+      let result = await this.checkWord(data.word);
       console.log(result);
       if (this.finish) return;
       if (result[0]) {
-        this.wordList.push(data);
+        if(this.playerSeq[this.turn%this.len][0] !== data.turn) return;
+        this.wordList.push(data.word);
         this.nextTurn();
         this.getRoomSocket().emit("hunminData", {
           success: true,
           nickname: this.playerSeq[this.turn % this.len][2],
-          word: data,
+          word: data.word,
           mean: result[1],
           msg: "성공이지롱~~~",
         });
@@ -220,7 +221,7 @@ class Hunmin extends Game {
         this.getRoomSocket().emit("hunminData", {
           success: false,
           nickname: this.playerSeq[this.turn % this.len][2],
-          word: data,
+          word: data.word,
           mean: "",
           msg: result[1],
         });
