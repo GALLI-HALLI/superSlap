@@ -17,6 +17,7 @@ import GameList from "../components/RoomPage/GameList";
 import Loser from "../components/RoomPage/Loser";
 import LeftOrRightGame from "../components/GamePage/LeftOrRightGame";
 import Hunmin from "../components/GamePage/Hunmin";
+import PencilSpin from "../components/GamePage/PencilSpin";
 
 const GameMap = {
   [GameType.None]: () => (
@@ -28,6 +29,7 @@ const GameMap = {
   [GameType.Bomb]: BombGame,
   [GameType.LeftRight]: LeftOrRightGame,
   [GameType.Hunmin]: Hunmin,
+  [GameType.Pencil]: PencilSpin,
 };
 
 const RoomPage = () => {
@@ -86,6 +88,7 @@ const RoomPage = () => {
   }
 
   if (metadata.gameStatus === GameStatus.Started) {
+    if (metadata.type === "pencil") return <PencilSpin />;
     const GameComponent = GameMap[metadata.type];
     return <GameComponent socket={socket} />;
   }

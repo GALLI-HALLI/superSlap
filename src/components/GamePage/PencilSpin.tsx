@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import "./App.css";
+import React, { memo, useEffect, useRef, useState } from "react";
+import "./PencilSpin.scss";
 import pencilImg from "../../image/pencil.png";
 
 const getRandom = (min: number, max: number) =>
@@ -98,7 +98,7 @@ function ClearCanvas(ctx: any, canvas: any) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function App() {
+function PencilSpin() {
   //canvas 사용을 위해 필요한 선언 1
   const canvasRef: any = useRef(null);
 
@@ -180,4 +180,4 @@ function App() {
   );
 }
 
-export default App;
+export default memo(PencilSpin);
