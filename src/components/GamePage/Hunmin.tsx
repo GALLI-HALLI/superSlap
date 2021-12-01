@@ -71,7 +71,7 @@ const Hunmin = ({ socket }: TSocket) => {
     socket.on("join_user", (data) => {
       setPlayers((prev) => {
         const nextPlayers = [...prev, data];
-        nextPlayers.sort((a, b) => b.seq - a.seq);
+        nextPlayers.sort((a, b) => a.seq - b.seq);
         return nextPlayers;
       });
     });
