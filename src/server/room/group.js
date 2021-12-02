@@ -54,6 +54,7 @@ module.exports = (socket, gameSocket) => {
         room.gameStatus = GameStatus.Started;
         room.type = type;
         sendMetaData(gameSocket, room, room.code, null);
+        room.gameStatus = GameStatus.Idle;
       } else {
         room.startGame(type);
       }
