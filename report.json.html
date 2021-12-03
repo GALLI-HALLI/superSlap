@@ -1,0 +1,2618 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Artillery report</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=PT+Serif:400,700,400italic"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.0/ace.js"
+      charset="utf-8"
+    ></script>
+
+    <style>
+      body,
+      p,
+      li {
+        font-family: sans-serif;
+        font-size: 10pt;
+      }
+
+      h1 {
+        font-size: 18pt;
+        font-weight: bold;
+      }
+
+      #errorsContainer > p {
+        color: #009900;
+      }
+
+      #footer {
+        padding: 1em;
+        font-size: 0.8em;
+        color: #999;
+        text-align: center;
+        margin-top: 1em;
+        background-color: #eee;
+      }
+      #editor {
+        font-size: 8pt;
+        height: 20em;
+      }
+
+      .chart-container {
+        margin: 20px 0px;
+      }
+    </style>
+
+    <style>
+      h1 {
+        line-height: 200%;
+      }
+
+      body {
+        background-color: #fcfcfc;
+      }
+
+      .container {
+        width: 100%;
+        min-width: 960px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row" id="header">
+        <div class="col-lg-offset-4">
+          <pre
+            style="
+              font-family: monospace;
+              font-size: 10pt;
+              font-weight: 700;
+              background-color: #fcfcfc;
+              border: none;
+            "
+          >
+        ___         __  _ ____                  _
+  _____/   |  _____/ /_(_) / /__  _______  __  (_)___  _____
+ /____/ /| | / ___/ __/ / / / _ \/ ___/ / / / / / __ \/____/
+/____/ ___ |/ /  / /_/ / / /  __/ /  / /_/ / / / /_/ /____/
+    /_/  |_/_/   \__/_/_/_/\___/_/   \__, (_)_/\____/
+                                    /____/
+    </pre
+          >
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="text-center" id="page-title">
+            Test run on <span id="timestamp"></span>
+          </h1>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-3">
+          <h4>Summary</h4>
+          <table class="table table-bordered table-hover table-condensed">
+            <tbody>
+              <tr>
+                <td>Test duration</td>
+                <td><span id="testDuration">0</span> sec</td>
+              </tr>
+              <tr>
+                <td>Virtual Users created</td>
+                <td><span id="vuCreated">0</span></td>
+              </tr>
+
+              <tr>
+                <td>Virtual Users completed</td>
+                <td><span id="vuCompleted">0</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-lg-5" id="scenarioCountsContainer">
+          <div>
+            <h4>Scenario counts</h4>
+            <p></p>
+
+            <table
+              class="table table-bordered table-hover table-condensed"
+              id="scenarioCounts"
+            ></table>
+          </div>
+        </div>
+
+        <div class="col-lg-1">
+          <div id="codesContainer">
+            <h4>Codes</h4>
+            <p></p>
+
+            <table
+              class="table table-bordered table-hover table-condensed"
+              id="codes"
+            ></table>
+          </div>
+        </div>
+
+        <div class="col-lg-3">
+          <div id="errorsContainer">
+            <h4>Errors</h4>
+            <p></p>
+
+            <table
+              class="table table-bordered table-hover table-condensed"
+              id="errors"
+            ></table>
+          </div>
+        </div>
+      </div>
+      <!-- /.row -->
+
+      <div class="row">
+        <div class="col-lg-12" id="customCountersContainer">
+          <div>
+            <h4>Custom Counters</h4>
+            <p></p>
+
+            <table
+              class="table table-bordered table-hover table-condensed"
+              id="customCountersTable"
+            ></table>
+          </div>
+        </div>
+      </div>
+      <!-- /.row -->
+
+      <div class="row">
+        <div class="text-center col-lg-12">
+          <h3>Charts</h3>
+        </div>
+      </div>
+
+      <div id="latencyChartsRow" class="row">
+        <div class="chart-container text-center col-lg-6">
+          <h4><i class="fas fa-chart-bar"></i> Overall latency distribution</h4>
+          <canvas id="latencyBarChart"></canvas>
+        </div>
+        <div class="chart-container text-center col-lg-6">
+          <h4><i class="fas fa-chart-area"></i> Latency at intervals</h4>
+          <canvas id="latencyAtIntervalsChart"></canvas>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="chart-container text-center col-lg-6">
+          <h4><i class="fas fa-chart-area"></i> Mean RPS</h4>
+          <canvas id="meanRpsChart"></canvas>
+        </div>
+        <div class="chart-container text-center col-lg-6">
+          <h4><i class="fas fa-chart-area"></i> RPS Count</h4>
+          <canvas id="rpsCountChart"></canvas>
+        </div>
+      </div>
+
+      <div id="httpCodesChartsRow" class="row">
+        <div class="chart-container text-center col-lg-6">
+          <h4><i class="fas fa-chart-area"></i> HTTP Codes at intervals</h4>
+          <canvas id="httpCodesAtIntervalsChart"></canvas>
+        </div>
+        <div class="chart-container text-center col-lg-6">
+          <h4><i class="fas fa-chart-pie"></i> HTTP Codes</h4>
+          <canvas id="httpCodesPieChart"></canvas>
+        </div>
+      </div>
+
+      <div id="errorsChartsRow" class="row">
+        <div class="chart-container text-center col-lg-12">
+          <h4><i class="fas fa-chart-area"></i> Errors at intervals</h4>
+          <canvas id="errorsAtIntervalsChart"></canvas>
+        </div>
+      </div>
+
+      <div id="customCountersChartsRow" class="row">
+        <div class="chart-container text-center col-lg-12">
+          <h4>
+            <i class="fas fa-chart-area"></i> Custom counters at intervals
+          </h4>
+          <canvas id="customCountersAtIntervalsChart"></canvas>
+        </div>
+      </div>
+
+      <div id="customStats"></div>
+
+      <div class="row">
+        <div class="codes-line text-center col-lg-12"></div>
+      </div>
+      <div class="row">
+        <div class="errors-line text-center col-lg-12"></div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8 col-lg-offset-2">
+        <h3 class="text-center">Raw report data</h3>
+        <p>
+          This is the raw JSON stats output that the report was generated from.
+        </p>
+        <div id="editor"></div>
+      </div>
+    </div>
+
+    <script charset="utf-8">
+      const Report = {
+        aggregate: {
+          counters: {
+            "core.vusers.created_by_name.0": 1620,
+            "core.vusers.created.total": 1620,
+            "engine.http.requests": 1620,
+            "engine.http.codes.200": 1620,
+            "engine.http.responses": 1620,
+            "engine.socketio.emit": 1620,
+            "core.vusers.completed": 1620,
+          },
+          histograms: {
+            "engine.http.response_time": {
+              mapping: {
+                relativeAccuracy: 0.009999999999999957,
+                _offset: 0,
+                gamma: 1.02020202020202,
+                _multiplier: 34.65620375188833,
+                minPossible: 1.135012422773875e-308,
+                maxPossible: 1.7620952510036562e308,
+              },
+              store: {
+                chunkSize: 128,
+                bins: [
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 246, 0, 0, 0, 0, 0,
+                  410, 0, 0, 0, 0, 0, 442, 0, 0, 0, 253, 0, 0, 0, 0, 87, 0, 0,
+                  0, 42, 0, 0, 24, 0, 0, 0, 15, 0, 0, 9, 0, 0, 11, 0, 0, 6, 0,
+                  0, 8, 0, 4, 0, 0, 1, 0, 1, 0, 2, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0,
+                  0, 4, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                ],
+                count: 1620,
+                minKey: -21,
+                maxKey: 377,
+                offset: -78,
+              },
+              negativeStore: {
+                chunkSize: 128,
+                bins: [],
+                count: 0,
+                minKey: null,
+                maxKey: null,
+                offset: 0,
+              },
+              zeroCount: 0,
+              count: 1620,
+              min: 7,
+              max: 314,
+              sum: 16697,
+            },
+            "engine.socketio.response_time": {
+              mapping: {
+                relativeAccuracy: 0.009999999999999957,
+                _offset: 0,
+                gamma: 1.02020202020202,
+                _multiplier: 34.65620375188833,
+                minPossible: 1.135012422773875e-308,
+                maxPossible: 1.7620952510036562e308,
+              },
+              store: {
+                chunkSize: 128,
+                bins: [
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 7, 6,
+                  11, 23, 17, 29, 36, 48, 46, 64, 57, 56, 52, 65, 52, 51, 30,
+                  31, 31, 39, 28, 26, 32, 26, 33, 34, 24, 23, 23, 23, 20, 20,
+                  26, 14, 17, 20, 26, 19, 22, 26, 20, 20, 26, 16, 18, 9, 26, 17,
+                  11, 16, 10, 9, 15, 12, 10, 10, 8, 8, 4, 5, 7, 6, 5, 4, 5, 6,
+                  3, 4, 3, 4, 2, 3, 1, 5, 6, 7, 0, 0, 4, 2, 5, 2, 1, 4, 2, 0, 0,
+                  2, 2, 2, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 2, 0, 0, 1,
+                  1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0,
+                ],
+                count: 1620,
+                minKey: -188,
+                maxKey: 85,
+                offset: -249,
+              },
+              negativeStore: {
+                chunkSize: 128,
+                bins: [],
+                count: 0,
+                minKey: null,
+                maxKey: null,
+                offset: 0,
+              },
+              zeroCount: 0,
+              count: 1620,
+              min: 0.1757,
+              max: 1.8916,
+              sum: 557.6394,
+            },
+            "core.vusers.session_length": {
+              mapping: {
+                relativeAccuracy: 0.009999999999999957,
+                _offset: 0,
+                gamma: 1.02020202020202,
+                _multiplier: 34.65620375188833,
+                minPossible: 1.135012422773875e-308,
+                maxPossible: 1.7620952510036562e308,
+              },
+              store: {
+                chunkSize: 128,
+                bins: [
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  338, 1062, 158, 19, 23, 7, 0, 0, 0, 0, 0, 0, 0, 4, 2, 0, 1, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 1, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                ],
+                count: 1620,
+                minKey: 221,
+                maxKey: 485,
+                offset: 161,
+              },
+              negativeStore: {
+                chunkSize: 128,
+                bins: [],
+                count: 0,
+                minKey: null,
+                maxKey: null,
+                offset: 0,
+              },
+              zeroCount: 0,
+              count: 1620,
+              min: 1061.0573,
+              max: 2129.3104,
+              sum: 1766392.5665000002,
+            },
+          },
+          rates: {
+            "engine.http.request_rate": 30,
+            "engine.socketio.emit_rate": 30,
+          },
+          "engine.http.request_rate": null,
+          "engine.socketio.emit_rate": null,
+          firstCounterAt: 1638520971135,
+          firstHistogramAt: 1638520971247,
+          lastCounterAt: 1638521030299,
+          lastHistogramAt: 1638521030380,
+          firstMetricAt: 1638520971135,
+          lastMetricAt: 1638521030380,
+          period: 1638521030000,
+          summaries: {
+            "engine.http.response_time": {
+              min: 7,
+              max: 314,
+              count: 1620,
+              p50: 10.1,
+              median: 10.1,
+              p75: 10.9,
+              p90: 12.1,
+              p95: 13.9,
+              p99: 19.9,
+              p999: 30.3,
+            },
+            "engine.socketio.response_time": {
+              min: 0.2,
+              max: 1.9,
+              count: 1620,
+              p50: 0.3,
+              median: 0.3,
+              p75: 0.4,
+              p90: 0.5,
+              p95: 0.7,
+              p99: 1.1,
+              p999: 1.8,
+            },
+            "core.vusers.session_length": {
+              min: 1061.1,
+              max: 2129.3,
+              count: 1620,
+              p50: 1085.9,
+              median: 1085.9,
+              p75: 1085.9,
+              p90: 1107.9,
+              p95: 1107.9,
+              p99: 1176.4,
+              p999: 2101.1,
+            },
+          },
+        },
+        intermediate: [
+          {
+            counters: {
+              "core.vusers.created_by_name.0": 270,
+              "core.vusers.created.total": 270,
+              "engine.http.requests": 270,
+              "engine.http.codes.200": 270,
+              "engine.http.responses": 270,
+              "engine.socketio.emit": 270,
+              "core.vusers.completed": 237,
+            },
+            histograms: {
+              "engine.http.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 31,
+                    0, 0, 0, 0, 0, 58, 0, 0, 0, 0, 0, 77, 0, 0, 0, 37, 0, 0, 0,
+                    0, 16, 0, 0, 0, 9, 0, 0, 10, 0, 0, 0, 5, 0, 0, 2, 0, 0, 1,
+                    0, 0, 2, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 1, 0,
+                    0, 0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 270,
+                  minKey: 48,
+                  maxKey: 200,
+                  offset: -14,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 270,
+                min: 7,
+                max: 32,
+                sum: 2916,
+              },
+              "engine.socketio.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 1, 0, 1, 4, 5, 6, 8, 11, 7, 10, 14, 10, 7, 9, 4, 7, 9,
+                    3, 8, 6, 6, 6, 3, 4, 7, 5, 4, 6, 2, 4, 3, 3, 5, 2, 4, 5, 0,
+                    3, 5, 2, 1, 1, 7, 0, 3, 1, 5, 2, 5, 3, 0, 3, 3, 3, 0, 2, 1,
+                    2, 0, 0, 0, 3, 0, 0, 1, 1, 1, 0, 1, 3, 0, 1, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 270,
+                  minKey: -109,
+                  maxKey: 41,
+                  offset: -162,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 270,
+                min: 0.1986,
+                max: 1.8511,
+                sum: 101.68490000000001,
+              },
+              "core.vusers.session_length": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 33,
+                    135, 31, 9, 22, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 237,
+                  minKey: 286,
+                  maxKey: 430,
+                  offset: 230,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 237,
+                min: 1061.0573,
+                max: 2129.3104,
+                sum: 261713.1711,
+              },
+            },
+            rates: {
+              "engine.http.request_rate": 30,
+              "engine.socketio.emit_rate": 30,
+            },
+            "engine.http.request_rate": null,
+            "engine.socketio.emit_rate": null,
+            firstCounterAt: 1638520971135,
+            firstHistogramAt: 1638520971247,
+            lastCounterAt: 1638520979891,
+            lastHistogramAt: 1638520979884,
+            firstMetricAt: 1638520971135,
+            lastMetricAt: 1638520979891,
+            period: "1638520970000",
+            summaries: {
+              "engine.http.response_time": {
+                min: 7,
+                max: 32,
+                count: 270,
+                p50: 10.1,
+                median: 10.1,
+                p75: 10.9,
+                p90: 13.9,
+                p95: 16,
+                p99: 29.1,
+                p999: 30.3,
+              },
+              "engine.socketio.response_time": {
+                min: 0.2,
+                max: 1.9,
+                count: 270,
+                p50: 0.3,
+                median: 0.3,
+                p75: 0.4,
+                p90: 0.6,
+                p95: 0.7,
+                p99: 1.5,
+                p999: 1.8,
+              },
+              "core.vusers.session_length": {
+                min: 1061.1,
+                max: 2129.3,
+                count: 237,
+                p50: 1085.9,
+                median: 1085.9,
+                p75: 1107.9,
+                p90: 1153.1,
+                p95: 1153.1,
+                p99: 1176.4,
+                p999: 2101.1,
+              },
+            },
+          },
+          {
+            counters: {
+              "core.vusers.created_by_name.0": 300,
+              "core.vusers.created.total": 300,
+              "engine.http.requests": 300,
+              "engine.http.codes.200": 300,
+              "engine.http.responses": 300,
+              "engine.socketio.emit": 300,
+              "core.vusers.completed": 303,
+            },
+            histograms: {
+              "engine.http.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 66, 0, 0, 0,
+                    0, 0, 76, 0, 0, 0, 0, 0, 71, 0, 0, 0, 41, 0, 0, 0, 0, 15, 0,
+                    0, 0, 8, 0, 0, 4, 0, 0, 0, 4, 0, 0, 2, 0, 0, 4, 0, 0, 0, 0,
+                    0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: 40,
+                  maxKey: 192,
+                  offset: -12,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 7,
+                max: 24,
+                sum: 2965,
+              },
+              "engine.socketio.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 2, 1,
+                    3, 4, 10, 5, 3, 7, 10, 7, 6, 2, 5, 6, 5, 6, 5, 6, 3, 5, 9,
+                    5, 9, 4, 4, 6, 9, 8, 5, 6, 5, 4, 2, 3, 7, 8, 6, 5, 7, 8, 0,
+                    5, 4, 2, 3, 2, 3, 3, 2, 2, 6, 3, 2, 1, 0, 2, 1, 2, 2, 0, 2,
+                    2, 2, 0, 2, 1, 1, 0, 1, 1, 4, 0, 0, 2, 0, 3, 1, 0, 1, 0, 0,
+                    0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: -121,
+                  maxKey: 36,
+                  offset: -177,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 0.1757,
+                max: 1.4738,
+                sum: 119.05970000000002,
+              },
+              "core.vusers.session_length": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 72,
+                    193, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 303,
+                  minKey: 286,
+                  maxKey: 429,
+                  offset: 230,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 303,
+                min: 1065.545,
+                max: 2094.8028,
+                sum: 332624.8881999999,
+              },
+            },
+            rates: {
+              "engine.http.request_rate": 30,
+              "engine.socketio.emit_rate": 30,
+            },
+            "engine.http.request_rate": null,
+            "engine.socketio.emit_rate": null,
+            firstCounterAt: 1638520980132,
+            firstHistogramAt: 1638520980201,
+            lastCounterAt: 1638520989892,
+            lastHistogramAt: 1638520989892,
+            firstMetricAt: 1638520980132,
+            lastMetricAt: 1638520989892,
+            period: "1638520980000",
+            summaries: {
+              "engine.http.response_time": {
+                min: 7,
+                max: 24,
+                count: 300,
+                p50: 10.1,
+                median: 10.1,
+                p75: 10.9,
+                p90: 12.1,
+                p95: 13.9,
+                p99: 16.9,
+                p999: 19.1,
+              },
+              "engine.socketio.response_time": {
+                min: 0.2,
+                max: 1.5,
+                count: 300,
+                p50: 0.3,
+                median: 0.3,
+                p75: 0.4,
+                p90: 0.6,
+                p95: 0.8,
+                p99: 1.1,
+                p999: 1.2,
+              },
+              "core.vusers.session_length": {
+                min: 1065.5,
+                max: 2094.8,
+                count: 303,
+                p50: 1085.9,
+                median: 1085.9,
+                p75: 1085.9,
+                p90: 1107.9,
+                p95: 1107.9,
+                p99: 1408.4,
+                p999: 2101.1,
+              },
+            },
+          },
+          {
+            counters: {
+              "core.vusers.created_by_name.0": 300,
+              "core.vusers.created.total": 300,
+              "engine.http.requests": 300,
+              "core.vusers.completed": 300,
+              "engine.http.codes.200": 300,
+              "engine.http.responses": 300,
+              "engine.socketio.emit": 300,
+            },
+            histograms: {
+              "core.vusers.session_length": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 61, 202, 28, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: 285,
+                  maxKey: 420,
+                  offset: 225,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 1062.2498,
+                max: 1456.7177,
+                sum: 325575.91000000003,
+              },
+              "engine.http.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0,
+                    39, 0, 0, 0, 0, 0, 76, 0, 0, 0, 0, 0, 98, 0, 0, 0, 47, 0, 0,
+                    0, 0, 14, 0, 0, 0, 10, 0, 0, 2, 0, 0, 0, 2, 0, 0, 2, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: 45,
+                  maxKey: 185,
+                  offset: -15,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 7,
+                max: 16,
+                sum: 2951,
+              },
+              "engine.socketio.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+                    2, 1, 2, 2, 2, 4, 5, 7, 8, 11, 14, 11, 10, 17, 7, 12, 9, 4,
+                    9, 7, 2, 2, 5, 3, 6, 5, 8, 5, 4, 5, 3, 2, 5, 2, 3, 4, 5, 5,
+                    5, 6, 4, 4, 6, 1, 1, 4, 7, 2, 3, 4, 2, 1, 1, 4, 5, 0, 0, 2,
+                    0, 0, 1, 0, 1, 0, 2, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0,
+                    2, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: -114,
+                  maxKey: 41,
+                  offset: -164,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 0.1776,
+                max: 1.8916,
+                sum: 104.00949999999997,
+              },
+            },
+            rates: {
+              "engine.http.request_rate": 30,
+              "engine.socketio.emit_rate": 30,
+            },
+            "engine.http.request_rate": null,
+            "engine.socketio.emit_rate": null,
+            firstCounterAt: 1638520990132,
+            firstHistogramAt: 1638520990203,
+            lastCounterAt: 1638520999899,
+            lastHistogramAt: 1638520999883,
+            firstMetricAt: 1638520990132,
+            lastMetricAt: 1638520999899,
+            period: "1638520990000",
+            summaries: {
+              "core.vusers.session_length": {
+                min: 1062.2,
+                max: 1456.7,
+                count: 300,
+                p50: 1085.9,
+                median: 1085.9,
+                p75: 1085.9,
+                p90: 1107.9,
+                p95: 1107.9,
+                p99: 1130.2,
+                p999: 1130.2,
+              },
+              "engine.http.response_time": {
+                min: 7,
+                max: 16,
+                count: 300,
+                p50: 10.1,
+                median: 10.1,
+                p75: 10.9,
+                p90: 10.9,
+                p95: 13.1,
+                p99: 15,
+                p999: 16,
+              },
+              "engine.socketio.response_time": {
+                min: 0.2,
+                max: 1.9,
+                count: 300,
+                p50: 0.3,
+                median: 0.3,
+                p75: 0.4,
+                p90: 0.5,
+                p95: 0.7,
+                p99: 1,
+                p999: 1.6,
+              },
+            },
+          },
+          {
+            counters: {
+              "core.vusers.created_by_name.0": 300,
+              "core.vusers.created.total": 300,
+              "engine.http.requests": 300,
+              "engine.http.codes.200": 300,
+              "engine.http.responses": 300,
+              "engine.socketio.emit": 300,
+              "core.vusers.completed": 300,
+            },
+            histograms: {
+              "engine.http.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 56, 0, 0,
+                    0, 0, 0, 85, 0, 0, 0, 0, 0, 77, 0, 0, 0, 48, 0, 0, 0, 0, 13,
+                    0, 0, 0, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 0, 2,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: 34,
+                  maxKey: 323,
+                  offset: -13,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 7,
+                max: 314,
+                sum: 3225,
+              },
+              "engine.socketio.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 5,
+                    5, 6, 9, 10, 16, 7, 22, 9, 8, 11, 10, 11, 9, 4, 4, 6, 10, 6,
+                    6, 4, 3, 9, 6, 5, 1, 2, 1, 5, 3, 5, 1, 2, 3, 9, 4, 5, 2, 4,
+                    1, 7, 3, 1, 3, 2, 5, 0, 3, 0, 1, 2, 2, 1, 1, 0, 0, 1, 2, 3,
+                    0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 2, 1, 0, 0, 0, 1, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: -120,
+                  maxKey: 18,
+                  offset: -181,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 0.177,
+                max: 0.9665,
+                sum: 93.29789999999998,
+              },
+              "core.vusers.session_length": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 61, 218, 16, 0, 1, 2, 0, 0, 0, 0, 0,
+                    0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: 285,
+                  maxKey: 413,
+                  offset: 221,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 1063.0474,
+                max: 1390.1598,
+                sum: 325576.9288,
+              },
+            },
+            rates: {
+              "engine.http.request_rate": 30,
+              "engine.socketio.emit_rate": 30,
+            },
+            "engine.http.request_rate": null,
+            "engine.socketio.emit_rate": null,
+            firstCounterAt: 1638521000132,
+            firstHistogramAt: 1638521000202,
+            lastCounterAt: 1638521009898,
+            lastHistogramAt: 1638521009880,
+            firstMetricAt: 1638521000132,
+            lastMetricAt: 1638521009898,
+            period: "1638521000000",
+            summaries: {
+              "engine.http.response_time": {
+                min: 7,
+                max: 314,
+                count: 300,
+                p50: 10.1,
+                median: 10.1,
+                p75: 10.1,
+                p90: 10.9,
+                p95: 12.1,
+                p99: 18,
+                p999: 19.1,
+              },
+              "engine.socketio.response_time": {
+                min: 0.2,
+                max: 1,
+                count: 300,
+                p50: 0.3,
+                median: 0.3,
+                p75: 0.4,
+                p90: 0.5,
+                p95: 0.6,
+                p99: 0.8,
+                p999: 0.9,
+              },
+              "core.vusers.session_length": {
+                min: 1063,
+                max: 1390.2,
+                count: 300,
+                p50: 1085.9,
+                median: 1085.9,
+                p75: 1085.9,
+                p90: 1085.9,
+                p95: 1107.9,
+                p99: 1176.4,
+                p999: 1380.5,
+              },
+            },
+          },
+          {
+            counters: {
+              "core.vusers.created_by_name.0": 300,
+              "core.vusers.created.total": 300,
+              "core.vusers.completed": 300,
+              "engine.http.requests": 300,
+              "engine.http.codes.200": 300,
+              "engine.http.responses": 300,
+              "engine.socketio.emit": 300,
+            },
+            histograms: {
+              "core.vusers.session_length": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 74, 196, 27, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: 285,
+                  maxKey: 413,
+                  offset: 221,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 1063.0314,
+                max: 1405.8977,
+                sum: 325702.4622999999,
+              },
+              "engine.http.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    9, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 82,
+                    0, 0, 0, 62, 0, 0, 0, 0, 18, 0, 0, 0, 7, 0, 0, 4, 0, 0, 0,
+                    4, 0, 0, 1, 0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 1, 0, 0, 0, 0, 1,
+                    0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: 34,
+                  maxKey: 190,
+                  offset: -22,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 7,
+                max: 24,
+                sum: 3057,
+              },
+              "engine.socketio.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 2, 1, 3, 1, 8, 4, 8, 13, 13, 16, 11, 14,
+                    17, 10, 12, 10, 10, 5, 6, 4, 7, 3, 6, 7, 5, 3, 6, 1, 4, 4,
+                    5, 2, 0, 4, 0, 2, 3, 2, 6, 4, 4, 3, 5, 3, 1, 3, 0, 4, 4, 3,
+                    4, 1, 1, 3, 0, 2, 0, 1, 0, 2, 1, 0, 2, 1, 1, 1, 0, 1, 1, 0,
+                    0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 300,
+                  minKey: -130,
+                  maxKey: 30,
+                  offset: -191,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 300,
+                min: 0.1805,
+                max: 1.3367,
+                sum: 93.18249999999999,
+              },
+            },
+            rates: {
+              "engine.http.request_rate": 30,
+              "engine.socketio.emit_rate": 30,
+            },
+            "engine.http.request_rate": null,
+            "engine.socketio.emit_rate": null,
+            firstCounterAt: 1638521010132,
+            firstHistogramAt: 1638521010201,
+            lastCounterAt: 1638521019898,
+            lastHistogramAt: 1638521019877,
+            firstMetricAt: 1638521010132,
+            lastMetricAt: 1638521019898,
+            period: "1638521010000",
+            summaries: {
+              "core.vusers.session_length": {
+                min: 1063,
+                max: 1405.9,
+                count: 300,
+                p50: 1085.9,
+                median: 1085.9,
+                p75: 1085.9,
+                p90: 1085.9,
+                p95: 1107.9,
+                p99: 1107.9,
+                p999: 1380.5,
+              },
+              "engine.http.response_time": {
+                min: 7,
+                max: 24,
+                count: 300,
+                p50: 10.1,
+                median: 10.1,
+                p75: 10.9,
+                p90: 12.1,
+                p95: 13.9,
+                p99: 19.1,
+                p999: 22,
+              },
+              "engine.socketio.response_time": {
+                min: 0.2,
+                max: 1.3,
+                count: 300,
+                p50: 0.2,
+                median: 0.2,
+                p75: 0.3,
+                p90: 0.5,
+                p95: 0.6,
+                p99: 0.9,
+                p999: 1.1,
+              },
+            },
+          },
+          {
+            counters: {
+              "core.vusers.created_by_name.0": 120,
+              "core.vusers.created.total": 120,
+              "engine.http.requests": 120,
+              "engine.http.codes.200": 120,
+              "engine.http.responses": 120,
+              "engine.socketio.emit": 120,
+              "core.vusers.completed": 120,
+            },
+            histograms: {
+              "engine.http.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
+                    0, 0, 0, 12, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 34, 0, 0, 0,
+                    15, 0, 0, 0, 0, 8, 0, 0, 0, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 120,
+                  minKey: 40,
+                  maxKey: 178,
+                  offset: -19,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 120,
+                min: 7,
+                max: 14,
+                sum: 1172,
+              },
+              "engine.socketio.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    1, 1, 1, 2, 5, 2, 6, 5, 4, 5, 4, 6, 5, 5, 5, 2, 3, 3, 1, 0,
+                    3, 2, 2, 2, 5, 4, 1, 2, 0, 2, 3, 0, 0, 2, 2, 1, 1, 1, 0, 1,
+                    1, 1, 0, 0, 1, 4, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 0,
+                    0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+                    0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 120,
+                  minKey: -144,
+                  maxKey: 30,
+                  offset: -185,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 120,
+                min: 0.1803,
+                max: 1.3936,
+                sum: 37.218199999999996,
+              },
+              "core.vusers.session_length": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 32, 78, 10, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 120,
+                  minKey: 285,
+                  maxKey: 413,
+                  offset: 221,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 120,
+                min: 1061.5554,
+                max: 1106.074,
+                sum: 129870.1625,
+              },
+            },
+            rates: {
+              "engine.http.request_rate": 12,
+              "engine.socketio.emit_rate": 12,
+            },
+            "engine.http.request_rate": null,
+            "engine.socketio.emit_rate": null,
+            firstCounterAt: 1638521020132,
+            firstHistogramAt: 1638521020212,
+            lastCounterAt: 1638521029895,
+            lastHistogramAt: 1638521029888,
+            firstMetricAt: 1638521020132,
+            lastMetricAt: 1638521029895,
+            period: "1638521020000",
+            summaries: {
+              "engine.http.response_time": {
+                min: 7,
+                max: 14,
+                count: 120,
+                p50: 10.1,
+                median: 10.1,
+                p75: 10.1,
+                p90: 12.1,
+                p95: 12.1,
+                p99: 13.1,
+                p999: 13.9,
+              },
+              "engine.socketio.response_time": {
+                min: 0.2,
+                max: 1.4,
+                count: 120,
+                p50: 0.2,
+                median: 0.2,
+                p75: 0.3,
+                p90: 0.5,
+                p95: 0.6,
+                p99: 1,
+                p999: 1,
+              },
+              "core.vusers.session_length": {
+                min: 1061.6,
+                max: 1106.1,
+                count: 120,
+                p50: 1085.9,
+                median: 1085.9,
+                p75: 1085.9,
+                p90: 1085.9,
+                p95: 1107.9,
+                p99: 1107.9,
+                p999: 1107.9,
+              },
+            },
+          },
+          {
+            counters: {
+              "core.vusers.created_by_name.0": 30,
+              "core.vusers.created.total": 30,
+              "engine.http.requests": 30,
+              "core.vusers.completed": 60,
+              "engine.http.codes.200": 30,
+              "engine.http.responses": 30,
+              "engine.socketio.emit": 30,
+            },
+            histograms: {
+              "core.vusers.session_length": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 5, 40, 13, 2, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 60,
+                  minKey: 285,
+                  maxKey: 413,
+                  offset: 221,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 60,
+                min: 1068.0165,
+                max: 1120.5464,
+                sum: 65329.0436,
+              },
+              "engine.http.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+                    0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 0, 3,
+                    0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0,
+                    0, 0, 3, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 30,
+                  minKey: 46,
+                  maxKey: 192,
+                  offset: -14,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 30,
+                min: 8,
+                max: 29,
+                sum: 411,
+              },
+              "engine.socketio.response_time": {
+                mapping: {
+                  relativeAccuracy: 0.009999999999999957,
+                  _offset: 0,
+                  gamma: 1.02020202020202,
+                  _multiplier: 34.65620375188833,
+                  minPossible: 1.135012422773875e-308,
+                  maxPossible: 1.7620952510036562e308,
+                },
+                store: {
+                  chunkSize: 128,
+                  bins: [
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0,
+                    1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 0, 2, 2, 0, 0, 2, 0, 1, 0, 1,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0,
+                    1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  ],
+                  count: 30,
+                  minKey: -142,
+                  maxKey: 2,
+                  offset: -198,
+                },
+                negativeStore: {
+                  chunkSize: 128,
+                  bins: [],
+                  count: 0,
+                  minKey: null,
+                  maxKey: null,
+                  offset: 0,
+                },
+                zeroCount: 0,
+                count: 30,
+                min: 0.181,
+                max: 0.8088,
+                sum: 9.1867,
+              },
+            },
+            rates: {
+              "engine.http.request_rate": 30,
+              "engine.socketio.emit_rate": 30,
+            },
+            "engine.http.request_rate": null,
+            "engine.socketio.emit_rate": null,
+            firstCounterAt: 1638521030132,
+            firstHistogramAt: 1638521030203,
+            lastCounterAt: 1638521031920,
+            lastHistogramAt: 1638521031904,
+            firstMetricAt: 1638521030132,
+            lastMetricAt: 1638521031920,
+            period: "1638521030000",
+            summaries: {
+              "core.vusers.session_length": {
+                min: 1068,
+                max: 1120.5,
+                count: 60,
+                p50: 1085.9,
+                median: 1085.9,
+                p75: 1085.9,
+                p90: 1107.9,
+                p95: 1107.9,
+                p99: 1130.2,
+                p999: 1130.2,
+              },
+              "engine.http.response_time": {
+                min: 8,
+                max: 29,
+                count: 30,
+                p50: 12.1,
+                median: 12.1,
+                p75: 16.9,
+                p90: 19.9,
+                p95: 19.9,
+                p99: 21.1,
+                p999: 21.1,
+              },
+              "engine.socketio.response_time": {
+                min: 0.2,
+                max: 0.8,
+                count: 30,
+                p50: 0.3,
+                median: 0.3,
+                p75: 0.3,
+                p90: 0.5,
+                p95: 0.5,
+                p99: 0.6,
+                p999: 0.6,
+              },
+            },
+          },
+        ],
+      };
+      const editor = ace.edit("editor");
+      editor.getSession().setMode("ace/mode/javascript");
+      editor.setValue(JSON.stringify(Report, null, 2));
+      editor.gotoLine(1);
+      editor.setHighlightActiveLine(false);
+
+      const l = _;
+
+      $("#timestamp").html(
+        moment(Report.aggregate.period).format("DD MMM YYYY HH:mm:SS")
+      );
+      // $('#testDuration').html(Math.floor((l.last(Report.intermediate).lastCounterAt - Report.intermediate[0].firstCounterAt)/1000));
+      $("#testDuration").html(l.size(Report.intermediate) * 10);
+      $("#vuCompleted").html(
+        Report.aggregate.counters["core.vusers.completed"]
+      );
+      $("#vuCreated").html(
+        Report.aggregate.counters["core.vusers.created.total"]
+      );
+
+      const chartBgColors = {
+        red: "rgba(255, 99, 132, 0.2)",
+        orange: "rgba(255, 159, 64, 0.2)",
+        yellow: "rgba(255, 205, 86, 0.2)",
+        green: "rgba(75, 192, 192, 0.2)",
+        blue: "rgba(54, 162, 235, 0.2)",
+      };
+
+      const chartBorderColors = {
+        red: "rgb(255, 99, 132)",
+        orange: "rgb(255, 159, 64)",
+        yellow: "rgb(255, 205, 86)",
+        green: "rgb(75, 192, 192)",
+        blue: "rgb(54, 162, 235)",
+      };
+
+      const getHttpColor = (httpCode) => {
+        const code = parseInt(httpCode, 10);
+
+        if (code >= 100 && code < 200) {
+          return chartBorderColors.blue;
+        } else if (code >= 200 && code < 300) {
+          return chartBorderColors.green;
+        } else if (code >= 300 && code < 400) {
+          return chartBorderColors.red;
+        } else if (code >= 400 && code < 500) {
+          return chartBorderColors.yellow;
+        }
+
+        return chartBorderColors.orange;
+      };
+
+      const getLatencyColor = (latency) => {
+        switch (latency) {
+          case "min":
+            return chartBorderColors.red;
+          case "max":
+            return chartBorderColors.orange;
+          case "median":
+            return chartBorderColors.yellow;
+          case "p95":
+            return chartBorderColors.green;
+          case "p99":
+            return chartBorderColors.green;
+          default:
+            return "";
+        }
+      };
+
+      const getCustomStats = (stats) =>
+        l.omitBy(
+          stats,
+          (_, key) =>
+            key.startsWith("errors.") ||
+            key.startsWith("core.") ||
+            key.startsWith("engine.")
+        );
+
+      const scenarioCounts = l.pickBy(Report.aggregate.counters, (_, key) =>
+        key.startsWith("core.vusers.created_by_name")
+      );
+
+      if (l.size(scenarioCounts) > 0) {
+        l.each(scenarioCounts, function (count, key) {
+          const [, , , name] = key.split(".");
+
+          const $tdName = $("<td>" + name + "</td>");
+          const percentage =
+            Math.round(
+              (count / Report.aggregate.counters["core.vusers.created.total"]) *
+                100 *
+                1000
+            ) / 1000;
+          const $tdCount = $(
+            "<td>" + count + " (" + percentage + "%)" + "</td>"
+          );
+          $("<tr></tr>")
+            .append($tdName)
+            .append($tdCount)
+            .appendTo($("#scenarioCounts"));
+        });
+      } else {
+        $("#scenarioCountsContainer").hide();
+      }
+
+      const httpCodes = l.pickBy(Report.aggregate.counters, (_, key) =>
+        key.startsWith("engine.http.codes")
+      );
+
+      if (l.size(httpCodes) > 0) {
+        l.each(httpCodes, function (count, key) {
+          let [, , , code] = key.split(".");
+          code = parseInt(code, 10);
+
+          let anchor = "";
+          if (code >= 100 && code < 200) {
+            anchor = "#1xx_informational_response";
+          } else if (code >= 200 && code < 300) {
+            anchor = "#2xx_success";
+          } else if (code >= 300 && code < 400) {
+            anchor = "#3xx_redirection";
+          } else if (code >= 400 && code < 500) {
+            anchor = "#4xx_client_errors";
+          } else if (code >= 500 && code < 600) {
+            anchor = "#5xx_server_errors";
+          }
+
+          const $a = $("<a>" + code + "</a>").attr(
+            "href",
+            "https://en.wikipedia.org/wiki/List_of_HTTP_status_codes" + anchor
+          );
+          const $td = $("<td></td>").append($a);
+          $el = $("<tr></tr>")
+            .append($td)
+            .append($("<td>" + count + "</td>"))
+            .appendTo($("#codes"));
+        });
+      } else {
+        $("#codesContainer").hide();
+      }
+
+      const errors = l.pickBy(Report.aggregate.counters, (_, key) =>
+        key.startsWith("errors.")
+      );
+      if (l.size(errors) > 0) {
+        l.each(errors, function (count, error) {
+          const [, errorDetail] = error.split("errors.");
+
+          $("<tr></tr>")
+            .append($("<td>" + errorDetail + "</td>"))
+            .append($("<td>" + count + "</td>"))
+            .appendTo($("#errors"));
+        });
+      } else {
+        $("#errorsContainer > p").html(
+          "&#10004; Test completed without network or OS errors."
+        );
+      }
+
+      const getTimePeriodAggregates = (summaries) => {
+        const summary =
+          summaries["engine.socketio.response_time"] ||
+          summaries["engine.http.response_time"];
+        const metrics = ["min", "max", "median", "p95", "p99"];
+
+        return l.pickBy(summary, (_, key) => metrics.includes(key));
+      };
+
+      const getLatencyDistribution = (data) => {
+        return l.reduce(
+          data,
+          (acc, value, key) => {
+            acc.labels.push(key);
+            acc.values.push(value);
+
+            return acc;
+          },
+          { labels: [], values: [] }
+        );
+      };
+
+      const randomRgbColor = () => {
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+
+        return "rgb(" + r + ", " + g + ", " + b + ")";
+      };
+
+      const latencyDistributionData = getLatencyDistribution(
+        getTimePeriodAggregates(Report.aggregate.summaries)
+      );
+
+      const latencyAtIntervalsData = (intermediates = []) => {
+        const data = intermediates.reduce(
+          (acc, entry, idx) => {
+            const latencies = getTimePeriodAggregates(entry.summaries);
+
+            l.each(latencies, (latency, key) => {
+              acc.values[key] = acc.values[key] || [];
+
+              acc.values[key].push(latency);
+            });
+
+            acc.labels.push((idx + 1) * 10);
+
+            return acc;
+          },
+          { labels: [], values: {} }
+        );
+
+        return {
+          labels: data.labels,
+          datasets: l.map(data.values, (entry, key) => {
+            const color = getLatencyColor(key);
+
+            return {
+              label: key,
+              data: entry,
+              fill: false,
+              backgroundColor: color,
+              borderColor: color,
+              tension: 0.5,
+            };
+          }),
+        };
+      };
+
+      const getCounterDataset = (intermediates = [], counterKeys) => {
+        let counterKey = "";
+
+        if (intermediates[0]) {
+          for (const key of counterKeys) {
+            if (key in intermediates[0].counters) {
+              counterKey = key;
+              break;
+            }
+          }
+        }
+
+        const data = intermediates.reduce(
+          (acc, entry, idx) => {
+            const count = entry.counters[counterKey] || 0;
+
+            acc.labels.push((idx + 1) * 10);
+            acc.values.push(count);
+
+            return acc;
+          },
+          { labels: [], values: [] }
+        );
+
+        return {
+          labels: data.labels,
+          datasets: [
+            {
+              data: data.values,
+              fill: false,
+              borderColor: randomRgbColor(),
+              tension: 0.5,
+            },
+          ],
+        };
+      };
+
+      const getMeanRpsData = (intermediates = []) => {
+        const data = intermediates.reduce(
+          (acc, entry, idx) => {
+            const count =
+              entry.rates["engine.http.request_rate"] ||
+              entry.rates["engine.socketio.emit_rate"] ||
+              entry.rates["engine.websocket.send_rate"] ||
+              0;
+
+            acc.labels.push((idx + 1) * 10);
+            acc.values.push(count);
+
+            return acc;
+          },
+          { labels: [], values: [] }
+        );
+
+        return {
+          labels: data.labels,
+          datasets: [
+            {
+              data: data.values,
+              fill: false,
+              borderColor: randomRgbColor(),
+              tension: 0.5,
+            },
+          ],
+        };
+      };
+
+      const getHttpCodesAtIntervalsData = (intermediates = []) => {
+        const data = intermediates.reduce(
+          (acc, entry, idx) => {
+            const httpCodes = l.pickBy(entry.counters, (_, key) =>
+              key.startsWith("engine.http.codes")
+            );
+
+            if (l.size(httpCodes) > 0) {
+              l.each(httpCodes, (count, key) => {
+                let [, , , code] = key.split(".");
+                code = parseInt(code, 10);
+
+                acc.values[code] = acc.values[code] || [];
+
+                acc.values[code].push(count);
+              });
+            }
+
+            acc.labels.push((idx + 1) * 10);
+
+            return acc;
+          },
+          { labels: [], values: {} }
+        );
+
+        return {
+          labels: data.labels,
+          datasets: l.map(data.values, (entry, key) => {
+            const color = getHttpColor(key);
+
+            return {
+              label: key,
+              data: entry,
+              fill: false,
+              backgroundColor: color,
+              borderColor: color,
+              tension: 0.5,
+            };
+          }),
+        };
+      };
+
+      const getHttpCodesData = (counters) => {
+        const httpCodes = l.pickBy(counters, (_, key) =>
+          key.startsWith("engine.http.codes")
+        );
+        const labels = [];
+        const data = [];
+        const bgColors = [
+          "rgba(54, 232, 235, 0.5)",
+          "rgba(54, 235, 93, 0.5)",
+          "rgba(229, 235, 54, 0.5)",
+          "rgba(166, 54, 235, 0.5)",
+          "rgba(235, 54, 69, 0.5)",
+        ];
+
+        if (l.size(httpCodes) > 0) {
+          l.each(httpCodes, function (count, key) {
+            let [, , , code] = key.split(".");
+            code = parseInt(code, 10);
+
+            labels.push(code);
+            data.push(count);
+          });
+        }
+
+        return {
+          labels,
+          datasets: [
+            {
+              backgroundColor: labels.map(getHttpColor),
+              hoverOffset: 4,
+              data,
+            },
+          ],
+        };
+      };
+
+      if (latencyDistributionData.values.length > 0) {
+        new Chart(document.getElementById("latencyBarChart"), {
+          type: "bar",
+          data: {
+            labels: latencyDistributionData.labels,
+            datasets: [
+              {
+                data: latencyDistributionData.values,
+                backgroundColor: Object.values(chartBgColors),
+                borderColor: Object.values(chartBorderColors),
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "ms",
+                },
+              },
+            },
+          },
+        });
+
+        new Chart(document.getElementById("latencyAtIntervalsChart"), {
+          type: "line",
+          data: latencyAtIntervalsData(Report.intermediate),
+          options: {
+            plugins: { legend: { position: "bottom" } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "ms",
+                },
+              },
+            },
+          },
+        });
+      } else {
+        $("#latencyChartsRow").hide();
+      }
+
+      const rpsCountAtIntervalsChart = new Chart(
+        document.getElementById("rpsCountChart"),
+        {
+          type: "line",
+          data: getCounterDataset(Report.intermediate, [
+            "engine.http.responses",
+            "engine.socketio.emit",
+            "engine.websocket.messages_sent",
+          ]),
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "ms",
+                },
+              },
+            },
+          },
+        }
+      );
+
+      const meanRpsAtIntervalsChart = new Chart(
+        document.getElementById("meanRpsChart"),
+        {
+          type: "line",
+          data: getMeanRpsData(Report.intermediate),
+          options: {
+            plugins: { legend: { display: false } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "ms",
+                },
+              },
+            },
+          },
+        }
+      );
+
+      if (l.size(httpCodes) > 0) {
+        new Chart(document.getElementById("httpCodesAtIntervalsChart"), {
+          type: "line",
+          data: getHttpCodesAtIntervalsData(Report.intermediate),
+          options: {
+            plugins: { legend: { position: "bottom" } },
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "ms",
+                },
+              },
+            },
+          },
+        });
+
+        new Chart(document.getElementById("httpCodesPieChart"), {
+          type: "doughnut",
+          data: getHttpCodesData(Report.aggregate.counters),
+          options: {
+            plugins: { legend: { position: "bottom" } },
+            aspectRatio: 2.2,
+            responsive: true,
+          },
+        });
+      } else {
+        $("#httpCodesChartsRow").hide();
+      }
+
+      if (l.size(errors) > 0) {
+        const getErrorsAtIntervalsData = (intermediates = []) => {
+          const data = intermediates.reduce(
+            (acc, entry, idx) => {
+              const errorsCounters = l.pickBy(entry.counters, (_, key) =>
+                key.startsWith("errors.")
+              );
+
+              l.each(errorsCounters, (count, key) => {
+                const [, errorDetail] = key.split("errors.");
+
+                acc.values[errorDetail] = acc.values[errorDetail] || [];
+
+                acc.values[errorDetail].push(count);
+              });
+
+              acc.labels.push((idx + 1) * 10);
+
+              return acc;
+            },
+            { labels: [], values: {} }
+          );
+
+          return {
+            labels: data.labels,
+            datasets: l.map(data.values, (entry, key) => {
+              return {
+                label: key,
+                data: entry,
+                fill: false,
+                backgroundColor: Object.values(chartBgColors),
+                borderColor: Object.values(chartBorderColors),
+                tension: 0.5,
+              };
+            }),
+          };
+        };
+
+        new Chart(document.getElementById("errorsAtIntervalsChart"), {
+          type: "line",
+          data: getErrorsAtIntervalsData(Report.intermediate),
+          options: {
+            plugins: { legend: { position: "bottom" } },
+            aspectRatio: 3.5,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "ms",
+                },
+              },
+            },
+          },
+        });
+      } else {
+        $("#errorsChartsRow").hide();
+      }
+
+      const customCounters = getCustomStats(Report.aggregate.counters);
+      if (l.size(customCounters) > 0) {
+        let rows = [];
+
+        l.each(customCounters, function (count, key) {
+          const row = $("<tr></tr>")
+            .append($("<td>" + key + "</td>"))
+            .append($("<td>" + count + "</td>"));
+
+          rows.push(row);
+        });
+
+        if (rows.length > 5) {
+          const visibleRows = rows.slice(0, 5);
+          const hiddenRows = rows.slice(5).map((row) => row.addClass("hidden"));
+
+          rows = [
+            ...visibleRows,
+            $(
+              '<tr id="expandCustomCountersRow"><td class="text-center" colspan="2"><a href="" id="expandCustomCounters">Expand</a></td></tr>'
+            ),
+            ...hiddenRows,
+          ];
+        }
+
+        rows.forEach((row) => row.appendTo($("#customCountersTable")));
+
+        if (rows.length > 5) {
+          $("#expandCustomCounters").on("click", (e) => {
+            e.preventDefault();
+
+            $("#customCountersTable tr").removeClass("hidden");
+            $("#expandCustomCountersRow").addClass("hidden");
+          });
+        }
+
+        const getCustomStatsAtIntervalsData = (intermediates = []) => {
+          const data = intermediates.reduce(
+            (acc, entry, idx) => {
+              const customCounters = getCustomStats(entry.counters);
+
+              l.each(customCounters, (count, key) => {
+                acc.values[key] = acc.values[key] || [];
+
+                acc.values[key].push(count);
+              });
+
+              acc.labels.push((idx + 1) * 10);
+
+              return acc;
+            },
+            { labels: [], values: {} }
+          );
+
+          return {
+            labels: data.labels,
+            datasets: l.map(data.values, (entry, key) => {
+              color = randomRgbColor();
+
+              return {
+                label: key,
+                data: entry,
+                fill: false,
+                backgroundColor: color,
+                borderColor: color,
+                tension: 0.5,
+              };
+            }),
+          };
+        };
+
+        new Chart(document.getElementById("customCountersAtIntervalsChart"), {
+          type: "line",
+          data: getCustomStatsAtIntervalsData(Report.intermediate),
+          options: {
+            plugins: { legend: { position: "bottom" } },
+            aspectRatio: 2.5,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: "ms",
+                },
+              },
+            },
+          },
+        });
+      } else {
+        $("#customCountersChartsRow").hide();
+        $("#customCountersContainer").hide();
+      }
+
+      const customStats = getCustomStats(Report.aggregate.summaries);
+      const customStatsContainer = $("#customStats");
+      if (l.size(customStats) > 0) {
+        let $row;
+
+        Object.entries(customStats).forEach((stats, idx) => {
+          const [statsName, statsData] = stats;
+          const canvasId = "customMetric_" + idx;
+
+          if (idx === 0 || idx % 0 === 0) {
+            $row = $('<div class="row"></div>');
+          }
+
+          $row.append(
+            [
+              '<div class="chart-container text-center col-lg-6"><h4><i class="fas fa-chart-bar"></i> ',
+              statsName,
+              '</h4><canvas id="',
+              canvasId,
+              '"></canvas></div>',
+            ].join("")
+          );
+
+          $row.appendTo(customStatsContainer);
+
+          const { labels, values } = getLatencyDistribution(
+            l.pickBy(statsData, (_, key) =>
+              ["min", "max", "median", "p95", "p99"].includes(key)
+            )
+          );
+
+          setTimeout(function () {
+            new Chart(document.getElementById(canvasId), {
+              type: "bar",
+              data: {
+                labels: labels,
+                datasets: [
+                  {
+                    data: values,
+                    backgroundColor: Object.values(chartBgColors),
+                    borderColor: Object.values(chartBorderColors),
+                    borderWidth: 1,
+                  },
+                ],
+              },
+              options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: "ms",
+                    },
+                  },
+                },
+              },
+            });
+          });
+        });
+      } else {
+        customStatsContainer.hide();
+      }
+    </script>
+    <div id="footer">
+      <footer>
+        This report was created with
+        <a href="https://artillery.io">Artillery</a> - free open-source
+        load-testing for HTTP and WebSockets
+      </footer>
+    </div>
+  </body>
+</html>

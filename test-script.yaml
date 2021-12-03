@@ -1,0 +1,34 @@
+config:
+  target: "https://superslap.site" # default target
+  socketio:
+    transports: ["websocket"]
+  phases:
+    - arrivalRate: 40
+      duration: 60
+  environments:
+    # local-dev:
+    #   target: "http://localhost:3333"
+    #   phases:
+    #   - arrivalRate: 10
+    #     duration: 60
+    preprod:
+      target: "https://service-foo.preprod.acmecorp.digital"
+scenarios:
+  - engine: "socketio"
+    flow:
+      - get:
+          url: "/"
+      - emit:
+          channel: "save_msg"
+          data:
+            {
+              "token": "...",
+              "messageData":
+                {
+                  "lng": 127.???????,
+                  "lat": 37.???????,
+                  "contents": "testing",
+                },
+              "radius": 500,
+            }
+      - think: 1

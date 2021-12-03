@@ -13,6 +13,7 @@
     "@types/node": "^12.20.36",
     "@types/react": "^16.14.20",
     "@types/react-dom": "^16.9.14",
+    "artillery": "^2.0.0-6",
     "bcrypt": "^5.0.1",
     "classnames": "^2.3.1",
     "concurrently": "^6.4.0",
