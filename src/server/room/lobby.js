@@ -1,6 +1,6 @@
 const RoomManager = require("./roomManager.js");
 const { customAlphabet } = require("nanoid");
-const nanoid = customAlphabet("1234567890abcdefghijklmnopqrstuvwxyz", 5);
+const nanoid = customAlphabet("1234567890a", 4);
 
 const checkAuth = require("../middleware/checkAuth");
 
