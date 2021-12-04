@@ -97,13 +97,10 @@ function PencilRotation(ctx: any, instance: TGameData, image: any) {
 
     if (decelerationStart === true) {
       instance.rotation.speed -= 0.01; //감속
-      console.log("slowing");
     } else if (instance.rotation.speed < maxSpeed) {
       instance.rotation.speed += 0.2; //가속
-      console.log("speeding");
     } else {
       instance.rotation.time += 1; // 회전 유지 시간
-      console.log("Rotating");
     }
   }
   // 연필 정지 시 게임 정보 초기화
