@@ -4,8 +4,10 @@ import "./LeftOrRightGame.scss";
 //이미지
 import BlueMonsterImg from "../../image/BlueMonster.png";
 import GreenMonsterImg from "../../image/GreenMonster.png";
-import ArrowLeftButtonImg from "../../image/ArrowLeftButton.png";
-import ArrowRightButtonImg from "../../image/ArrowRightButton.png";
+// import ArrowLeftButtonImg from "../../image/ArrowLeftButton.png";
+// import ArrowRightButtonImg from "../../image/ArrowRightButton.png";
+import ArrowLeftButtonImg from "../../image/neonArrowLeft.png";
+import ArrowRightButtonImg from "../../image/neonArrowRight.png";
 // 화살표 버튼 소스(다른 색도 있음) https://www.iconsdb.com/barbie-pink-icons/arrow-left-icon.html
 
 // 반응형
@@ -475,7 +477,9 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   }
 
   function drawScore(ctx: any) {
+    ctx.save();
     ctx.font = "bold 100px Trebuchet MS";
+    ctx.fillStyle = "white";
 
     if (score < 10 && score >= 0) {
       // 양수 일의 자리
@@ -494,6 +498,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     ctx.save();
     ctx.font = "bold 30px Trebuchet MS";
     ctx.fillText("your score", 180 - 70, instance.score.location + 30);
+    ctx.restore();
     ctx.restore();
   }
 

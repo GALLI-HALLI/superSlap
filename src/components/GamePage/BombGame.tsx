@@ -660,7 +660,10 @@ const BombGame = ({ socket }: TBombGameProps) => {
     /*==== 캔버스 요소 조작 시작 ====*/
 
     ClearCanvas(ctx, canvas);
+
     ctx.save();
+
+    // 게임 종료시 폭발 효과
     if (gameEnded) {
       if (frameCnt > 200) {
         ctx.translate(0, 0);
@@ -671,9 +674,10 @@ const BombGame = ({ socket }: TBombGameProps) => {
       }
     }
 
+    // 게임 바탕 그림
     ctx.drawImage(gameBackground, 0, 0, 360, 500);
 
-    // 공들 출력
+    // 공들을 출력
     ctx.save();
     for (let i = 0; i < balls.length; i++) {
       let ball = balls[i];
@@ -752,7 +756,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           ctx.restore();
         }
         /*==== 추가사항 ====*/
-      }
+      } // 폭탄일 경우 종료
 
       // 플레이어 이름 출력
       ctx.save();
@@ -764,6 +768,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
         ctx.fillText("나", ball.x - 7, ball.y - initialData.ballRad - 4 - 6);
         ctx.closePath();
       } else {
+        // 상대 닉네임 출력
         let tempNickname = textLengthOverCut(ball.nickname, 7, "...");
 
         ctx.fillStyle = "black";
@@ -780,10 +785,13 @@ const BombGame = ({ socket }: TBombGameProps) => {
     }
     ctx.restore();
 
+    // 게임 종료시 피니쉬 효과 출력
     if (gameEnded) {
       // ctx.drawImage(explosion, 0, 70, 360, 360);
       drawGameFinish(ctx);
     }
+
+    // 게임 시작시 카운트 다운 효과
     drawGameStart(
       ctx,
       instance.gameCanvas.width,
