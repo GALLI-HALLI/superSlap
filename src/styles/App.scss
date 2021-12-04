@@ -3,13 +3,19 @@
   src: url("./font/Jua-Regular.ttf");
 }
 
-$Lavender: #e2b9ff;
+$Lavender: black;
 
 Body {
   background: $Lavender;
   overflow: hidden;
   margin: 0;
   font-family: "Jua-Regular";
+  background-image: url("../image/backgroundIMG.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: white;
+  text-shadow: 0 0 5px #fff, 0 0 5px #fff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   .App {

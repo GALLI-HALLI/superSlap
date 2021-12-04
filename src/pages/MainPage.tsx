@@ -37,7 +37,7 @@ const MainPage = ({ children }: PropsWithChildren<{}>) => {
 
   return (
     <div className={styles.mainPage}>
-      <LogoImg />
+      <label className={styles.name}>SUPER SLAP</label>
       <form method="POST" onSubmit={handleFormSubmit}>
         <div className={styles.inputContainer}>
           <FormInput

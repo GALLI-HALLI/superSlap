@@ -1,17 +1,46 @@
+/* Flickering animation */
+@keyframes flicker {
+  0%,
+  18%,
+  22%,
+  25%,
+  53%,
+  57%,
+  100% {
+    text-shadow: 0 0 0.5px #fff, 0 0 1px #fff, 0 0 5px #0fa, 0 0 4px #0fa,
+      0 0 6px #0fa, 0 0 7px #0fa;
+  }
+
+  20%,
+  24%,
+  55% {
+    text-shadow: none;
+  }
+}
+
 .lobbyPageContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 50px;
+  margin-top: 30px;
   flex-direction: column;
+  .username {
+    font-size: 25px;
+    margin-top: 10px;
+    .player {
+      animation: flicker 1.5s infinite alternate;
+      color: white;
+    }
+  }
 
   .buttonContainer {
     display: flex;
     width: 90%;
-    margin: 250px 0 0 0;
+    margin: 70px 0 0 0;
     justify-content: space-between;
     align-items: center;
     button {
+      font-size: 20px;
       height: 100px;
       width: 100px;
     }

@@ -58,7 +58,9 @@ const LobbyPage = () => {
     <div className={styles.lobbyPageContainer}>
       <LogoImg />
       <div>{showModal && <SearchRoomModal close={closeModal} />}</div>
-      <div>어서오세요, {data?.name}님</div>
+      <div className={styles.username}>
+        어서오세요, <label className={styles.player}>{data?.name}</label>님
+      </div>
       <div className={styles.buttonContainer}>
         <Button onClick={makeRoom}>방만들기</Button>
         <Button onClick={openModal}>방찾기</Button>

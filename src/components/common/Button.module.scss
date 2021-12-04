@@ -1,10 +1,14 @@
 @mixin btnStyle {
   width: 80px;
   height: 35px;
-  border-radius: 10px;
-  border: none;
-  background: #974dcb;
+
+  border: blueviolet solid;
+  background-color: rgba(blueviolet, 0.7);
+  border-radius: 5px;
+  box-shadow: 0 0 10px blueviolet, -0 -0 10px blueviolet;
   font-family: "Jua-Regular";
+  color: white;
+  text-shadow: 0 0 5px #fff, 0 0 5px #fff;
   &:hover {
     background: #6937a1;
   }

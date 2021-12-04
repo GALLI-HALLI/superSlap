@@ -12,21 +12,28 @@
   }
   .gameListTitle {
     display: flex;
+    font-size: 20px;
     padding: 10px;
     align-items: center;
+    border: #b0eaff solid;
     border-radius: 20px 20px 0 0;
+    box-shadow: 0 0 10px #00baf6, -0 -0 10px #00baf6;
     height: 35px;
-    background-color: #974dcb;
+    background-color: rgba(0, 0, 0, 0.8);
     .roomNumber {
       margin-left: auto;
     }
   }
   .gameList {
+    margin-top: 5px;
     display: flex;
+    font-size: 20px;
     flex-direction: column;
     padding: 10px;
-    background-color: white;
-    height: 410px;
+    border: white solid;
+    background-color: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 10px white;
+    height: 400px;
     border-radius: 0 0 20px 20px;
 
     ul {

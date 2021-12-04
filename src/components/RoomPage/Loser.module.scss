@@ -1,10 +1,11 @@
 .loserContainer {
   display: flex;
+  color: black;
   align-items: center;
   margin-top: 50px;
   flex-direction: column;
   border-radius: 20px;
-  background-color: white;
+  background-color: rgba(white, 0.8);
 
   .title {
     display: flex;

@@ -1,11 +1,17 @@
+input {
+  background-color: rgba(black, 0.7);
+  color: white;
+  outline: none;
+  border: none;
+  box-shadow: 0 4px 2px -1px white;
+}
+
 .input {
   font-size: 10px;
   margin-top: 5px;
   &Box {
     width: 300px;
     height: 30px;
-    border: none;
-    border-radius: 10px;
     padding-left: 10px;
   }
 
