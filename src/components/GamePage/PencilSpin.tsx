@@ -46,12 +46,13 @@ class GameData {
   };
 
   initial = {
-    maxTime: (5 + getRandom(0, 1.3)) * 60,
+    maxTime: (2.5 + getRandom(0, 1.3)) * 60,
     maxSpeed: 10,
   };
 
   state = {
     gameStart: false,
+    onGoing: false,
   };
 }
 
@@ -96,20 +97,18 @@ function PencilRotation(ctx: any, instance: TGameData, image: any) {
 
     if (decelerationStart === true) {
       instance.rotation.speed -= 0.01; //감속
-      console.log("slowing");
     } else if (instance.rotation.speed < maxSpeed) {
       instance.rotation.speed += 0.2; //가속
-      console.log("speeding");
     } else {
       instance.rotation.time += 1; // 회전 유지 시간
-      console.log("Rotating");
     }
   }
   // 연필 정지 시 게임 정보 초기화
   else {
     instance.rotation.speed = 0;
     instance.rotation.time = 1;
-    instance.initial.maxTime = (5 + getRandom(0, 1.3)) * 60; // 최대 회전시간 재설정(랜덤을위해)
+    instance.initial.maxTime = (2.5 + getRandom(0, 1.3)) * 60; // 최대 회전시간 재설정(랜덤을위해)
+    instance.state.onGoing = false;
   }
 }
 
@@ -129,9 +128,14 @@ function PencilSpin({ meta }: { meta: TMetadata }) {
 
   // 게임을 시작하거나, 게임이 시작된 후 다시 초기화 시킴.
   const handleCanvasClick = () => {
+    if (instance.state.onGoing) {
+      return;
+    }
+
     if (!instance.state.gameStart) {
       // 게임 시작
       instance.state.gameStart = true;
+      instance.state.onGoing = true;
     } else {
       // 게임 설정 초기화
       instance.state.gameStart = false;
@@ -147,12 +151,12 @@ function PencilSpin({ meta }: { meta: TMetadata }) {
     /*==== 캔버스 요소 조작 시작====*/
     ClearCanvas(ctx, canvas);
 
-    ctx.save();
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, instance.gameCanvas.width, 60);
-    ctx.restore();
+    // ctx.save();
+    // ctx.fillStyle = "white";
+    // ctx.fillRect(0, 0, instance.gameCanvas.width, 60);
+    // ctx.restore();
 
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
     ctx.font = "bold 30px Arial";
     ctx.fillText("슈퍼 연필 돌리기!", 60, 50);
 

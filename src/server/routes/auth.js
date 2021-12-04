@@ -88,6 +88,24 @@ router.post(
 );
 
 router.post(
+  "/checkId",
+  asyncHandler(async (req, res) => {
+    const { id } = req.body;
+
+    let user1 = await User.findOne({ id });
+    if (user1) {
+      return res.json({
+        success: false,
+      });
+    } else {
+      return res.json({
+        success: true,
+      });
+    }
+  })
+);
+
+router.post(
   "/login",
   asyncHandler(async (req, res) => {
     const { password, id } = req.body;
