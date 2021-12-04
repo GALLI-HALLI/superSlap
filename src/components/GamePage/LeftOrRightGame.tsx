@@ -4,8 +4,11 @@ import "./LeftOrRightGame.scss";
 //이미지
 import BlueMonsterImg from "../../image/BlueMonster.png";
 import GreenMonsterImg from "../../image/GreenMonster.png";
-import ArrowLeftButtonImg from "../../image/ArrowLeftButton.png";
-import ArrowRightButtonImg from "../../image/ArrowRightButton.png";
+// import ArrowLeftButtonImg from "../../image/ArrowLeftButton.png";
+// import ArrowRightButtonImg from "../../image/ArrowRightButton.png";
+import ArrowLeftButtonImg from "../../image/neonArrowLeft.png";
+import ArrowRightButtonImg from "../../image/neonArrowRight.png";
+import BackgroundImg from "../../image/neonLeftRight.png";
 // 화살표 버튼 소스(다른 색도 있음) https://www.iconsdb.com/barbie-pink-icons/arrow-left-icon.html
 
 // 반응형
@@ -188,6 +191,8 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   ArrowRightButton.src = ArrowRightButtonImg;
   const tutorial = new Image();
   tutorial.src = tutorialImage;
+  const background = new Image();
+  background.src = BackgroundImg;
 
   //키보드 좌우 클릭 감지
 
@@ -723,6 +728,14 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     const ctx = canvas.getContext("2d");
 
     ClearCanvas(ctx, canvas);
+
+    ctx.drawImage(
+      background,
+      0,
+      0,
+      instance.gameCanvas.width,
+      instance.gameCanvas.height
+    );
 
     drawTimer(ctx);
     drawScore(ctx);
