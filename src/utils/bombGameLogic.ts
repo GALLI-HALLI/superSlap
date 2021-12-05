@@ -1,7 +1,7 @@
 import { TPlayerBall, TGameCanvas } from "../types/bombGameTypes";
 
 export function isWallCollision(
-  playerBall: any,
+  playerBall: TPlayerBall,
   canvas: TGameCanvas,
   ballRad: number
 ) {
@@ -11,18 +11,18 @@ export function isWallCollision(
   if (tempY - ballRad <= 0) {
     //천장
     tempY = ballRad;
-    console.log("hit bottom");
+    console.log("hit top");
   } else if (tempY + ballRad >= canvas.height) {
     //바닥
     tempY = canvas.height - ballRad;
-    console.log("hit top");
+    console.log("hit bottom");
   }
 
-  if (playerBall.x - ballRad <= 0) {
+  if (tempX - ballRad <= 0) {
     //왼쪽 벽
     tempX = ballRad;
     console.log("hit left");
-  } else if (playerBall.x + ballRad >= canvas.width) {
+  } else if (tempX + ballRad >= canvas.width) {
     //오른쪽 벽
     tempX = canvas.width - ballRad;
     console.log("hit right");
@@ -52,7 +52,6 @@ export function isBallCollision(
 export function adjustPosition(
   ball1: TPlayerBall,
   ball2: TPlayerBall,
-  xySpeed: number[],
   ballRad: number
 ) {
   const radiusSum = ballRad * 2;
@@ -69,16 +68,16 @@ export function adjustPosition(
   let xDirection;
   let yDirection;
 
-  if (ball2.x < ball1.x && ball2.y < ball1.y) {
+  if (ball2.x <= ball1.x && ball2.y <= ball1.y) {
     xDirection = 1;
     yDirection = 1;
-  } else if (ball2.x > ball1.x && ball2.y < ball1.y) {
+  } else if (ball2.x >= ball1.x && ball2.y <= ball1.y) {
     xDirection = -1;
     yDirection = 1;
-  } else if (ball2.x > ball1.x && ball2.y > ball1.y) {
+  } else if (ball2.x >= ball1.x && ball2.y >= ball1.y) {
     xDirection = -1;
     yDirection = -1;
-  } else if (ball2.x < ball1.x && ball2.y > ball1.y) {
+  } else if (ball2.x <= ball1.x && ball2.y >= ball1.y) {
     xDirection = 1;
     yDirection = -1;
   } else {

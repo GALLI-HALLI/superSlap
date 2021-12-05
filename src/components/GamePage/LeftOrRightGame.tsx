@@ -299,12 +299,19 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   function moveMonster() {
     //세로 이동
     let initialY = 0;
+    //현재 공의 위치를 저장한 뒤에, setinterval로 해당 공을 32px 아래만큼 이동시키고 clearinterval
     initialY += monsterList[1].y;
+
+    let ballDownSpeed = 2;
 
     const animation = setInterval(function () {
       monsterList.forEach(function (item: any, index: any, array: any) {
-        array[index].y = item.y + 2;
+        array[index].y = item.y + ballDownSpeed;
       });
+
+      if (monsterList[1].y - monsterList[0].y < instance.ballDistance.y) {
+        monsterList[0].y -= ballDownSpeed;
+      }
 
       if (initialY + instance.ballDistance.y <= monsterList[1].y) {
         clearInterval(animation);
@@ -680,7 +687,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
         //위부터 아래까지 일렬로 늘어지게
         let sth = instance.ballDistance.y;
-        monster.y += sth * i;
+        monster.y += sth * i; // 32 * 9 = 288 최저 위치
 
         monsterList.push(monster);
       }

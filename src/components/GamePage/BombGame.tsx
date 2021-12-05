@@ -2,7 +2,7 @@ import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Joystick } from "react-joystick-component";
 import { Socket } from "socket.io-client";
 import { SocketServerEvent } from "../../constants/socket";
-import "./BombGame.css";
+import "./BombGame.scss";
 
 //게임 로직
 import {
@@ -373,8 +373,6 @@ function shakeGenerator(amplitude: number) {
 function bombFlickering(bombflick: TBombFlick) {
   bombflick.frameCnt += 1;
   bombflick.x += 0.003 * bombflick.a;
-  console.log(bombflick.frameCnt);
-  console.log(bombflick.period);
   if (bombflick.frameCnt > bombflick.period) {
     bombflick.a += 1;
     bombflick.frameCnt = 0;
@@ -675,7 +673,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
     }
 
     // 게임 바탕 그림
-    ctx.drawImage(gameBackground, 0, 0, 360, 500);
+    // ctx.drawImage(gameBackground, 0, 0, 360, 500);
 
     // 공들을 출력
     ctx.save();
@@ -719,6 +717,20 @@ const BombGame = ({ socket }: TBombGameProps) => {
           57
         );
 
+        //폭탄이 점멸하게
+        // f(x) = sin(x * a) * (1/2)
+        if (!gameEnded) {
+          let trans = bombFlickering(bombFlick);
+          ctx.save();
+          ctx.globalAlpha = trans;
+          ctx.fillStyle = "red";
+          ctx.beginPath();
+          ctx.arc(ball.x, ball.y, initialData.ballRad, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+
         if (gameEnded) {
           ctx.drawImage(
             explosion,
@@ -728,18 +740,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
             150
           );
         }
-
-        //폭탄이 점멸하게
-        // f(x) = sin(x * a) * (1/2)
-        let trans = bombFlickering(bombFlick);
-        ctx.save();
-        ctx.globalAlpha = trans;
-        ctx.fillStyle = "red";
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, initialData.ballRad, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
 
         /*==== 추가사항 ====*/
         if (ongoingData.otherBombChangeFreeze) {
@@ -816,11 +816,13 @@ const BombGame = ({ socket }: TBombGameProps) => {
     if (gameEnded || !gameStart) {
       return;
     }
+
     /*==== 데이터 조작 후 서버 전송 ====*/
     const curPlayer = ballMap[myId];
     // 내가 직접 공 위치 클라 꺼는 바꾸면 안됌
     const curPlayerClone: TPlayerBall = JSON.parse(JSON.stringify(curPlayer));
 
+    //조이스틱이 이동 중일 경우,
     if (joystickData.state === "move" && !ongoingData.myBombChangeFreeze) {
       let xySpeed: number[] = [joystickData.moveX, joystickData.moveY];
 
@@ -866,7 +868,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
             let adjustedBallPosition3: number[] = adjustPosition(
               curPlayer,
               otherPlayerClone,
-              xySpeed,
               initialData.ballRad
             );
             curPlayerClone.x += adjustedBallPosition3[0];
@@ -888,11 +889,37 @@ const BombGame = ({ socket }: TBombGameProps) => {
       joystickData.state === "stop" &&
       !ongoingData.myBombChangeFreeze
     ) {
+      // 조이스틱이 멈춰있고 내가 폭탄일떄,
       if (
         curPlayerClone.bomb &&
         curPlayerClone !== undefined &&
         balls.length > 1
       ) {
+        let bombChangeHappend = false;
+        // balls 라스트 안의 공들과 내 공의 출동 확인
+        for (let ball of balls) {
+          // 내가 직접 공 위치 클라 꺼는 바꾸면 안됌2
+          const otherPlayerClone = JSON.parse(JSON.stringify(ball));
+
+          if (curPlayerClone.id !== otherPlayerClone.id) {
+            const collision: boolean = isBallCollision(
+              curPlayerClone,
+              otherPlayerClone,
+              initialData.ballRad
+            );
+
+            // 충돌했을때
+            if (collision) {
+              console.log("collision");
+
+              // 내가 폭탄일 경우, 상대방한테 넘겨줌
+              if (!bombChangeHappend) {
+                bombChange(curPlayerClone.id, otherPlayerClone.id);
+                bombChangeHappend = true;
+              }
+            }
+          }
+        }
       }
     }
 
@@ -909,7 +936,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
       <div className="bombgame">
         <div>
           <canvas
-            id="canvas"
+            id="canvasBG"
             ref={canvasRef}
             height={gameCanvas.height}
             width={gameCanvas.width}
