@@ -46,6 +46,28 @@ const Hunmin = ({ socket }: TSocket) => {
     turnTimeLimit: 0,
   });
 
+  const currentUser = {
+    backgroundColor: "rgba(0,255,0, 0.8)",
+    border: "1px solid rgba(0, 0, 0, 0.05)",
+    boxShadow: "0 0 10px #00CC00",
+  };
+
+  const nomalUser = {
+    backgroundColor: "rgba(255,255,255, 0.8)",
+  };
+
+  const answer = {
+    backgroundColor: "rgba(0,0,0, 0.8)",
+    border: "1px solid rgba(0, 0, 0, 0.05)",
+    boxShadow: "0 0 10px #FFFFFF",
+  };
+
+  const wrong = {
+    backgroundColor: "rgba(0,0,0, 0.8)",
+    border: "1px solid rgba(255, 0, 0, 0.05)",
+    boxShadow: "0 0 10px #FF0000",
+  };
+
   const changeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -132,7 +154,7 @@ const Hunmin = ({ socket }: TSocket) => {
       )}
       <div
         className={styles.playContainer}
-        style={{ backgroundColor: checkWord.success ? "white" : "red" }}
+        style={checkWord.success ? answer : wrong}
       >
         <div className={styles.suggestAndTime}>
           <div className={styles.gameTime}>{gameTimeRemain / 1000}</div>
@@ -161,11 +183,12 @@ const Hunmin = ({ socket }: TSocket) => {
 
             return (
               <div
-                style={{
-                  backgroundColor: isPlayerTurn(currentPlayerId, player)
-                    ? "green"
-                    : "white",
-                }}
+                className={styles.currentPlayer}
+                style={
+                  isPlayerTurn(currentPlayerId, player)
+                    ? currentUser
+                    : nomalUser
+                }
               >
                 {nickname}
               </div>
