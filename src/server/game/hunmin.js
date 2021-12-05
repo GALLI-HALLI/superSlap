@@ -41,6 +41,7 @@ class Hunmin extends Game {
     super(room);
     this.playerSeq = [];
     this.playerSocket = [];
+    this.id = this.room.id;
     this.len = 0;
     this.turn = -1;
     this.nowWord = "";
@@ -53,6 +54,7 @@ class Hunmin extends Game {
       let suggest =
         consonants[parseInt(Math.random() * 14)] +
         consonants[parseInt(Math.random() * 14)];
+      if(this.id === 'nanunkim') suggest = 'ㅂㄱ'
       this.nowWord = suggest;
       this.len = this.playerSeq.length;
       this.playerSeq.sort((a, b) => {
