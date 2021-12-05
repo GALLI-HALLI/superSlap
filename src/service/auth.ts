@@ -65,9 +65,21 @@ export const searchRoom = (code: TRoomId): Promise<any> => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(code),
   }).then((res) => {
-    console.log("4444");
     if (res.status !== 200) {
       throw new Error("Failed to fetch join");
+    }
+    return res.json();
+  });
+};
+
+export const checkIdVaild = (id: string): Promise<any> => {
+  return fetch("/api/auth/checkId", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  }).then((res) => {
+    if (res.status !== 200) {
+      throw new Error("Failed to fetch user register");
     }
     return res.json();
   });

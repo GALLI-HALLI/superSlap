@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import FormInput from "../components/MainPage/FormInput";
-import LogoImg from "../components/MainPage/LogoImg";
 import styles from "./RegisterPage.module.scss";
 import Button from "../components/common/Button";
 import React, { useState } from "react";
@@ -10,18 +9,15 @@ import { registerUser, setResetRegister } from "../store/user/user.action";
 import { useSelector } from "../hooks/typeReduxHook";
 import { AsyncActionStatus } from "../constants/redux";
 import { useHistory } from "react-router";
-import { setResetRoom } from "../store/room/room.action";
+import { checkIdVaild } from "../service/auth";
 
-const existingIds = ["kqjatjr@gmail.com"];
-
-const checkDuplicate = (value: string) =>
-  Promise.resolve(!existingIds.includes(value) && value.length > 5);
+const usernameValidator = (value: string) =>
+  checkIdVaild(value).then(({ success }) => success && value.length > 5);
 
 const RegisterPage = () => {
   const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
-
   const registerStatus = useSelector((store) => store.user.register.status);
   const history = useHistory();
 
@@ -32,6 +28,8 @@ const RegisterPage = () => {
       history.push("/");
     }
   }, [registerStatus, history]);
+
+  useEffect(() => {});
 
   const dispatch = useDispatch();
 
@@ -47,7 +45,7 @@ const RegisterPage = () => {
 
   return (
     <div className={styles.registerPage}>
-      <LogoImg />
+      <label className={styles.name}>SUPER SLAP</label>
       <form method="POST" onSubmit={handleFormSubmit}>
         <div>
           <FormInput
@@ -58,7 +56,7 @@ const RegisterPage = () => {
               invalid: "사용 불가능한 아이디 입니다.",
             }}
             placeholder="아이디를 입력해 주세요"
-            validator={checkDuplicate}
+            validator={usernameValidator}
             onChange={({ value }) => {
               setId(value);
             }}

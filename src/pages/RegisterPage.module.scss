@@ -1,3 +1,21 @@
+@font-face {
+  font-family: "Monoton-Regular";
+  src: url("../styles/font/Monoton-Regular.ttf");
+}
+@keyframes name {
+  0%,
+  100% {
+    text-shadow: 0 0 10px #fa1c16, 0 0 2px #fa1c16, 0 0 5px #fa1c16,
+      0 0 5px #fa1c16, 0 0 2px #fed128, 4px 4px 2px #806914;
+    color: #fed128;
+  }
+  50% {
+    text-shadow: 0 0 10px #800e0b, 0 0 2px #800e0b, 0 0 5px #800e0b,
+      0 0 5px #800e0b, 0 0 2px #800e0b, 4px 4px 2px #40340a;
+    color: #806914;
+  }
+}
+
 .registerPage {
   display: flex;
   justify-content: center;
@@ -8,10 +26,20 @@
   .regiBtnContainer {
     display: flex;
     justify-content: flex-end;
-    margin-top: 10px;
   }
   .regiBtn {
     margin-left: 10px;
     display: block;
+  }
+  .name {
+    margin-bottom: 50px;
+    font-family: "Monoton-Regular";
+    color: #fb4264;
+    font-size: 40px;
+    line-height: 40px;
+    text-shadow: 0 0 3vw #f40a35;
+    animation: name 1s ease infinite;
+    -moz-animation: name 1s ease infinite;
+    -webkit-animation: name 1s ease infinite;
   }
 }
