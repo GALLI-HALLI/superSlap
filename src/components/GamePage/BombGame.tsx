@@ -16,6 +16,14 @@ import bombImage from "../../image/bomb.png";
 import backgroundImage from "../../image/gameBackground.jpg";
 import explosionImage from "../../image/explosion.png";
 import electricImage from "../../image/electric.png";
+import monsterImg1 from "../../image/monsters/monster1.png";
+import monsterImg2 from "../../image/monsters/monster2.png";
+import monsterImg3 from "../../image/monsters/monster3.png";
+import monsterImg4 from "../../image/monsters/monster4.png";
+import monsterImg5 from "../../image/monsters/monster5.png";
+import monsterImg6 from "../../image/monsters/monster6.png";
+import monsterImg7 from "../../image/monsters/monster7.png";
+import monsterImg8 from "../../image/monsters/monster8.png";
 
 //튜토리얼
 import GameTutorial from "./GameTutorial";
@@ -42,6 +50,7 @@ import {
 } from "../../types/bombGameTypes";
 import { gameEnd } from "../../server/constants/socketEvents";
 import { unstable_renderSubtreeIntoContainer } from "react-dom";
+import { createJsxSpreadAttribute } from "typescript";
 
 /* ================== 조이스틱 관련 시작 ================== */
 
@@ -499,6 +508,25 @@ const BombGame = ({ socket }: TBombGameProps) => {
   //canvas 사용을 위해 필요한 선언 1
   const canvasRef: any = useRef(null);
 
+  //몬스터 이미지 로딩
+  const monsterImgNameArr = [
+    monsterImg1,
+    monsterImg2,
+    monsterImg3,
+    monsterImg4,
+    monsterImg5,
+    monsterImg6,
+    monsterImg7,
+    monsterImg8,
+  ];
+  const monsterImgArr: HTMLImageElement[] = [];
+
+  for (let i = 0; i < 8; i++) {
+    const tempMonster = new Image();
+    tempMonster.src = monsterImgNameArr[i];
+    monsterImgArr.push(tempMonster);
+  }
+
   // 소켓 초기화
   const { bombChange, sendData } = useMemo(
     () => setupSocketEvents(socket, true),
@@ -679,6 +707,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
     ctx.save();
     for (let i = 0; i < balls.length; i++) {
       let ball = balls[i];
+      let tempMonster = monsterImgArr[i];
 
       //이름 박스 출력
       ctx.save();
@@ -695,24 +724,35 @@ const BombGame = ({ socket }: TBombGameProps) => {
         20, //height
         10, //radius
         true,
-        true
+        false
       );
       ctx.restore();
 
       // 공 출력
-      ctx.fillStyle = ball.color;
+      ctx.save();
+      ctx.fillStyle = "white";
       ctx.beginPath();
       ctx.arc(ball.x, ball.y, initialData.ballRad, 0, 2 * Math.PI);
       ctx.fill();
       ctx.stroke();
+      ctx.restore();
+
+      // 그 위에 몬스터 이미지 출력
+      ctx.drawImage(
+        tempMonster,
+        ball.x - initialData.ballRad - 2,
+        ball.y - initialData.ballRad - 2,
+        44,
+        44
+      );
 
       //폭탄을 들고 있는 공일 경우
       if (ball.bomb === true) {
         //폭탄 그리기
         ctx.drawImage(
           bomb,
-          ball.x - initialData.ballRad - 15,
-          ball.y - initialData.ballRad - 14,
+          ball.x - initialData.ballRad - 15 - 20,
+          ball.y - initialData.ballRad - 14 + 20,
           57,
           57
         );
@@ -725,7 +765,13 @@ const BombGame = ({ socket }: TBombGameProps) => {
           ctx.globalAlpha = trans;
           ctx.fillStyle = "red";
           ctx.beginPath();
-          ctx.arc(ball.x, ball.y, initialData.ballRad, 0, 2 * Math.PI);
+          ctx.arc(
+            ball.x - 20,
+            ball.y + 20,
+            initialData.ballRad,
+            0,
+            2 * Math.PI
+          );
           ctx.fill();
           ctx.stroke();
           ctx.restore();

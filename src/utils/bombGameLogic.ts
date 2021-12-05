@@ -11,23 +11,18 @@ export function isWallCollision(
   if (tempY - ballRad <= 0) {
     //천장
     tempY = ballRad;
-    console.log("hit top");
   } else if (tempY + ballRad >= canvas.height) {
     //바닥
     tempY = canvas.height - ballRad;
-    console.log("hit bottom");
   }
 
   if (tempX - ballRad <= 0) {
     //왼쪽 벽
     tempX = ballRad;
-    console.log("hit left");
   } else if (tempX + ballRad >= canvas.width) {
     //오른쪽 벽
     tempX = canvas.width - ballRad;
-    console.log("hit right");
   }
-  // console.log(joystickData.moveX, joystickData.moveY)
   return [tempX, tempY];
 }
 
