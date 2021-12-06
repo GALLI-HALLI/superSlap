@@ -561,7 +561,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
           ifGameFinish();
           clearInterval(event);
         }
-      }, 40);
+      }, 30);
     }, 6000);
   }, []);
 
