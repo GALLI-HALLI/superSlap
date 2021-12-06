@@ -38,7 +38,7 @@ const Loser = ({ meta }: { meta: TMetadata }) => {
             <ul>
               {meta.rank && (
                 <li>
-                  <span>아이디</span> <span>점수</span>{" "}
+                  <span>낙네임</span> <span>점수</span>{" "}
                 </li>
               )}
               {meta.rank.map(({ nickname, score }) => {
