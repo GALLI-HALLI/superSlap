@@ -198,15 +198,18 @@ const bombFlick: TBombFlick = {
   period: 180, //커질수록 천천히 깜빡임
 };
 
-let balls: TPlayerBall[] = [];
-let ballMap: Record<string, playerBall> = {};
+// let balls: TPlayerBall[] = [];
+// let ballMap: Record<string, playerBall> = {};
 let myId: string;
 
 let gameEnded = false;
 let gameStart = false;
 
-function joinUser(data: TPlayerBall[]) {
+function joinUser(data: TPlayerBall[], instance: any) {
   console.log("join user");
+
+  let balls = instance.balls;
+  let ballMap = instance.ballMap;
 
   for (let i = 0; i < data.length; i++) {
     let ball = new playerBall();
@@ -224,7 +227,10 @@ function joinUser(data: TPlayerBall[]) {
   return;
 }
 
-function leaveUser(id: string) {
+function leaveUser(id: string, instance: any) {
+  let balls = instance.balls;
+  let ballMap = instance.ballMap;
+
   for (var i = 0; i < balls.length; i++) {
     if (balls[i].id === id) {
       balls.splice(i, 1);
@@ -234,7 +240,10 @@ function leaveUser(id: string) {
   delete ballMap[id];
 }
 
-function updateState(data: TPlayerBall) {
+function updateState(data: TPlayerBall, instance: any) {
+  let balls = instance.balls;
+  let ballMap = instance.ballMap;
+
   for (let i = 0; i < balls.length; i++) {
     if (balls[i].id === data.id) {
       balls[i].x = data.x;
@@ -253,7 +262,16 @@ function updateState(data: TPlayerBall) {
   ball.bomb = data.bomb;
 }
 
-function updateBomb(sid: string, sbomb: boolean, rid: string, rbomb: boolean) {
+function updateBomb(
+  sid: string,
+  sbomb: boolean,
+  rid: string,
+  rbomb: boolean,
+  instance: any
+) {
+  let balls = instance.balls;
+  let ballMap = instance.ballMap;
+
   for (let i = 0; i < balls.length; i++) {
     if (balls[i].id === sid) {
       balls[i].bomb = sbomb;
@@ -298,7 +316,7 @@ function updateBomb(sid: string, sbomb: boolean, rid: string, rbomb: boolean) {
 /* ================== 게임 정보 관련 끝 ================== */
 
 /* ================== 서버 관련 시작 ================== */
-const setupSocketEvents = (socket: Socket, end: boolean) => {
+const setupSocketEvents = (socket: Socket, end: boolean, instance: any) => {
   socket.on("user_id", function (data) {
     if (!end) return;
     myId = data;
@@ -306,22 +324,22 @@ const setupSocketEvents = (socket: Socket, end: boolean) => {
 
   socket.once("join_user", function (data: TPlayerBall[]) {
     if (!end) return;
-    joinUser(data);
+    joinUser(data, instance);
   });
 
   socket.on("leave_user", function (data) {
     if (!end) return;
-    leaveUser(data);
+    leaveUser(data, instance);
   });
 
   socket.on("update_state", function (data: TPlayerBall) {
     if (!end) return;
-    updateState(data);
+    updateState(data, instance);
   });
 
   socket.on("update_bomb", function (data) {
     if (!end) return;
-    updateBomb(data.sid, data.sbomb, data.rid, data.rbomb);
+    updateBomb(data.sid, data.sbomb, data.rid, data.rbomb, instance);
   });
 
   socket.on(SocketServerEvent.GameEnd, function (data) {
@@ -482,8 +500,8 @@ function initializeBombGame() {
   bombFlick.frameCnt = 0;
   bombFlick.period = 120;
 
-  balls = [];
-  ballMap = {};
+  // balls = [];
+  // ballMap = {};
   myId = "";
 
   gameEnded = false;
@@ -521,15 +539,17 @@ const BombGame = ({ socket }: TBombGameProps) => {
   ];
   const monsterImgArr: HTMLImageElement[] = [];
 
-  for (let i = 0; i < 8; i++) {
-    const tempMonster = new Image();
-    tempMonster.src = monsterImgNameArr[i];
-    monsterImgArr.push(tempMonster);
-  }
+  useEffect(() => {
+    for (let i = 0; i < 8; i++) {
+      const tempMonster = new Image();
+      tempMonster.src = monsterImgNameArr[i];
+      monsterImgArr.push(tempMonster);
+    }
+  }, []);
 
   // 소켓 초기화
   const { bombChange, sendData } = useMemo(
-    () => setupSocketEvents(socket, true),
+    () => setupSocketEvents(socket, true, instance),
     [socket]
   );
 
@@ -682,6 +702,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
     //canvas 사용을 위해 필요한 선언 2
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
+    let balls = instance.balls;
 
     /*==== 캔버스 요소 조작 시작 ====*/
 
@@ -863,8 +884,12 @@ const BombGame = ({ socket }: TBombGameProps) => {
       return;
     }
 
+    let balls = instance.balls;
+    let ballMap = instance.ballMap;
+
     /*==== 데이터 조작 후 서버 전송 ====*/
     const curPlayer = ballMap[myId];
+    if (curPlayer === undefined) return;
     // 내가 직접 공 위치 클라 꺼는 바꾸면 안됌
     const curPlayerClone: TPlayerBall = JSON.parse(JSON.stringify(curPlayer));
 
