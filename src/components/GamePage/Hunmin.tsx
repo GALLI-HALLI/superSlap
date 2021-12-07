@@ -53,7 +53,7 @@ const Hunmin = ({ socket }: TSocket) => {
   };
 
   const nomalUser = {
-    backgroundColor: "rgba(255,255,255, 0.8)",
+    backgroundColor: "rgba(128,128,128, 0.8)",
   };
 
   const answer = {
