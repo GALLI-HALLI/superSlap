@@ -198,15 +198,16 @@ const bombFlick: TBombFlick = {
   period: 180, //커질수록 천천히 깜빡임
 };
 
-let balls: TPlayerBall[] = [];
-let ballMap: Record<string, playerBall> = {};
+// let balls: TPlayerBall[] = [];
+// let ballMap: Record<string, playerBall> = {};
 let myId: string;
 
 let gameEnded = false;
 let gameStart = false;
 
-function joinUser(data: TPlayerBall[]) {
-  console.log("join user");
+function joinUser(data: TPlayerBall[], instance: any) {
+  let balls = instance.balls;
+  let ballMap = instance.ballMap;
 
   for (let i = 0; i < data.length; i++) {
     let ball = new playerBall();
@@ -224,7 +225,10 @@ function joinUser(data: TPlayerBall[]) {
   return;
 }
 
-function leaveUser(id: string) {
+function leaveUser(id: string, instance: any) {
+  let balls = instance.balls;
+  let ballMap = instance.ballMap;
+
   for (var i = 0; i < balls.length; i++) {
     if (balls[i].id === id) {
       balls.splice(i, 1);
@@ -234,7 +238,10 @@ function leaveUser(id: string) {
   delete ballMap[id];
 }
 
-function updateState(data: TPlayerBall) {
+function updateState(data: TPlayerBall, instance: any) {
+  let balls = instance.balls;
+  let ballMap = instance.ballMap;
+
   for (let i = 0; i < balls.length; i++) {
     if (balls[i].id === data.id) {
       balls[i].x = data.x;
@@ -253,7 +260,16 @@ function updateState(data: TPlayerBall) {
   ball.bomb = data.bomb;
 }
 
-function updateBomb(sid: string, sbomb: boolean, rid: string, rbomb: boolean) {
+function updateBomb(
+  sid: string,
+  sbomb: boolean,
+  rid: string,
+  rbomb: boolean,
+  instance: any
+) {
+  let balls = instance.balls;
+  let ballMap = instance.ballMap;
+
   for (let i = 0; i < balls.length; i++) {
     if (balls[i].id === sid) {
       balls[i].bomb = sbomb;
@@ -298,7 +314,7 @@ function updateBomb(sid: string, sbomb: boolean, rid: string, rbomb: boolean) {
 /* ================== 게임 정보 관련 끝 ================== */
 
 /* ================== 서버 관련 시작 ================== */
-const setupSocketEvents = (socket: Socket, end: boolean) => {
+const setupSocketEvents = (socket: Socket, end: boolean, instance: any) => {
   socket.on("user_id", function (data) {
     if (!end) return;
     myId = data;
@@ -306,22 +322,22 @@ const setupSocketEvents = (socket: Socket, end: boolean) => {
 
   socket.once("join_user", function (data: TPlayerBall[]) {
     if (!end) return;
-    joinUser(data);
+    joinUser(data, instance);
   });
 
   socket.on("leave_user", function (data) {
     if (!end) return;
-    leaveUser(data);
+    leaveUser(data, instance);
   });
 
   socket.on("update_state", function (data: TPlayerBall) {
     if (!end) return;
-    updateState(data);
+    updateState(data, instance);
   });
 
   socket.on("update_bomb", function (data) {
     if (!end) return;
-    updateBomb(data.sid, data.sbomb, data.rid, data.rbomb);
+    updateBomb(data.sid, data.sbomb, data.rid, data.rbomb, instance);
   });
 
   socket.on(SocketServerEvent.GameEnd, function (data) {
@@ -343,8 +359,6 @@ const setupSocketEvents = (socket: Socket, end: boolean) => {
   function bombChange(ballId1: string, ballId2: string) {
     if (ballId1 === undefined || ballId2 === undefined) return;
 
-    console.log("bomb change");
-
     let data = {
       send: ballId1,
       receive: ballId2,
@@ -355,7 +369,6 @@ const setupSocketEvents = (socket: Socket, end: boolean) => {
   }
 
   function gameFinished(loser: string, color: string) {
-    console.log("game ended");
     gameEnded = true;
     end = false;
   }
@@ -482,9 +495,9 @@ function initializeBombGame() {
   bombFlick.frameCnt = 0;
   bombFlick.period = 120;
 
-  balls = [];
-  ballMap = {};
-  myId = "";
+  // balls = [];
+  // ballMap = {};
+  // myId = "";
 
   gameEnded = false;
   gameStart = false;
@@ -501,7 +514,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
   // 첫 랜더링 때 바뀌는 전역변수들 초기화
   useEffect(() => {
-    console.log("게임 설정 초기화");
     initializeBombGame();
   }, []);
 
@@ -521,15 +533,17 @@ const BombGame = ({ socket }: TBombGameProps) => {
   ];
   const monsterImgArr: HTMLImageElement[] = [];
 
-  for (let i = 0; i < 8; i++) {
-    const tempMonster = new Image();
-    tempMonster.src = monsterImgNameArr[i];
-    monsterImgArr.push(tempMonster);
-  }
+  useEffect(() => {
+    for (let i = 0; i < 8; i++) {
+      const tempMonster = new Image();
+      tempMonster.src = monsterImgNameArr[i];
+      monsterImgArr.push(tempMonster);
+    }
+  }, []);
 
   // 소켓 초기화
   const { bombChange, sendData } = useMemo(
-    () => setupSocketEvents(socket, true),
+    () => setupSocketEvents(socket, true, instance),
     [socket]
   );
 
@@ -553,7 +567,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
     }, 6000);
 
     setTimeout(function () {
-      console.log("캔버스 랜더링 시작");
       render();
       let event = setInterval(function () {
         handleGameEvents();
@@ -682,6 +695,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
     //canvas 사용을 위해 필요한 선언 2
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
+    let balls = instance.balls;
 
     /*==== 캔버스 요소 조작 시작 ====*/
 
@@ -863,8 +877,12 @@ const BombGame = ({ socket }: TBombGameProps) => {
       return;
     }
 
+    let balls = instance.balls;
+    let ballMap = instance.ballMap;
+
     /*==== 데이터 조작 후 서버 전송 ====*/
     const curPlayer = ballMap[myId];
+    if (curPlayer === undefined) return;
     // 내가 직접 공 위치 클라 꺼는 바꾸면 안됌
     const curPlayerClone: TPlayerBall = JSON.parse(JSON.stringify(curPlayer));
 
@@ -897,8 +915,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
           // 충돌했을때
           if (collision) {
-            console.log("collision");
-
             // 내가 폭탄일 경우, 상대방한테 넘겨줌
             if (
               curPlayerClone.bomb &&
@@ -956,8 +972,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
             // 충돌했을때
             if (collision) {
-              console.log("collision");
-
               // 내가 폭탄일 경우, 상대방한테 넘겨줌
               if (!bombChangeHappend) {
                 bombChange(curPlayerClone.id, otherPlayerClone.id);
