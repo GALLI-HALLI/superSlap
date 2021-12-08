@@ -90,12 +90,12 @@ const RegisterPage = () => {
           />
         </div>
         <div className={styles.regiBtnContainer}>
-          <Link to="/">
-            <Button className={styles.regiBtn}>뒤로가기</Button>
-          </Link>
           <Button type="submit" className={styles.regiBtn}>
             가입 하기
           </Button>
+          <Link to="/">
+            <Button className={styles.regiBtn}>뒤로가기</Button>
+          </Link>
         </div>
       </form>
     </div>

@@ -53,7 +53,7 @@ const Hunmin = ({ socket }: TSocket) => {
   };
 
   const nomalUser = {
-    backgroundColor: "rgba(255,255,255, 0.8)",
+    backgroundColor: "rgba(128,128,128, 0.8)",
   };
 
   const answer = {
@@ -63,7 +63,7 @@ const Hunmin = ({ socket }: TSocket) => {
   };
 
   const wrong = {
-    backgroundColor: "rgba(0,0,0, 0.8)",
+    backgroundColor: "rgba(255,0,0, 0.8)",
     border: "1px solid rgba(255, 0, 0, 0.05)",
     boxShadow: "0 0 10px #FF0000",
   };
