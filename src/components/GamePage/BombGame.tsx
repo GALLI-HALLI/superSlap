@@ -206,8 +206,6 @@ let gameEnded = false;
 let gameStart = false;
 
 function joinUser(data: TPlayerBall[], instance: any) {
-  console.log("join user");
-
   let balls = instance.balls;
   let ballMap = instance.ballMap;
 
@@ -361,8 +359,6 @@ const setupSocketEvents = (socket: Socket, end: boolean, instance: any) => {
   function bombChange(ballId1: string, ballId2: string) {
     if (ballId1 === undefined || ballId2 === undefined) return;
 
-    console.log("bomb change");
-
     let data = {
       send: ballId1,
       receive: ballId2,
@@ -373,7 +369,6 @@ const setupSocketEvents = (socket: Socket, end: boolean, instance: any) => {
   }
 
   function gameFinished(loser: string, color: string) {
-    console.log("game ended");
     gameEnded = true;
     end = false;
   }
@@ -519,7 +514,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
   // 첫 랜더링 때 바뀌는 전역변수들 초기화
   useEffect(() => {
-    console.log("게임 설정 초기화");
     initializeBombGame();
   }, []);
 
@@ -573,7 +567,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
     }, 6000);
 
     setTimeout(function () {
-      console.log("캔버스 랜더링 시작");
       render();
       let event = setInterval(function () {
         handleGameEvents();
@@ -922,8 +915,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
           // 충돌했을때
           if (collision) {
-            console.log("collision");
-
             // 내가 폭탄일 경우, 상대방한테 넘겨줌
             if (
               curPlayerClone.bomb &&
@@ -981,8 +972,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
             // 충돌했을때
             if (collision) {
-              console.log("collision");
-
               // 내가 폭탄일 경우, 상대방한테 넘겨줌
               if (!bombChangeHappend) {
                 bombChange(curPlayerClone.id, otherPlayerClone.id);
