@@ -502,7 +502,7 @@ function initializeBombGame() {
 
   // balls = [];
   // ballMap = {};
-  myId = "";
+  // myId = "";
 
   gameEnded = false;
   gameStart = false;
