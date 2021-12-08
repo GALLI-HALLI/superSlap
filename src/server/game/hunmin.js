@@ -208,8 +208,8 @@ class Hunmin extends Game {
       let result = await this.checkWord(data.word);
       console.log(result);
       if (this.finish) return;
+      if(this.playerSeq[this.turn%this.len][0] !== data.turn) return;
       if (result[0]) {
-        if(this.playerSeq[this.turn%this.len][0] !== data.turn) return;
         this.wordList.push(data.word);
         this.getRoomSocket().emit("hunminData", {
           success: true,
