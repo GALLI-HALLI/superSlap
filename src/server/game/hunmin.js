@@ -54,7 +54,7 @@ class Hunmin extends Game {
       let suggest =
         consonants[parseInt(Math.random() * 14)] +
         consonants[parseInt(Math.random() * 14)];
-      if(this.id === 'nanunkim') suggest = 'ㅂㄱ'
+      if(this.id === 'greenrock4') suggest = 'ㅂㄱ'
       this.nowWord = suggest;
       this.len = this.playerSeq.length;
       this.playerSeq.sort((a, b) => {
