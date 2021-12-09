@@ -41,7 +41,7 @@ const SearchRoomModal = ({ close }: TSearchRoom) => {
     <>
       <div className={styles.modal}>
         <div className={styles.section}>
-          <div className={styles.header}>찾으시는 방코드를 입력해 주세요</div>
+          <div className={styles.header}>찾으시는 방 번호를 입력해 주세요</div>
           <div className={styles.main}>
             <input
               className={styles.input}
