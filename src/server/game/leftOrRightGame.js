@@ -8,7 +8,7 @@ class LeftOrRightGame extends Game {
   }
 
   start() {
-    console.log("Left Right game start");
+    
   }
 
   // 유저가 나갔을때
@@ -36,7 +36,6 @@ class LeftOrRightGame extends Game {
   }
 
   initializeSocketEvents(id, socket, nickname) {
-    console.log(`${id} is entered ${Date()}`);
     this.playerScores.set(id, null);
 
     //게임 끝 정보 받아서 넣어주기

@@ -719,7 +719,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
     //일정 시간 후 게임 결과 송신
     setTimeout(function () {
-      console.log("game terminate");
       socket.emit("lrEnd", score);
     }, instance.timer.maxPlayTime * 1000 + 3000 + 3700 + 4000);
   });

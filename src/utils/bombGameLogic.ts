@@ -34,7 +34,6 @@ export function isBallCollision(
   const radiusSum = ballRad * 2;
   const dx = ball2.x - ball1.x;
   const dy = ball2.y - ball1.y;
-  // console.log(gameData.x, gameData.y)
 
   if (radiusSum * radiusSum > dx * dx + dy * dy) {
     //ball collide
@@ -76,7 +75,6 @@ export function adjustPosition(
     xDirection = 1;
     yDirection = -1;
   } else {
-    console.log("문제가 있습니다");
     xDirection = 1;
     yDirection = 1;
   }

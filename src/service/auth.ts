@@ -59,7 +59,6 @@ export const getRoomID = (): Promise<TRoomId> => {
 };
 
 export const searchRoom = (code: TRoomId): Promise<any> => {
-  console.log(code, "asdfasdf");
   return fetch("/api/lobby/enter", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

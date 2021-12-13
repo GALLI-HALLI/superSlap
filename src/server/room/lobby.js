@@ -21,7 +21,6 @@ const createLobbyRoute = (gameSocket) => {
 
   router.post("/enter", (req, res) => {
     const code = req.body.roomId;
-    console.log(req.body);
     if (roomManager.hasRoom(code)) {
       if (roomManager.rooms.get(code).players.size > 7) {
         return res.json({
