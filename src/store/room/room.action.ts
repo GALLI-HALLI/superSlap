@@ -20,7 +20,6 @@ export const getRoomId = () => async (dispatch: Dispatch) => {
   dispatch(getRoomIdLoading());
   try {
     const roomCode = await getRoomID();
-    console.log(roomCode);
     dispatch(getRoomIdSuccess({ roomCode }));
   } catch {
     dispatch(getRoomIdFaliure());

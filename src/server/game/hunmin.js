@@ -41,7 +41,6 @@ class Hunmin extends Game {
     super(room);
     this.playerSeq = [];
     this.playerSocket = [];
-    this.id = this.room.id;
     this.len = 0;
     this.turn = -1;
     this.nowWord = "";
@@ -54,7 +53,6 @@ class Hunmin extends Game {
       let suggest =
         consonants[parseInt(Math.random() * 14)] +
         consonants[parseInt(Math.random() * 14)];
-      if(this.id === 'greenrock4') suggest = 'ㅂㄱ'
       this.nowWord = suggest;
       this.len = this.playerSeq.length;
       this.playerSeq.sort((a, b) => {
@@ -200,13 +198,10 @@ class Hunmin extends Game {
   }
 
   initializeSocketEvents(id, socket, nickname) {
-    console.log(socket + " is entered");
-
     this.joinGame(id, nickname);
 
     socket.on("word", async (data) => {
       let result = await this.checkWord(data.word);
-      console.log(result);
       if (this.finish) return;
       if(this.playerSeq[this.turn%this.len][0] !== data.turn) return;
       if (result[0]) {
