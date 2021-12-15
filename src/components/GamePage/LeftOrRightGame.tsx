@@ -4,20 +4,13 @@ import "./LeftOrRightGame.scss";
 //이미지
 import BlueMonsterImg from "../../image/BlueMonster.png";
 import GreenMonsterImg from "../../image/GreenMonster.png";
-// import ArrowLeftButtonImg from "../../image/ArrowLeftButton.png";
-// import ArrowRightButtonImg from "../../image/ArrowRightButton.png";
 import ArrowLeftButtonImg from "../../image/neonArrowLeft.png";
 import ArrowRightButtonImg from "../../image/neonArrowRight.png";
 // 화살표 버튼 소스(다른 색도 있음) https://www.iconsdb.com/barbie-pink-icons/arrow-left-icon.html
-
-// 반응형
-import { useMediaQuery } from "react-responsive";
+import tutorialImage from "../../image/tutorialLeftRight.png";
 
 // 서버
 import { Socket } from "socket.io-client";
-// import { SocketServerEvent } from "../../constants/socket";
-
-import tutorialImage from "../../image/tutorialLeftRight.png";
 
 //게임 시작 애니메이션
 //총 3.7초 3700
@@ -51,7 +44,7 @@ class GameData {
   };
 
   ballDistance = {
-    x: 10, //임시
+    x: 10,
     y: 32, //공 위아래 간격
   };
 
@@ -84,6 +77,15 @@ class GameData {
     },
   };
 }
+
+type monster = {
+  isBlue: boolean;
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  goLeft: boolean;
+};
 
 class Monster {
   isBlue: boolean;
@@ -192,7 +194,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   tutorial.src = tutorialImage;
 
   //키보드 좌우 클릭 감지
-
   useEffect(() => {
     setTimeout(function () {
       window.addEventListener("keydown", (event) => {
@@ -209,8 +210,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   useEffect(() => {});
 
-  // const isTabletOrMobile = useMediaQuery({ query: "(max-width: 767px)" });
-
   // onclick + touch handler in canvas tag
   const handleCanvasClick = (event: any) => {
     if (
@@ -224,10 +223,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     let x;
     let y;
 
-    // if (isTabletOrMobile) {
-    //   x = event.clientX;
-    //   y = event.clientY;
-    // } else {
     x = event.clientX - rect.left; //canvas.offsetLeft or Right
     y = event.clientY - rect.top;
 
@@ -318,7 +313,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       }
     }, 5);
 
-    if (monsterLRList.lengt === 0) return;
+    if (monsterLRList.length === 0) return;
     // 가로 이동
     let cnt2 = 0;
 
@@ -719,6 +714,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
     //일정 시간 후 게임 결과 송신
     setTimeout(function () {
+      console.log("game terminate");
       socket.emit("lrEnd", score);
     }, instance.timer.maxPlayTime * 1000 + 3000 + 3700 + 4000);
   });

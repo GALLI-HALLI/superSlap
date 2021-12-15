@@ -45,12 +45,8 @@ import {
   TGameIntialData,
   TGameOngoingData,
   TTimerData,
-  TImages,
   TBombFlick,
 } from "../../types/bombGameTypes";
-import { gameEnd } from "../../server/constants/socketEvents";
-import { unstable_renderSubtreeIntoContainer } from "react-dom";
-import { createJsxSpreadAttribute } from "typescript";
 
 /* ================== 조이스틱 관련 시작 ================== */
 
@@ -81,21 +77,12 @@ const handleStop = (event: IJoystickUpdateEvent) => {
 
 const bomb = new Image();
 bomb.src = bombImage;
-
 const gameBackground = new Image();
 gameBackground.src = backgroundImage;
-
 const explosion = new Image();
 explosion.src = explosionImage;
-
 const electric = new Image();
 electric.src = electricImage;
-
-const Images: TImages = {
-  bombIm: bomb,
-  gameBackgroundIm: gameBackground,
-  explosionIm: explosion,
-};
 
 /* ================== 이미지 관련 끝 ================== */
 
@@ -128,21 +115,6 @@ class BombGameData {
     height: 500,
   };
 
-  initialData: TGameIntialData = {
-    ballRad: 20,
-    ballMoveSpeed: 2, // 1 보다 큰 수로 속도 배율
-    bombMoveSpeed: 3, // 폭탄은 유저보다 빠르게
-    maxPlayTime: 30,
-    bombFreezeTime: 1000, // 1초 = 1000
-  };
-
-  ongoingData: TGameOngoingData = {
-    gameTime: 0,
-    gameEnded: false,
-    myBombChangeFreeze: false,
-    otherBombChangeFreeze: false,
-  };
-
   bombFlick: TBombFlick = {
     x: 0,
     a: 1,
@@ -154,9 +126,6 @@ class BombGameData {
   ballMap: Record<string, playerBall> = {};
   myId: string = "";
 
-  gameEnded = false;
-  gameStart = false;
-
   ifEnd = {
     height: -(500 + 140),
   };
@@ -165,12 +134,6 @@ class BombGameData {
     value: 0,
   };
 }
-
-//Note: 현재 픽셀 위치 설정은 canvas 360x500을 기준으로 맞춰져있습니다.
-const gameCanvas: TGameCanvas = {
-  width: 360,
-  height: 500,
-};
 
 const initialData: TGameIntialData = {
   ballRad: 20,
@@ -187,19 +150,6 @@ const ongoingData: TGameOngoingData = {
   otherBombChangeFreeze: false,
 };
 
-const timerData: TTimerData = {
-  progressBarHeight: 0,
-};
-
-const bombFlick: TBombFlick = {
-  x: 0,
-  a: 1,
-  frameCnt: 0,
-  period: 180, //커질수록 천천히 깜빡임
-};
-
-// let balls: TPlayerBall[] = [];
-// let ballMap: Record<string, playerBall> = {};
 let myId: string;
 
 let gameEnded = false;
@@ -400,7 +350,7 @@ function bombFlickering(bombflick: TBombFlick) {
     bombflick.frameCnt = 0;
   }
 
-  return Math.sin(bombFlick.x - 1.57) / 2.7 + 0.37;
+  return Math.sin(bombflick.x - 1.57) / 2.7 + 0.37;
 }
 
 type radius = {
@@ -489,11 +439,6 @@ function initializeBombGame() {
   ongoingData.gameEnded = false;
   ongoingData.myBombChangeFreeze = false;
   ongoingData.otherBombChangeFreeze = false;
-
-  bombFlick.x = 0;
-  bombFlick.a = 1;
-  bombFlick.frameCnt = 0;
-  bombFlick.period = 120;
 
   // balls = [];
   // ballMap = {};
@@ -774,7 +719,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
         //폭탄이 점멸하게
         // f(x) = sin(x * a) * (1/2)
         if (!gameEnded) {
-          let trans = bombFlickering(bombFlick);
+          let trans = bombFlickering(instance.bombFlick);
           ctx.save();
           ctx.globalAlpha = trans;
           ctx.fillStyle = "red";
@@ -847,7 +792,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
     // 게임 종료시 피니쉬 효과 출력
     if (gameEnded) {
-      // ctx.drawImage(explosion, 0, 70, 360, 360);
       drawGameFinish(ctx);
     }
 
@@ -941,7 +885,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
       // 벽 충돌 체크 후 tempSpeed를 업데이트
       let adjustedBallPosition2: number[] = isWallCollision(
         curPlayerClone,
-        gameCanvas,
+        instance.gameCanvas,
         initialData.ballRad
       );
 
@@ -998,8 +942,8 @@ const BombGame = ({ socket }: TBombGameProps) => {
           <canvas
             id="canvasBG"
             ref={canvasRef}
-            height={gameCanvas.height}
-            width={gameCanvas.width}
+            height={instance.gameCanvas.height}
+            width={instance.gameCanvas.width}
           />
         </div>
         <div className="joystick">
