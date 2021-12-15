@@ -4,20 +4,13 @@ import "./LeftOrRightGame.scss";
 //이미지
 import BlueMonsterImg from "../../image/BlueMonster.png";
 import GreenMonsterImg from "../../image/GreenMonster.png";
-// import ArrowLeftButtonImg from "../../image/ArrowLeftButton.png";
-// import ArrowRightButtonImg from "../../image/ArrowRightButton.png";
 import ArrowLeftButtonImg from "../../image/neonArrowLeft.png";
 import ArrowRightButtonImg from "../../image/neonArrowRight.png";
 // 화살표 버튼 소스(다른 색도 있음) https://www.iconsdb.com/barbie-pink-icons/arrow-left-icon.html
-
-// 반응형
-import { useMediaQuery } from "react-responsive";
+import tutorialImage from "../../image/tutorialLeftRight.png";
 
 // 서버
 import { Socket } from "socket.io-client";
-// import { SocketServerEvent } from "../../constants/socket";
-
-import tutorialImage from "../../image/tutorialLeftRight.png";
 
 //게임 시작 애니메이션
 //총 3.7초 3700

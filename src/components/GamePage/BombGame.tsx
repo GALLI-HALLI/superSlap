@@ -45,12 +45,8 @@ import {
   TGameIntialData,
   TGameOngoingData,
   TTimerData,
-  TImages,
   TBombFlick,
 } from "../../types/bombGameTypes";
-import { gameEnd } from "../../server/constants/socketEvents";
-import { unstable_renderSubtreeIntoContainer } from "react-dom";
-import { createJsxSpreadAttribute } from "typescript";
 
 /* ================== 조이스틱 관련 시작 ================== */
 
@@ -81,21 +77,12 @@ const handleStop = (event: IJoystickUpdateEvent) => {
 
 const bomb = new Image();
 bomb.src = bombImage;
-
 const gameBackground = new Image();
 gameBackground.src = backgroundImage;
-
 const explosion = new Image();
 explosion.src = explosionImage;
-
 const electric = new Image();
 electric.src = electricImage;
-
-const Images: TImages = {
-  bombIm: bomb,
-  gameBackgroundIm: gameBackground,
-  explosionIm: explosion,
-};
 
 /* ================== 이미지 관련 끝 ================== */
 
@@ -185,10 +172,6 @@ const ongoingData: TGameOngoingData = {
   gameEnded: false,
   myBombChangeFreeze: false,
   otherBombChangeFreeze: false,
-};
-
-const timerData: TTimerData = {
-  progressBarHeight: 0,
 };
 
 const bombFlick: TBombFlick = {
