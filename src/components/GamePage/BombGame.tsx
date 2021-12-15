@@ -115,21 +115,6 @@ class BombGameData {
     height: 500,
   };
 
-  initialData: TGameIntialData = {
-    ballRad: 20,
-    ballMoveSpeed: 2, // 1 보다 큰 수로 속도 배율
-    bombMoveSpeed: 3, // 폭탄은 유저보다 빠르게
-    maxPlayTime: 30,
-    bombFreezeTime: 1000, // 1초 = 1000
-  };
-
-  ongoingData: TGameOngoingData = {
-    gameTime: 0,
-    gameEnded: false,
-    myBombChangeFreeze: false,
-    otherBombChangeFreeze: false,
-  };
-
   bombFlick: TBombFlick = {
     x: 0,
     a: 1,
@@ -140,9 +125,6 @@ class BombGameData {
   balls: TPlayerBall[] = [];
   ballMap: Record<string, playerBall> = {};
   myId: string = "";
-
-  gameEnded = false;
-  gameStart = false;
 
   ifEnd = {
     height: -(500 + 140),
@@ -168,15 +150,6 @@ const ongoingData: TGameOngoingData = {
   otherBombChangeFreeze: false,
 };
 
-// const bombFlick: TBombFlick = {
-//   x: 0,
-//   a: 1,
-//   frameCnt: 0,
-//   period: 180, //커질수록 천천히 깜빡임
-// };
-
-// let balls: TPlayerBall[] = [];
-// let ballMap: Record<string, playerBall> = {};
 let myId: string;
 
 let gameEnded = false;
@@ -819,7 +792,6 @@ const BombGame = ({ socket }: TBombGameProps) => {
 
     // 게임 종료시 피니쉬 효과 출력
     if (gameEnded) {
-      // ctx.drawImage(explosion, 0, 70, 360, 360);
       drawGameFinish(ctx);
     }
 
