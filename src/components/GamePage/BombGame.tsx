@@ -168,12 +168,12 @@ const ongoingData: TGameOngoingData = {
   otherBombChangeFreeze: false,
 };
 
-const bombFlick: TBombFlick = {
-  x: 0,
-  a: 1,
-  frameCnt: 0,
-  period: 180, //커질수록 천천히 깜빡임
-};
+// const bombFlick: TBombFlick = {
+//   x: 0,
+//   a: 1,
+//   frameCnt: 0,
+//   period: 180, //커질수록 천천히 깜빡임
+// };
 
 // let balls: TPlayerBall[] = [];
 // let ballMap: Record<string, playerBall> = {};
@@ -377,7 +377,7 @@ function bombFlickering(bombflick: TBombFlick) {
     bombflick.frameCnt = 0;
   }
 
-  return Math.sin(bombFlick.x - 1.57) / 2.7 + 0.37;
+  return Math.sin(bombflick.x - 1.57) / 2.7 + 0.37;
 }
 
 type radius = {
@@ -466,11 +466,6 @@ function initializeBombGame() {
   ongoingData.gameEnded = false;
   ongoingData.myBombChangeFreeze = false;
   ongoingData.otherBombChangeFreeze = false;
-
-  bombFlick.x = 0;
-  bombFlick.a = 1;
-  bombFlick.frameCnt = 0;
-  bombFlick.period = 120;
 
   // balls = [];
   // ballMap = {};
@@ -751,7 +746,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
         //폭탄이 점멸하게
         // f(x) = sin(x * a) * (1/2)
         if (!gameEnded) {
-          let trans = bombFlickering(bombFlick);
+          let trans = bombFlickering(instance.bombFlick);
           ctx.save();
           ctx.globalAlpha = trans;
           ctx.fillStyle = "red";
