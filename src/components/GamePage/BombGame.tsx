@@ -153,12 +153,6 @@ class BombGameData {
   };
 }
 
-//Note: 현재 픽셀 위치 설정은 canvas 360x500을 기준으로 맞춰져있습니다.
-const gameCanvas: TGameCanvas = {
-  width: 360,
-  height: 500,
-};
-
 const initialData: TGameIntialData = {
   ballRad: 20,
   ballMoveSpeed: 4, // 1 보다 큰 수로 속도 배율
@@ -924,7 +918,7 @@ const BombGame = ({ socket }: TBombGameProps) => {
       // 벽 충돌 체크 후 tempSpeed를 업데이트
       let adjustedBallPosition2: number[] = isWallCollision(
         curPlayerClone,
-        gameCanvas,
+        instance.gameCanvas,
         initialData.ballRad
       );
 
@@ -981,8 +975,8 @@ const BombGame = ({ socket }: TBombGameProps) => {
           <canvas
             id="canvasBG"
             ref={canvasRef}
-            height={gameCanvas.height}
-            width={gameCanvas.width}
+            height={instance.gameCanvas.height}
+            width={instance.gameCanvas.width}
           />
         </div>
         <div className="joystick">
