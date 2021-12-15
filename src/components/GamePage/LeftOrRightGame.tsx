@@ -78,6 +78,15 @@ class GameData {
   };
 }
 
+type monster = {
+  isBlue: boolean;
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  goLeft: boolean;
+};
+
 class Monster {
   isBlue: boolean;
   width: number;
@@ -185,7 +194,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
   tutorial.src = tutorialImage;
 
   //키보드 좌우 클릭 감지
-
   useEffect(() => {
     setTimeout(function () {
       window.addEventListener("keydown", (event) => {
@@ -202,8 +210,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
 
   useEffect(() => {});
 
-  // const isTabletOrMobile = useMediaQuery({ query: "(max-width: 767px)" });
-
   // onclick + touch handler in canvas tag
   const handleCanvasClick = (event: any) => {
     if (
@@ -217,10 +223,6 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
     let x;
     let y;
 
-    // if (isTabletOrMobile) {
-    //   x = event.clientX;
-    //   y = event.clientY;
-    // } else {
     x = event.clientX - rect.left; //canvas.offsetLeft or Right
     y = event.clientY - rect.top;
 
@@ -311,7 +313,7 @@ function LeftOrRightGame({ socket }: TBombGameProps) {
       }
     }, 5);
 
-    if (monsterLRList.lengt === 0) return;
+    if (monsterLRList.length === 0) return;
     // 가로 이동
     let cnt2 = 0;
 
